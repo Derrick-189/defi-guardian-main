@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+{% block title %}State Visualization — DeFi Guardian{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Page Layout ── */
+.viz-page { display:flex; flex-direction:column; gap:1.25rem; }
+
+/* ── Stats row ── */
+.viz-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; }
+.viz-stat { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.75rem; text-align:center; }
+.viz-stat-val { font-size:1.6rem; font-weight:800; color:var(--accent); line-height:1; }
+.viz-stat-lbl { font-size:0.7rem; color:var(--text2); text-transform:uppercase; letter-spacing:.06em; margin-top:.2rem; }
+
+/* ── Main two-column area ── */
+.viz-main { display:grid; grid-template-columns:1fr 300px; gap:1.25rem; align-items:start; }
+
+/* ── D3 Canvas ── */
+.viz-canvas-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.viz-canvas-toolbar { display:flex; align-items:center; gap:.5rem; padding:.6rem 1rem; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.viz-canvas-toolbar label { font-size:.78rem; color:var(--text2); white-space:nowrap; }
+#viz-canvas { width:100%; height:500px; background:#080d14; display:block; cursor:grab; }
+#viz-canvas:active { cursor:grabbing; }
+.viz-legend { display:flex; gap:1rem; flex-wrap:wrap; padding:.6rem 1rem; border-top:1px solid var(--border); }
+.legend-item { display:flex; align-items:center; gap:.35rem; font-size:.75rem; color:var(--text2); }
+.legend-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+
+/* ── Right panel ── */
+.node-info-panel { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1rem; }
+.node-info-title { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text2); margin-bottom:.75rem; }
+.node-info-name { font-size:1.05rem; font-weight:700; color:var(--text); font-family:'JetBrains Mono',monospace; margin-bottom:.5rem; }
+.node-info-row { display:flex; justify-content:space-between; font-size:.8rem; padding:.3rem 0; border-bottom:1px solid var(--border); }
+.node-info-row:last-child { border-bottom:none; }
+.node-info-key { color:var(--text2); }
+.node-info-val { font-family:'JetBrains Mono',monospace; font-size:.78rem; }
+
+/* LTL list */
+.ltl-item { display:flex; align-items:flex-start; gap:.5rem; padding:.5rem .75rem; border-bottom:1px solid var(--border); font-size:.8rem; }
+.ltl-item:last-child { border-bottom:none; }
+.ltl-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:.3rem; }
+.ltl-name { font-family:'JetBrains Mono',monospace; font-size:.75rem; font-weight:600; }
+.ltl-formula { color:var(--text2); font-size:.72rem; margin-top:.1rem; }
+
+/* ── Professional FSM (Mermaid) ── */
+.fsm-section { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:1.25rem; }
+.fsm-header { display:flex; align-items:center; gap:.5rem; margin-bottom:1rem; }
+.fsm-title { font-size:.9rem; font-weight:700; color:var(--text); }
+.fsm-subtitle { font-size:.75rem; color:var(--text2); margin-left:auto; }
+.fsm-tabs { display:flex; gap:.5rem; margin-bottom:1rem; }
+.fsm-tab { font-size:.78rem; padding:.3rem .75rem; border-radius:5px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; transition:all .15s; }
+.fsm-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.mermaid-wrap { background:#0a0f1a; border-radius:8px; padding:1.5rem; overflow-x:auto; min-height:220px; display:flex; justify-content:center; align-items:center; }
+.mermaid-wrap svg { max-width:100%; }
+
+/* Status badges */
+.badge-pass { background:#1a4731; color:#4ade80; border:1px solid #2d6a4f; border-radius:4px; padding:1px 6px; font-size:.7rem; font-weight:700; }
+.badge-fail { background:#4a1515; color:#f87171; border:1px solid #7f1d1d; border-radius:4px; padding:1px 6px; font-size:.7rem; font-weight:700; }
+.badge-sim { background:#1a2e4a; color:#60a5fa; border:1px solid #1e3a5f; border-radius:4px; padding:1px 6px; font-size:.7rem; }
+
+/* Tooltip */
+.viz-tooltip { position:fixed; background:rgba(10,15,26,.96); border:1px solid var(--border); border-radius:6px; padding:.6rem .85rem; font-size:.78rem; pointer-events:none; z-index:9999; display:none; max-width:260px; }
+.viz-tooltip .tt-title { font-weight:700; color:var(--text); margin-bottom:.35rem; font-family:'JetBrains Mono',monospace; }
+.viz-tooltip .tt-row { display:flex; justify-content:space-between; gap:1rem; color:var(--text2); margin-top:.15rem; }
+.viz-tooltip .tt-val { color:var(--text); font-family:'JetBrains Mono',monospace; }
+
+@media (max-width:900px) {
+  .viz-main { grid-template-columns:1fr; }
+  .viz-stats { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title"><i class="fa-solid fa-diagram-project"></i> State Visualization</h1>
+    <p class="page-subtitle">Interactive state-space explorer and FSM diagram from the latest verification run</p>
+  </div>
+  <div style="display:flex;gap:.5rem;align-items:center;">
+    <span id="sim-badge" class="badge-sim" hidden>Simulated</span>
+    <button class="btn btn-sm btn-ghost" onclick="loadAll()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+  </div>
+</div>
+
+<div class="viz-page">
+
+  <!-- Stats row -->
+  <div class="viz-stats">
+    <div class="viz-stat"><div class="viz-stat-val" id="vs-nodes">—</div><div class="viz-stat-lbl">States</div></div>
+    <div class="viz-stat"><div class="viz-stat-val" id="vs-edges">—</div><div class="viz-stat-lbl">Transitions</div></div>
+    <div class="viz-stat"><div class="viz-stat-val text-danger" id="vs-errors">—</div><div class="viz-stat-lbl">Violations</div></div>
+    <div class="viz-stat"><div class="viz-stat-val" id="vs-depth">—</div><div class="viz-stat-lbl">Max Depth</div></div>
+  </div>
+
+  <!-- Main area -->
+  <div class="viz-main">
+
+    <!-- Left: D3 canvas -->
+    <div class="viz-canvas-card">
+      <div class="viz-canvas-toolbar">
+        <label>Layout:</label>
+        <select id="layout-sel" class="input select input-sm" style="width:130px" onchange="relayout()">
+          <option value="force">Force-directed</option>
+          <option value="hierarchical">Hierarchical</option>
+          <option value="circular">Circular</option>
+        </select>
+        <label style="margin-left:.5rem;">Size:</label>
+        <input type="range" id="node-size" min="8" max="28" value="16" style="width:70px" oninput="setNodeRadius(this.value)">
+        <label style="margin-left:.5rem;"><input type="checkbox" id="show-labels" checked onchange="render2d()" style="width:auto"> Labels</label>
+        <input type="search" id="node-search" class="input input-sm" placeholder="Search…" style="width:130px;margin-left:.5rem" oninput="render2d()">
+        <div style="margin-left:auto;display:flex;gap:.5rem">
+          <button class="btn btn-sm btn-ghost" onclick="fitGraph()"><i class="fa-solid fa-compress-arrows-alt"></i></button>
+          <button class="btn btn-sm btn-ghost" onclick="exportSVG()"><i class="fa-solid fa-download"></i></button>
+        </div>
+      </div>
+      <svg id="viz-canvas">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#58a6ff" opacity=".8"/>
+          </marker>
+          <marker id="arrow-err" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#f85149" opacity=".9"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+        <g id="canvas-root">
+          <g id="link-layer"></g>
+          <g id="node-layer"></g>
+        </g>
+      </svg>
+      <div class="viz-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Initial</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div>Normal</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Accept</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f85149"></div>Error/Violation</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#bc8cff"></div>Deadlock</div>
+        <span style="margin-left:auto;font-size:.7rem;color:var(--text2)">Drag · Scroll to zoom · Click for details</span>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="node-info-panel">
+        <div class="node-info-title">Node Details</div>
+        <div id="node-info-content">
+          <p class="text-muted text-sm" style="text-align:center;padding:.75rem 0">Click a node to inspect</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0;">
+        <div class="card-header" style="padding:.65rem 1rem;margin-bottom:0;">
+          <h2 class="card-title" style="font-size:.85rem;"><i class="fa-solid fa-list-check"></i> LTL Properties</h2>
+        </div>
+        <div id="viz-ltl-list" style="max-height:230px;overflow-y:auto;">
+          <p class="text-muted text-sm" style="padding:1rem;text-align:center">Loading…</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:.75rem;">
+        <div class="card-title" style="font-size:.82rem;margin-bottom:.5rem;"><i class="fa-solid fa-terminal"></i> Call Trace</div>
+        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+          <input type="range" id="trace-slider" min="0" max="0" value="0" style="flex:1;min-width:80px" disabled oninput="jumpTrace(this.value)">
+          <span id="trace-lbl" style="font-size:.75rem;color:var(--text2);white-space:nowrap;">Step 0/0</span>
+        </div>
+        <div id="trace-step-info" style="font-size:.75rem;color:var(--text2);margin-top:.4rem;font-family:'JetBrains Mono',monospace;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional FSM Diagram Section -->
+  <div class="fsm-section">
+    <div class="fsm-header">
+      <i class="fa-solid fa-diagram-nested" style="color:var(--accent)"></i>
+      <span class="fsm-title">DeFi Lending Pool — Formal State Machine</span>
+      <span class="fsm-subtitle">Verified FSM · LTL-annotated transitions</span>
+      <button class="btn btn-xs btn-ghost" onclick="refreshFSM()" style="margin-left:.5rem">
+        <i class="fa-solid fa-arrows-rotate"></i> Sync
+      </button>
+    </div>
+
+    <!-- FSM tabs: Lending Pool / Counterexample Trace -->
+    <div class="fsm-tabs">
+      <button class="fsm-tab active" data-tab="lending" onclick="switchFSM('lending',this)">Lending Pool FSM</button>
+      <button class="fsm-tab" data-tab="trace" onclick="switchFSM('trace',this)">Counterexample Trace</button>
+      <button class="fsm-tab" data-tab="erc20" onclick="switchFSM('erc20',this)">ERC-20 Token FSM</button>
+    </div>
+
+    <!-- Lending FSM (always shown) -->
+    <div id="fsm-lending" class="mermaid-wrap">
+      <div class="mermaid" id="mmd-lending">%%{init:{'theme':'dark','themeVariables':{'primaryColor':'#1a2e4a','edgeLabelBackground':'#0d1117','tertiaryColor':'#1a1a2e'}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> Idle : deploy
+
+  Idle --> Collateralized : deposit(amount)\n[amount > 0]
+  Collateralized --> Idle : withdraw(amount)\n[debt == 0]
+  Collateralized --> DebtActive : borrow(amount)\n[collateral ≥ amount × price]
+  DebtActive --> Collateralized : repay(amount)\n[amount ≤ debt]
+  DebtActive --> Liquidated : liquidate()\n[healthFactor < 150]
+  Liquidated --> Idle : reset()
+
+  state Idle {
+    note: "No user position\nlock = false\ndebt = 0"
+  }
+  state Collateralized {
+    note: "collateral > 0\ndebt = 0\n✅ safe to borrow"
+  }
+  state DebtActive {
+    note: "debt > 0\n⚠ health monitored\ninvariant: debt ≤ col×price"
+  }
+  state Liquidated {
+    note: "🔴 position seized\nhealthFactor < 150"
+  }
+
+  classDef idle fill:#1a2e4a,stroke:#58a6ff,stroke-width:2px,color:#c9d1d9
+  classDef safe fill:#1a4731,stroke:#4ade80,stroke-width:2px,color:#c9d1d9
+  classDef risky fill:#3d2b1a,stroke:#f59e0b,stroke-width:2px,color:#c9d1d9
+  classDef danger fill:#4a1515,stroke:#f85149,stroke-width:2px,color:#f87171
+  class Idle idle
+  class Collateralized safe
+  class DebtActive risky
+  class Liquidated danger</div>
+    </div>
+
+    <!-- Counterexample trace FSM (hidden until loaded) -->
+    <div id="fsm-trace" class="mermaid-wrap" style="display:none;">
+      <div id="fsm-trace-content" style="color:var(--text2);font-size:.85rem;">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading counterexample trace…
+      </div>
+    </div>
+
+    <!-- ERC-20 FSM -->
+    <div id="fsm-erc20" class="mermaid-wrap" style="display:none;">
+      <div class="mermaid" id="mmd-erc20">%%{init:{'theme':'dark','themeVariables':{'primaryColor':'#1a2e4a','edgeLabelBackground':'#0d1117'}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> Deployed : constructor(totalSupply)
+
+  Deployed --> Active : transfer(to, amount)\n[balance[from] ≥ amount]
+  Active --> Active : transfer / approve / transferFrom
+  Active --> Paused : pause() [onlyOwner]
+  Paused --> Active : unpause() [onlyOwner]
+  Active --> Burned : burn(amount)\n[balance ≥ amount]
+  Deployed --> Active : mint(to, amount) [onlyOwner]
+
+  classDef deployed fill:#1a2e4a,stroke:#58a6ff,color:#c9d1d9
+  classDef active fill:#1a4731,stroke:#4ade80,color:#c9d1d9
+  classDef paused fill:#3d2b1a,stroke:#f59e0b,color:#c9d1d9
+  classDef burned fill:#4a1515,stroke:#f85149,color:#f87171
+  class Deployed deployed
+  class Active active
+  class Paused paused
+  class Burned burned</div>
+    </div>
+
+    <!-- LTL annotations below diagram -->
+    <div style="margin-top:1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;" id="ltl-annotations"></div>
+  </div>
+
+</div>
+
+<div class="viz-tooltip" id="viz-tooltip"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ── Config ── */
+var COLORS = {
+  initial:'#4ade80', normal:'#58a6ff', accept:'#f59e0b',
+  error:'#f85149',   deadlock:'#bc8cff'
+};
+var W=800, H=500;
+var nodeRadius=16, showLabels=true;
+var gData={nodes:[],links:[]}, ltlData=[], traceSteps=[];
+var traceIdx=0;
+
+/* ── Mermaid init ── */
+mermaid.initialize({
+  startOnLoad:false,
+  theme:'dark',
+  themeVariables:{ primaryColor:'#1a2e4a', edgeLabelBackground:'#0d1117',
+                   nodeTextColor:'#c9d1d9', lineColor:'#58a6ff' },
+  securityLevel:'loose',
+  flowchart:{ htmlLabels:true, useMaxWidth:true }
+});
+
+/* ── D3 setup ── */
+var svg = d3.select('#viz-canvas');
+var root = svg.select('#canvas-root');
+var linkLayer = root.select('#link-layer');
+var nodeLayer = root.select('#node-layer');
+var tooltip = document.getElementById('viz-tooltip');
+
+// Zoom behaviour
+var zoom = d3.zoom().scaleExtent([.1,6])
+  .on('zoom', function(e){ root.attr('transform', e.transform); });
+svg.call(zoom);
+
+// Simulation
+var sim = d3.forceSimulation()
+  .force('link', d3.forceLink().id(function(d){return d.id;}).distance(110))
+  .force('charge', d3.forceManyBody().strength(-280))
+  .force('center', d3.forceCenter(W/2, H/2))
+  .force('collide', d3.forceCollide(nodeRadius+8))
+  .on('tick', ticked);
+
+/* ── Load everything ── */
+function loadAll(){
+  Promise.all([
+    fetch('/api/state-graph/0',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};}),
+    fetch('/api/ltl-properties',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];}),
+    fetch('/api/counterexample/latest',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})
+  ]).then(function(results){
+    var rawGraph=results[0], ltl=results[1], ce=results[2];
+    ltlData = Array.isArray(ltl)?ltl:[];
+    
+    // Build graph
+    gData = normalise(rawGraph, ltlData);
+    if(!gData.nodes.length) gData = defiDemoGraph(ltlData);
+    
+    // Stats
+    document.getElementById('vs-nodes').textContent = gData.nodes.length;
+    document.getElementById('vs-edges').textContent = gData.links.length;
+    document.getElementById('vs-errors').textContent = ltlData.filter(function(p){return p.success===false;}).length;
+    var maxD = gData.nodes.reduce(function(m,n){return Math.max(m,n.depth||0);},0);
+    document.getElementById('vs-depth').textContent = maxD;
+    
+    // Simulated badge
+    if(ce.simulated) document.getElementById('sim-badge').removeAttribute('hidden');
+    
+    // Trace steps
+    if(ce.trace_data && ce.trace_data.steps){
+      traceSteps = ce.trace_data.steps||[];
+      var sl=document.getElementById('trace-slider');
+      sl.max=Math.max(0,traceSteps.length-1);
+      sl.disabled=traceSteps.length===0;
+      updateTraceLabel(0);
+    }
+    
+    // LTL annotations
+    renderLTL(ltlData);
+    renderLTLAnnotations(ltlData);
+    
+    // D3 graph
+    startSim();
+    
+    // Trace FSM if we have steps
+    if(traceSteps.length) buildTraceFSM(traceSteps, ltlData);
+    
+  }).catch(function(err){ console.error('loadAll error',err); gData=defiDemoGraph([]); startSim(); });
+}
+
+/* ── Default DeFi demo graph when no data from server ── */
+function defiDemoGraph(ltl){
+  var failedNames = new Set((ltl||[]).filter(function(p){return p.success===false;}).map(function(p){return p.name;}));
+  var nodes=[
+    {id:'INIT',       label:'INIT',         type:'initial',  depth:0, desc:'Start state: lock=false, debt=0, collateral=0'},
+    {id:'IDLE',       label:'Idle',         type:'normal',   depth:0, desc:'No active position. User can deposit.'},
+    {id:'COLLAT',     label:'Collateralized',type:'normal',  depth:1, desc:'Collateral deposited. Ready to borrow.'},
+    {id:'DEBT',       label:'DebtActive',   type:'accept',   depth:2, desc:'Active loan. Invariant: debt ≤ collateral × price'},
+    {id:'REPAID',     label:'Repaid',       type:'normal',   depth:2, desc:'Loan repaid. Ready to withdraw.'},
+    {id:'LIQUIDATED', label:'Liquidated',   type:'error',    depth:3, desc:'Health factor < 150%. Position seized.'},
+  ];
+  var links=[
+    {source:'INIT',    target:'IDLE',       label:'deploy'},
+    {source:'IDLE',    target:'COLLAT',     label:'deposit(amt)'},
+    {source:'COLLAT',  target:'IDLE',       label:'withdraw [debt=0]'},
+    {source:'COLLAT',  target:'DEBT',       label:'borrow(amt) [col≥amt×p]'},
+    {source:'DEBT',    target:'REPAID',     label:'repay(debt)'},
+    {source:'DEBT',    target:'LIQUIDATED', label:'liquidate [hf<150]'},
+    {source:'REPAID',  target:'IDLE',       label:'withdraw'},
+    {source:'LIQUIDATED',target:'IDLE',     label:'reset'},
+  ];
+  return {nodes:nodes,links:links};
+}
+
+/* ── Normalise raw API graph ── */
+function normalise(d, ltl){
+  if(!d||!d.nodes||!d.nodes.length) return {nodes:[],links:[]};
+  var failed=new Set((ltl||[]).filter(function(p){return p.success===false;}).map(function(p){return p.name;}));
+  var nodes=(d.nodes||[]).map(function(n){
+    var t=n.type||'normal';
+    if(failed.has(n.id)||failed.has(n.label)) t='error';
+    return Object.assign({},n,{type:t,depth:n.depth||0,desc:n.description||n.label||n.id});
+  });
+  var nodeSet=new Set(nodes.map(function(n){return n.id;}));
+  var links=(d.links||d.edges||[]).filter(function(e){
+    var s=typeof e.source==='object'?e.source.id:e.source;
+    var t=typeof e.target==='object'?e.target.id:e.target;
+    return nodeSet.has(s)&&nodeSet.has(t);
+  }).map(function(e){
+    return {source:typeof e.source==='object'?e.source.id:e.source,
+            target:typeof e.target==='object'?e.target.id:e.target,
+            label:e.label||e.action||''};
+  });
+  return {nodes:nodes,links:links};
+}
+
+/* ── D3 Force Simulation ── */
+function startSim(){
+  var layout=document.getElementById('layout-sel').value;
+  var nd=gData.nodes.map(function(n){return Object.assign({},n);});
+  var ld=gData.links.map(function(l){return Object.assign({},l);});
+  
+  applyLayout(nd,layout);
+  render2d(nd,ld);
+  
+  sim.nodes(nd);
+  sim.force('link').links(ld);
+  if(layout==='force') sim.alpha(1).restart();
+  else sim.stop();
+}
+
+function applyLayout(nodes,layout){
+  var cx=W/2,cy=H/2;
+  if(layout==='circular'){
+    var r=180, n=nodes.length;
+    nodes.forEach(function(d,i){d.x=cx+r*Math.cos(2*Math.PI*i/n);d.y=cy+r*Math.sin(2*Math.PI*i/n);d.fx=d.x;d.fy=d.y;});
+  } else if(layout==='hierarchical'){
+    var maxD=nodes.reduce(function(m,d){return Math.max(m,d.depth||0);},0)||1;
+    nodes.forEach(function(d){
+      d.fy=(d.depth||0)/maxD*(H-120)+60;
+      d.fx=undefined;
+    });
+  } else {
+    nodes.forEach(function(d){d.fx=undefined;d.fy=undefined;});
+  }
+}
+
+function relayout(){
+  gData.nodes.forEach(function(n){n.fx=undefined;n.fy=undefined;});
+  startSim();
+}
+
+function setNodeRadius(v){ nodeRadius=parseInt(v); startSim(); }
+
+function render2d(nd,ld){
+  nd=nd||sim.nodes(); ld=ld||sim.force('link').links()||[];
+  var search=(document.getElementById('node-search').value||'').toLowerCase();
+  showLabels=document.getElementById('show-labels').checked;
+  
+  // Filter
+  var visible=new Set(nd.filter(function(n){return !search||n.label.toLowerCase().includes(search)||n.id.toLowerCase().includes(search);}).map(function(n){return n.id;}));
+  
+  // Links
+  var link=linkLayer.selectAll('g.lnk').data(ld,function(d){return d.source.id+'-'+d.target.id;});
+  link.exit().remove();
+  var linkEnter=link.enter().append('g').attr('class','lnk');
+  linkEnter.append('line');
+  linkEnter.append('text').attr('class','link-label').attr('text-anchor','middle').attr('font-size','9').attr('fill','#8b949e');
+  link=linkEnter.merge(link);
+  link.style('opacity',function(d){
+    var s=typeof d.source==='object'?d.source.id:d.source;
+    var t=typeof d.target==='object'?d.target.id:d.target;
+    return (visible.has(s)&&visible.has(t))?1:0.15;
+  });
+  link.select('line').attr('stroke','#58a6ff').attr('stroke-width',1.5).attr('stroke-opacity',.5)
+    .attr('marker-end',function(d){
+      var t=typeof d.target==='object'?d.target:nd.find(function(n){return n.id===d.target;});
+      return (t&&t.type==='error')?'url(#arrow-err)':'url(#arrow)';
+    });
+  
+  // Nodes
+  var node=nodeLayer.selectAll('g.nd').data(nd,function(d){return d.id;});
+  node.exit().remove();
+  var nodeEnter=node.enter().append('g').attr('class','nd').style('cursor','pointer')
+    .call(d3.drag().on('start',dragstart).on('drag',dragged).on('end',dragend))
+    .on('click',function(e,d){ showNodeInfo(d); })
+    .on('mouseover',function(e,d){ showTooltip(e,d); })
+    .on('mouseout',function(){ tooltip.style.display='none'; });
+  nodeEnter.append('circle');
+  nodeEnter.append('text').attr('text-anchor','middle').attr('dominant-baseline','central').attr('font-size','9').attr('fill','#fff').attr('font-weight','600').attr('pointer-events','none');
+  nodeEnter.append('text').attr('class','node-label').attr('text-anchor','middle').attr('font-size','10').attr('fill','#c9d1d9').attr('dy',function(){return nodeRadius+12;}).attr('pointer-events','none');
+  
+  node=nodeEnter.merge(node);
+  node.style('opacity',function(d){return visible.has(d.id)?1:0.15;});
+  node.select('circle')
+    .attr('r',nodeRadius)
+    .attr('fill',function(d){return COLORS[d.type]||COLORS.normal;})
+    .attr('stroke',function(d){return d.type==='initial'?'#fff':'rgba(255,255,255,.2)';})
+    .attr('stroke-width',function(d){return d.type==='initial'?2.5:1;})
+    .attr('filter',function(d){return d.type==='error'?'url(#glow)':'none';});
+  node.select('text:not(.node-label)').text(function(d){
+    return (d.label||d.id).substring(0,3).toUpperCase();
+  });
+  node.select('text.node-label').text(function(d){return showLabels?(d.label||d.id):'';});
+  
+  // Re-assign simulation
+  sim.nodes(nd).on('tick',function(){
+    link.select('line')
+      .attr('x1',function(d){return d.source.x;}).attr('y1',function(d){return d.source.y;})
+      .attr('x2',function(d){return d.target.x;}).attr('y2',function(d){return d.target.y;});
+    link.select('text').attr('x',function(d){return (d.source.x+d.target.x)/2;}).attr('y',function(d){return (d.source.y+d.target.y)/2-5;})
+      .text(function(d){return showLabels?(d.label||''):'';});
+    node.attr('transform',function(d){return 'translate('+d.x+','+d.y+')';});
+  });
+}
+
+function ticked(){} // handled in render2d
+
+function dragstart(e,d){ if(!e.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; }
+function dragged(e,d){ d.fx=e.x; d.fy=e.y; }
+function dragend(e,d){ if(!e.active) sim.alphaTarget(0); }
+
+function fitGraph(){
+  svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity.translate(W/4,H/4).scale(.7));
+}
+
+function exportSVG(){
+  var s=new XMLSerializer();
+  var str=s.serializeToString(document.getElementById('viz-canvas'));
+  var b=new Blob([str],{type:'image/svg+xml'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='state-graph.svg'; a.click();
+}
+
+/* ── Node info panel ── */
+function showNodeInfo(d){
+  var html='<div class="node-info-name">'+escH(d.label||d.id)+'</div>';
+  html+='<div style="margin-bottom:.5rem"><span style="background:'+COLORS[d.type]+';color:#000;border-radius:3px;padding:1px 6px;font-size:.7rem;font-weight:700;">'+escH(d.type.toUpperCase())+'</span></div>';
+  html+='<div class="node-info-row"><span class="node-info-key">State ID</span><span class="node-info-val">'+escH(d.id)+'</span></div>';
+  html+='<div class="node-info-row"><span class="node-info-key">Depth</span><span class="node-info-val">'+(d.depth||0)+'</span></div>';
+  if(d.desc) html+='<div class="node-info-row" style="flex-direction:column;align-items:flex-start;"><span class="node-info-key">Description</span><span class="node-info-val" style="margin-top:.2rem;color:var(--text2);font-size:.75rem;">'+escH(d.desc)+'</span></div>';
+  
+  // Show if any LTL violated here
+  var ltlViolated=ltlData.filter(function(p){return !p.success&&(p.name===d.id||p.name===d.label);});
+  if(ltlViolated.length){
+    html+='<div style="margin-top:.5rem;padding:.4rem;background:#4a1515;border-radius:4px;font-size:.75rem;color:#f87171;"><i class="fa-solid fa-triangle-exclamation"></i> LTL violation: '+escH(ltlViolated[0].name)+'</div>';
+  }
+  document.getElementById('node-info-content').innerHTML=html;
+  
+  // Highlight trace path to this node
+  var traceToNode=traceSteps.filter(function(s){
+    return (s.proc_name===d.id||s.proc_name===d.label||String(s.state)===d.id);
+  });
+  if(traceToNode.length){
+    var sl=document.getElementById('trace-slider');
+    sl.value=Math.min(traceSteps.indexOf(traceToNode[0]), parseInt(sl.max));
+    jumpTrace(sl.value);
+  }
+}
+
+/* ── Tooltip ── */
+function showTooltip(e,d){
+  tooltip.innerHTML='<div class="tt-title">'+escH(d.label||d.id)+'</div>'+
+    '<div class="tt-row"><span>Type</span><span class="tt-val">'+escH(d.type)+'</span></div>'+
+    '<div class="tt-row"><span>Depth</span><span class="tt-val">'+(d.depth||0)+'</span></div>'+
+    (d.desc?'<div class="tt-row" style="flex-direction:column"><span>'+escH(d.desc.substring(0,80))+'</span></div>':'');
+  tooltip.style.display='block';
+  tooltip.style.left=(e.clientX+12)+'px';
+  tooltip.style.top=(e.clientY-12)+'px';
+}
+document.addEventListener('mousemove',function(e){ if(tooltip.style.display!=='none'){ tooltip.style.left=(e.clientX+12)+'px'; tooltip.style.top=(e.clientY-12)+'px'; } });
+
+/* ── LTL list ── */
+function renderLTL(ltl){
+  var el=document.getElementById('viz-ltl-list');
+  if(!ltl||!ltl.length){ el.innerHTML='<p class="text-muted text-sm" style="padding:1rem;text-align:center">No properties found</p>'; return; }
+  el.innerHTML=ltl.map(function(p){
+    var pass=p.success!==false;
+    var dot=pass?'#4ade80':'#f85149';
+    return '<div class="ltl-item">'+
+      '<div class="legend-dot ltl-dot" style="background:'+dot+'"></div>'+
+      '<div><div class="ltl-name">'+escH(p.name||'unnamed')+'</div>'+
+      (p.formula?'<div class="ltl-formula">'+escH(p.formula)+'</div>':'')+
+      '</div>'+
+      '<span style="margin-left:auto;flex-shrink:0"><span class="'+(pass?'badge-pass':'badge-fail')+'">'+(pass?'PASS':'FAIL')+'</span></span>'+
+      '</div>';
+  }).join('');
+}
+
+/* ── LTL annotations below diagram ── */
+function renderLTLAnnotations(ltl){
+  var el=document.getElementById('ltl-annotations');
+  if(!ltl||!ltl.length){ el.innerHTML=''; return; }
+  el.innerHTML=ltl.map(function(p){
+    var pass=p.success!==false;
+    return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.5rem .75rem;font-size:.75rem;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.2rem;">'+
+      '<span style="font-family:JetBrains Mono,monospace;font-weight:600;color:var(--text);">'+escH(p.name||'')+'</span>'+
+      '<span class="'+(pass?'badge-pass':'badge-fail')+'">'+(pass?'✓ VERIFIED':'✗ VIOLATED')+'</span>'+
+      '</div>'+
+      (p.formula?'<code style="color:var(--text2);font-size:.7rem;">'+escH(p.formula)+'</code>':'')+
+      '</div>';
+  }).join('');
+}
+
+/* ── Trace playback ── */
+function updateTraceLabel(i){
+  var lbl=document.getElementById('trace-lbl');
+  var info=document.getElementById('trace-step-info');
+  lbl.textContent='Step '+i+'/'+Math.max(0,traceSteps.length-1);
+  if(!traceSteps.length){ info.textContent=''; return; }
+  var s=traceSteps[Math.min(i,traceSteps.length-1)];
+  info.textContent=(s.action||s.proc_name||'')+' '+(s.is_error?'⚠':'');
+}
+
+function jumpTrace(v){
+  traceIdx=parseInt(v);
+  updateTraceLabel(traceIdx);
+  // Highlight matching node in D3
+  var step=traceSteps[traceIdx];
+  if(!step) return;
+  nodeLayer.selectAll('g.nd').select('circle')
+    .attr('stroke',function(d){
+      return (d.id===step.proc_name||d.label===step.proc_name||String(d.id)===String(step.state))?'#fff':'rgba(255,255,255,.2)';
+    })
+    .attr('stroke-width',function(d){
+      return (d.id===step.proc_name||d.label===step.proc_name||String(d.id)===String(step.state))?4:1;
+    });
+}
+
+/* ── FSM tabs ── */
+function switchFSM(tab, btn){
+  ['lending','trace','erc20'].forEach(function(t){
+    document.getElementById('fsm-'+t).style.display=(t===tab?'flex':'none');
+  });
+  document.querySelectorAll('.fsm-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  
+  if(tab==='trace') buildTraceFSM(traceSteps, ltlData);
+}
+
+/* ── Build Mermaid counterexample trace diagram ── */
+function buildTraceFSM(steps, ltl){
+  var el=document.getElementById('fsm-trace-content');
+  if(!steps||!steps.length){
+    el.innerHTML='<p style="color:var(--text2);font-size:.85rem;"><i class="fa-solid fa-circle-info"></i> No counterexample trace available. Run a verification first.</p>';
+    return;
+  }
+  
+  // Build state names from steps
+  var lines=['%%{init:{\'theme\':\'dark\'}}%%','stateDiagram-v2','  direction LR','  [*] --> Step0'];
+  var failed=new Set((ltl||[]).filter(function(p){return p.success===false;}).map(function(p){return p.name;}));
+  
+  steps.slice(0,12).forEach(function(s,i){
+    var sid='Step'+i;
+    var nxt=i<Math.min(steps.length-1,11)?'Step'+(i+1):null;
+    var label=(s.action||s.proc_name||'step '+i).replace(/['"]/g,'').substring(0,30);
+    lines.push('  state "'+label+'" as '+sid);
+    if(nxt) lines.push('  '+sid+' --> '+nxt+' : '+(s.updates&&Object.keys(s.updates).length?Object.keys(s.updates)[0]:'→'));
+    if(s.is_error) lines.push('  class '+sid+' errState');
+  });
+  lines.push('  classDef errState fill:#4a1515,stroke:#f85149,stroke-width:2px,color:#f87171');
+  
+  var code=lines.join('\n');
+  var div=document.createElement('div');
+  div.className='mermaid';
+  div.id='mmd-trace-dyn';
+  div.textContent=code;
+  el.innerHTML='';
+  el.appendChild(div);
+  
+  mermaid.run({nodes:[div]}).catch(function(e){
+    // Fallback: show step table
+    el.innerHTML=buildTraceTable(steps.slice(0,10));
+  });
+}
+
+function buildTraceTable(steps){
+  var rows=steps.map(function(s,i){
+    return '<tr style="'+(s.is_error?'background:#4a1515;color:#f87171':'')+'">'
+      +'<td style="padding:.3rem .5rem;font-family:JetBrains Mono,monospace;">'+(i+1)+'</td>'
+      +'<td style="padding:.3rem .5rem;">'+escH(s.action||s.proc_name||'')+'</td>'
+      +'<td style="padding:.3rem .5rem;font-family:JetBrains Mono,monospace;font-size:.7rem;">'
+      +Object.entries(s.updates||{}).map(function(kv){return kv[0]+'='+kv[1];}).join(', ')
+      +'</td>'
+      +(s.is_error?'<td style="padding:.3rem .5rem;color:#f87171;">⚠ violation</td>':'<td></td>')
+      +'</tr>';
+  }).join('');
+  return '<table style="width:100%;font-size:.78rem;border-collapse:collapse;">'
+    +'<thead><tr style="border-bottom:1px solid var(--border)">'
+    +'<th style="padding:.3rem .5rem;text-align:left">#</th>'
+    +'<th style="padding:.3rem .5rem;text-align:left">Action</th>'
+    +'<th style="padding:.3rem .5rem;text-align:left">Variable Updates</th>'
+    +'<th style="padding:.3rem .5rem;text-align:left">Status</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table>';
+}
+
+/* ── Refresh FSM ── */
+function refreshFSM(){
+  mermaid.run({nodes: document.querySelectorAll('.mermaid')});
+}
+
+/* ── Utils ── */
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── Init ── */
+function onReady(){
+  // Set SVG size based on container
+  var wrap=document.getElementById('viz-canvas');
+  W=wrap.getBoundingClientRect().width||800;
+  H=wrap.getBoundingClientRect().height||500;
+  sim.force('center', d3.forceCenter(W/2, H/2));
+  
+  loadAll();
+  
+  // Render static Mermaid diagrams
+  setTimeout(function(){
+    mermaid.run({nodes: Array.from(document.querySelectorAll('.mermaid'))});
+  }, 200);
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', onReady);
+else onReady();
+
+})();
+</script>
+{% endblock %}

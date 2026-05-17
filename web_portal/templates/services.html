@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Services — DeFi Guardian{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="page-hero">
+  <h1 class="page-hero-title">Verification Plans</h1>
+  <p class="page-hero-subtitle">
+    Choose the plan that fits your project. All plans include access to all 8 verification engines.
+  </p>
+</section>
+
+<!-- Plans Grid -->
+{% if plans %}
+<div class="plans-grid">
+  {% for plan in plans %}
+  <div class="plan-card {% if plan.featured %}plan-card-featured{% endif %}">
+    {% if plan.featured %}
+    <div class="plan-badge">Most Popular</div>
+    {% endif %}
+    <div class="plan-header">
+      <h2 class="plan-name">{{ plan.name }}</h2>
+      <div class="plan-price">
+        {% if plan.price == 0 %}
+          <span class="plan-price-amount">Free</span>
+        {% elif plan.price == -1 %}
+          <span class="plan-price-amount">Custom</span>
+        {% else %}
+          <span class="plan-price-currency">$</span>
+          <span class="plan-price-amount">{{ plan.price }}</span>
+          <span class="plan-price-period">/mo</span>
+        {% endif %}
+      </div>
+      {% if plan.description %}
+      <p class="plan-description">{{ plan.description }}</p>
+      {% endif %}
+    </div>
+    <div class="plan-features">
+      <ul class="plan-features-list">
+        {% for feature in plan.features %}
+        <li class="plan-feature-item">
+          <i class="fa-solid fa-check plan-feature-check"></i>
+          {{ feature }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="plan-cta">
+      {% if plan.price == 0 %}
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-rocket"></i> Get Started Free
+      </a>
+      {% elif plan.price == -1 %}
+      <a href="{{ url_for('contact') }}" class="btn btn-secondary btn-block">
+        <i class="fa-solid fa-envelope"></i> Contact Sales
+      </a>
+      {% else %}
+      <a href="{{ url_for('register') }}" class="btn {% if plan.featured %}btn-primary{% else %}btn-secondary{% endif %} btn-block">
+        <i class="fa-solid fa-credit-card"></i> Subscribe
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- Default plans when no context provided -->
+<div class="plans-grid">
+
+  <!-- Community -->
+  <div class="plan-card">
+    <div class="plan-header">
+      <h2 class="plan-name">Community</h2>
+      <div class="plan-price">
+        <span class="plan-price-amount">Free</span>
+      </div>
+      <p class="plan-description">Perfect for individual developers and open-source projects.</p>
+    </div>
+    <div class="plan-features">
+      <ul class="plan-features-list">
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> All 8 verification tools</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Up to 50 runs/month</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Web portal access</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Community support</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> LTL specification editor</li>
+        <li class="plan-feature-item text-muted"><i class="fa-solid fa-xmark" style="color:var(--text-muted);"></i> LLM spec generation</li>
+        <li class="plan-feature-item text-muted"><i class="fa-solid fa-xmark" style="color:var(--text-muted);"></i> Priority queue</li>
+      </ul>
+    </div>
+    <div class="plan-cta">
+      <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block">
+        <i class="fa-solid fa-rocket"></i> Get Started Free
+      </a>
+    </div>
+  </div>
+
+  <!-- Professional (featured) -->
+  <div class="plan-card plan-card-featured">
+    <div class="plan-badge">Most Popular</div>
+    <div class="plan-header">
+      <h2 class="plan-name">Professional</h2>
+      <div class="plan-price">
+        <span class="plan-price-currency">$</span>
+        <span class="plan-price-amount">49</span>
+        <span class="plan-price-period">/mo</span>
+      </div>
+      <p class="plan-description">For professional auditors and security teams.</p>
+    </div>
+    <div class="plan-features">
+      <ul class="plan-features-list">
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> All 8 verification tools</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Unlimited runs</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Web portal + API access</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Priority support</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> LTL + CVL editor</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> LLM spec generation</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Priority queue</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> PDF audit reports</li>
+      </ul>
+    </div>
+    <div class="plan-cta">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-credit-card"></i> Subscribe
+      </a>
+    </div>
+  </div>
+
+  <!-- Enterprise -->
+  <div class="plan-card">
+    <div class="plan-header">
+      <h2 class="plan-name">Enterprise</h2>
+      <div class="plan-price">
+        <span class="plan-price-amount">Custom</span>
+      </div>
+      <p class="plan-description">For organisations needing on-premise deployment and SLAs.</p>
+    </div>
+    <div class="plan-features">
+      <ul class="plan-features-list">
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Everything in Professional</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> On-premise deployment</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Custom integrations</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Dedicated support</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> SLA guarantees</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> SSO / SAML</li>
+        <li class="plan-feature-item"><i class="fa-solid fa-check plan-feature-check"></i> Audit trail &amp; compliance</li>
+      </ul>
+    </div>
+    <div class="plan-cta">
+      <a href="{{ url_for('contact') }}" class="btn btn-secondary btn-block">
+        <i class="fa-solid fa-envelope"></i> Contact Sales
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endif %}
+
+<!-- FAQ -->
+<div class="card" style="margin-top: 2rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-circle-question"></i> Frequently Asked Questions</h2>
+  </div>
+  <div class="card-body">
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3 class="faq-question">Can I self-host DeFi Guardian?</h3>
+        <p class="faq-answer">Yes. DeFi Guardian is open-source. Clone the repository and follow the setup guide to run it on your own infrastructure.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">Do I need to install the verification tools separately?</h3>
+        <p class="faq-answer">Tools not installed locally will run in simulated mode, producing realistic deterministic output. Install the binaries to use real verification.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">Is my contract source code stored?</h3>
+        <p class="faq-answer">Contracts are stored locally in your instance's database. When using the hosted service, data is encrypted at rest and never shared with third parties.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

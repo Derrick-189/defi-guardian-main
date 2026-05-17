@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+
+{% block title %}Counterexample Analysis — DeFi Guardian{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-content {
+    padding: 0 !important;
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Report header ── */
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .report-header-left { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; min-width: 0; }
+  .report-header-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+  .audit-filename { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); }
+
+  /* Stats row */
+  .ce-stats-row {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.4rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    font-size: 0.78rem;
+  }
+  .ce-stats-row .stat-item { display: flex; gap: 0.4rem; align-items: center; }
+  .ce-stats-row .label { color: var(--text2); }
+  .ce-stats-row .value { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+  /* ── Three-panel layout ── */
+  .report-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    height: 100%;
+    overflow: hidden;
+  }
+  .report-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 0;
+  }
+  .report-panel:last-child { border-right: none; }
+
+  /* ── Main Scrollable Area ── */
+  .report-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panels-wrapper {
+    height: 520px;
+    min-height: 400px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  /* ── Diagnostics Cards ── */
+  .diagnostics-area {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background: var(--bg-dim);
+    flex: 1;
+  }
+
+  .diagnostic-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .diagnostic-card-header {
+    padding: 0.75rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .diagnostic-card-body {
+    padding: 1rem;
+  }
+
+  .card-warning {\ border-top: 3px solid var(--warning); }
+  .card-warning .diagnostic-card-header { color: var(--warning); }
+  
+  .card-recommendation { border-top: 3px solid var(--accent); }
+  .card-recommendation .diagnostic-card-header { color: var(--accent); }
+
+  .diagnostic-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .diagnostic-item {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .diagnostic-item i {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .warning-item i { color: var(--warning); }
+  .rec-item i { color: var(--accent); }
+
+
+  .panel-header {
+    padding: 0.5rem 0.85rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .panel-header-tabs { padding: 0; }
+  .panel-tabs { display: flex; }
+  .panel-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text2);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .panel-tab:hover { color: var(--text); }
+  .panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .panel-body { flex: 1; overflow-y: auto; min-height: 0; }
+
+  /* Rule items */
+  .rule-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+    font-size: 0.82rem;
+  }
+  .rule-item:hover { background: var(--bg3); }
+  .rule-item.active { background: rgba(88,166,255,0.08); border-left-color: var(--accent); color: var(--accent); }
+  .rule-icon { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .rule-icon.verified { background: var(--success); box-shadow: 0 0 4px var(--success); }
+  .rule-icon.violated { background: var(--danger);  box-shadow: 0 0 4px var(--danger); }
+  .rule-icon.timeout  { background: var(--warning); }
+  .rule-icon.unknown  { background: var(--text2); }
+
+  /* Trace steps */
+  .trace-step {
+    padding: 0.4rem 0.85rem;
+    border-left: 2px solid transparent;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: background 0.1s;
+    line-height: 1.5;
+  }
+  .trace-step:hover { background: var(--bg3); }
+  .trace-step.active { border-left-color: var(--accent); background: rgba(88,166,255,0.05); }
+  .trace-step.error  { border-left-color: var(--danger);  background: rgba(248,81,73,0.05); }
+  .step-num  { color: var(--text2); margin-right: 0.5rem; min-width: 2rem; display: inline-block; }
+  .step-proc { color: var(--purple); font-size: 0.72rem; }
+  .step-action { color: var(--text); }
+
+  /* Trace search bar */
+  .trace-search-bar { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+  .trace-search-bar input { font-size: 0.8rem; }
+
+  /* Variables */
+  .var-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.4rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+  }
+  .var-name  { color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+  .var-value { color: var(--text);  font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+  .var-changed { color: var(--accent); font-weight: 700; }
+  .var-before  { color: var(--text2); text-decoration: line-through; font-size: 0.72rem; margin-right: 0.3rem; }
+
+
+
+  /* Tab content */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Panel placeholder */
+  .panel-placeholder { text-align: center; padding: 2rem 1rem; color: var(--text2); font-size: 0.82rem; line-height: 1.8; }
+
+  /* Raw output */
+  #raw-output-pre {
+    margin: 0; padding: 0.85rem; font-size: 0.75rem;
+    background: transparent; border: none; border-radius: 0;
+    white-space: pre-wrap; word-break: break-all;
+    color: var(--text2); font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── Header Bar ── -->
+<div class="report-header">
+  <div class="report-header-left">
+    <!-- Run selector -->
+    <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+      <select id="run-selector" class="input select input-sm"
+              style="max-width:260px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"
+              title="Select a verification run">
+        <option value="latest">Latest run</option>
+      </select>
+      <div class="audit-info" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span class="audit-filename">
+          <i class="fa-solid fa-file-code"></i>
+          <span id="ce-filename">{{ audit.filename if audit and audit.filename else 'Loading…' }}</span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="report-header-right">
+    <div style="position:relative;">
+      <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);color:var(--text2);font-size:0.75rem;pointer-events:none;"></i>
+      <input type="search" id="trace-search" class="input input-sm"
+             style="padding-left:2rem;width:180px;" placeholder="Search trace…">
+    </div>
+    <button class="btn btn-sm btn-ghost" id="hex-toggle">
+      <i class="fa-solid fa-code"></i> HEX
+    </button>
+    <button class="btn btn-sm btn-ghost" id="download-trail-btn" title="Download trail file" hidden>
+      <i class="fa-solid fa-download"></i> Trail
+    </button>
+    <button class="btn btn-sm btn-ghost" id="share-btn">
+      <i class="fa-solid fa-share-nodes"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ── Stats row ── -->
+<div class="ce-stats-row" id="ce-stats">
+  <span class="stat-item"><span class="label">States</span><span class="value" id="ce-stat-states">—</span></span>
+  <span class="stat-item"><span class="label">Transitions</span><span class="value" id="ce-stat-trans">—</span></span>
+  <span class="stat-item"><span class="label">Depth</span><span class="value" id="ce-stat-depth">—</span></span>
+  <span class="stat-item"><span class="label">Rules</span><span class="label"></span><span class="value" id="ce-stat-rules">—</span></span>
+  <span class="stat-item"><span class="label">Violations</span><span class="value text-danger" id="ce-stat-violations">—</span></span>
+  <span style="margin-left:auto;" class="text-muted" style="font-size:0.72rem;" id="ce-last-run"></span>
+</div>
+
+<!-- ── Main Scrollable Area ── -->
+<div class="report-scroll-container">
+  
+  <div class="panels-wrapper">
+    <!-- ── Three-Panel Layout ── -->
+    <div class="report-layout" id="report-layout">
+
+      <!-- Panel 1: Rules -->
+      <div class="report-panel" id="panel-rules">
+        <div class="panel-header">
+          <i class="fa-solid fa-list-check"></i> RULES / PROPERTIES
+        </div>
+        <div class="panel-body" id="rules-panel">
+          <p class="panel-placeholder">
+            <i class="fa-solid fa-list-check" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+            Loading rules…
+          </p>
+        </div>
+      </div>
+
+      <!-- Panel 2: Call Trace -->
+      <div class="report-panel report-panel-main" id="panel-trace">
+        <div class="panel-header panel-header-tabs">
+          <div class="panel-tabs" role="tablist">
+            <button class="panel-tab active" role="tab" aria-selected="true"
+                    data-tab="call-trace" id="tab-call-trace">Call Trace</button>
+            <button class="panel-tab" role="tab" aria-selected="false"
+                    data-tab="raw-output" id="tab-raw-output">Raw Output</button>
+            <button class="panel-tab" role="tab" aria-selected="false"
+                    data-tab="state-diagram" id="tab-state-diagram">State Diagram</button>
+          </div>
+        </div>
+        <div class="panel-body" id="trace-panel">
+          <div class="tab-content active" id="tab-content-call-trace">
+            <div class="trace-search-bar">
+              <input type="search" class="input input-sm w-full" id="trace-filter-input"
+                     placeholder="Filter steps by action or process…">
+            </div>
+            <div id="trace-steps-container">
+              <p class="panel-placeholder">
+                <i class="fa-solid fa-timeline" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+                Loading trace…
+              </p>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-content-raw-output" hidden>
+            <pre id="raw-output-pre">Loading…</pre>
+          </div>
+          <div class="tab-content" id="tab-content-state-diagram" hidden style="height:100%;">
+            <div id="mermaid-container" style="padding:1rem;height:100%;overflow:auto;">
+              <div class="mermaid" id="state-machine-diagram">
+                stateDiagram-v2
+                [*] --> Loading
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Variables -->
+      <div class="report-panel" id="panel-vars">
+        <div class="panel-header">
+          <i class="fa-solid fa-database"></i> VARIABLES
+        </div>
+        <div class="panel-body" id="vars-panel">
+          <p class="panel-placeholder">
+            <i class="fa-solid fa-database" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+            Select a trace step
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Diagnostics Area ── -->
+  <div class="diagnostics-area">
+    
+    <!-- Warnings Card -->
+    <div id="warnings" class="diagnostic-card card-warning" hidden>
+      <div class="diagnostic-card-header">
+        <i class="fa-solid fa-triangle-exclamation"></i> Warnings
+      </div>
+      <div class="diagnostic-card-body" id="warnings-content"></div>
+    </div>
+
+    <!-- Recommendations Card -->
+    <div id="recommendations" class="diagnostic-card card-recommendation" hidden>
+      <div class="diagnostic-card-header">
+        <i class="fa-solid fa-lightbulb"></i> Recommendations
+      </div>
+      <div class="diagnostic-card-body" id="recommendations-content"></div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  window.DG_AUDIT_ID = "{{ audit_id }}";
+</script>
+<script src="{{ url_for('static', filename='js/counterexample.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ── Run selector: load all available runs ────────────────────────────
+  var selector = document.getElementById('run-selector');
+
+  function populateRunSelector(currentId) {
+    fetch('/api/counterexample/runs', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (runs) {
+        if (!runs || !runs.length) return;
+
+        // Group by filename for optgroups
+        var byFile = {};
+        runs.forEach(function (run) {
+          var f = run.filename || 'unknown';
+          if (!byFile[f]) byFile[f] = [];
+          byFile[f].push(run);
+        });
+
+        // Clear existing options except "Latest run"
+        while (selector.options.length > 1) selector.remove(1);
+
+        // Build optgroups per file
+        Object.keys(byFile).sort().forEach(function (filename) {
+          var grp = document.createElement('optgroup');
+          grp.label = filename;
+          byFile[filename].forEach(function (run) {
+            var opt = document.createElement('option');
+            opt.value = run.id;
+            var statusIcon = run.status === 'PASS' ? '✓' : '✗';
+            opt.textContent = run.tool + '  ' + statusIcon + '  ' + run.date.slice(0, 16);
+            // Colour-code by status
+            opt.style.color = run.status === 'PASS' ? 'var(--success)' : 'var(--danger)';
+            if (String(run.id) === String(currentId)) opt.selected = true;
+            grp.appendChild(opt);
+          });
+          selector.appendChild(grp);
+        });
+      })
+      .catch(function () {});
+  }
+
+  // Populate on load — use a small delay to ensure counterexample.js has
+  // registered window._ceLoadData inside its own DOMContentLoaded handler
+  setTimeout(function () {
+    populateRunSelector(window.DG_AUDIT_ID);
+  }, 100);
+
+  // Switch run when selector changes
+  if (selector) {
+    selector.addEventListener('change', function () {
+      var val = selector.value;
+      window.DG_AUDIT_ID = val;
+      // Update URL without reload
+      var newUrl = val === 'latest'
+        ? '/counterexample/latest'
+        : '/counterexample/' + val;
+      history.pushState({}, '', newUrl);
+      // Reload data in the viewer — _ceLoadData is set by counterexample.js
+      if (typeof window._ceLoadData === 'function') {
+        window._ceLoadData(val);
+      }
+    });
+  }
+
+  // ── Stats row from state ─────────────────────────────────────────────
+  // (Disabled: counterexample.js now updates these from the specific run data)
+  /*
+  fetch('/api/state/current', { credentials: 'same-origin' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return;
+      function set(id, v) { var el = document.getElementById(id); if (el && v !== undefined && v !== null) el.textContent = v; }
+      set('ce-stat-states', d.states_stored || d.states || '—');
+      set('ce-stat-trans',  d.transitions   || '—');
+      set('ce-stat-depth',  d.depth         || '—');
+      var ltl = d.ltl_results || [];
+      set('ce-stat-rules', ltl.length || '—');
+      set('ce-stat-violations', ltl.filter(function (r) { return !r.success; }).length);
+      var lastRun = document.getElementById('ce-last-run');
+      if (lastRun && d.datetime) lastRun.textContent = d.datetime;
+    })
+    .catch(function () {});
+  */
+
+  // ── Panel tab switching ──────────────────────────────────────────────
+  document.querySelectorAll('.panel-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = btn.getAttribute('data-tab');
+      document.querySelectorAll('.panel-tab').forEach(function (b) {
+        b.classList.remove('active'); b.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-content').forEach(function (c) {
+        c.classList.remove('active'); c.hidden = true;
+      });
+      btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
+      var content = document.getElementById('tab-content-' + target);
+      if (content) { content.classList.add('active'); content.hidden = false; }
+    });
+  });
+
+  // ── Share button ─────────────────────────────────────────────────────
+  var shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function () {
+      navigator.clipboard.writeText(window.location.href).then(function () {
+        if (window.DGSocket) window.DGSocket.showToast('Copied', 'Link copied to clipboard', 'success');
+      });
+    });
+  }
+
+  // ── Re-populate selector after new verification ──────────────────────
+  document.addEventListener('dg:verification_complete', function () {
+    populateRunSelector(window.DG_AUDIT_ID);
+  });
+
+});
+</script>
+{% endblock %}

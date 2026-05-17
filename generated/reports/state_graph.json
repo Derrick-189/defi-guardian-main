@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    "Contract",
+    "Contract.State_1",
+    "Contract.INIT",
+    "LTL_safety_no_overflow",
+    "LTL_safety_reentrancy",
+    "LTL_liveness_progress",
+    "LTL_invariant_collateral",
+    "LTL_response_price_drop",
+    "LTL_stability",
+    "LTL_fairness",
+    "LTL_reachability_liquidation"
+  ],
+  "edges": [
+    {
+      "from": "Contract.INIT",
+      "to": "Contract.State_1",
+      "label": "assignment"
+    }
+  ],
+  "counterexample_path": [],
+  "model_name": "Account.sol",
+  "timestamp": "2026-05-17T13:05:28.254104"
+}

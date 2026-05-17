@@ -1,0 +1,69 @@
+{
+    "name": "defi-guardian-vscode",
+    "displayName": "DeFi Guardian",
+    "description": "Formal verification for Solidity and Rust smart contracts",
+    "version": "1.0.0",
+    "publisher": "defi-guardian",
+    "engines": {
+      "vscode": "^1.80.0"
+    },
+    "categories": ["Programming Languages", "Linters", "Testing"],
+    "activationEvents": [
+      "onLanguage:solidity",
+      "onLanguage:rust"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+      "commands": [
+        {
+          "command": "defi-guardian.verify",
+          "title": "🛡️ DeFi Guardian: Verify Contract",
+          "category": "Formal Verification"
+        },
+        {
+          "command": "defi-guardian.showLTL",
+          "title": "📋 DeFi Guardian: Show LTL Properties",
+          "category": "Formal Verification"
+        },
+        {
+          "command": "defi-guardian.showStateDiagram",
+          "title": "📊 DeFi Guardian: Show State Diagram",
+          "category": "Formal Verification"
+        }
+      ],
+      "configuration": {
+        "title": "DeFi Guardian",
+        "properties": {
+          "defiGuardian.spinPath": {
+            "type": "string",
+            "default": "spin",
+            "description": "Path to SPIN executable"
+          },
+          "defiGuardian.verifyOnSave": {
+            "type": "boolean",
+            "default": false,
+            "description": "Run verification automatically on save"
+          },
+          "defiGuardian.showInlineResults": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show verification results inline"
+          }
+        }
+      },
+      "keybindings": [
+        {
+          "command": "defi-guardian.verify",
+          "key": "ctrl+shift+v",
+          "mac": "cmd+shift+v",
+          "when": "editorLangId == solidity || editorLangId == rust"
+        }
+      ]
+    },
+    "scripts": {
+      "package": "vsce package"
+    },
+    "devDependencies": {
+      "@types/vscode": "^1.80.0"
+    }
+  }

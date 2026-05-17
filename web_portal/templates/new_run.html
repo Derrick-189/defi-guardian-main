@@ -1,0 +1,640 @@
+{% extends "base.html" %} {% block title %}New Verification Run — DeFi
+Guardian{% endblock %} {% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1 class="page-title">
+            <i class="fa-solid fa-play"></i> New Verification Run
+        </h1>
+        <p class="page-subtitle">
+            Upload or paste a smart contract to begin formal verification.
+        </p>
+    </div>
+</div>
+
+<form id="run-form" novalidate style="max-width: 860px">
+    <!-- ── Contract Source ── -->
+    <div class="card" style="margin-bottom: 1.25rem">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa-solid fa-file-code"></i> Contract Source
+            </h2>
+        </div>
+
+        <!-- Source type tabs -->
+        <div class="form-tabs" role="tablist">
+            <button
+                type="button"
+                class="form-tab active"
+                data-input-tab="upload"
+                id="tab-upload"
+                role="tab"
+                aria-selected="true"
+            >
+                <i class="fa-solid fa-upload"></i> Upload File
+            </button>
+            <button
+                type="button"
+                class="form-tab"
+                data-input-tab="paste"
+                id="tab-paste"
+                role="tab"
+                aria-selected="false"
+            >
+                <i class="fa-solid fa-paste"></i> Paste Code
+            </button>
+        </div>
+
+        <!-- Upload panel -->
+        <div class="tab-input-panel" id="panel-upload" role="tabpanel">
+            <div class="file-drop-zone" id="file-drop-zone">
+                <input
+                    type="file"
+                    id="file-input"
+                    name="file"
+                    accept=".sol,.rs,.pml"
+                    class="file-input-hidden"
+                    aria-label="Upload contract file"
+                />
+                <label for="file-input" class="file-drop-label">
+                    <i class="fa-solid fa-cloud-arrow-up file-drop-icon"></i>
+                    <span class="file-drop-text"
+                        >Drop a file here or
+                        <span class="link-text">browse</span></span
+                    >
+                    <span class="file-drop-hint"
+                        >Accepts .sol · .rs · .pml</span
+                    >
+                </label>
+            </div>
+            <div
+                id="file-selected-name"
+                class="file-selected-name"
+                hidden
+            ></div>
+        </div>
+
+        <!-- Paste panel -->
+        <div class="tab-input-panel" id="panel-paste" role="tabpanel" hidden>
+            <div class="form-group">
+                <label for="code-paste" class="form-label"
+                    >Contract source code</label
+                >
+                <textarea
+                    id="code-paste"
+                    name="code"
+                    class="input font-mono"
+                    rows="14"
+                    spellcheck="false"
+                    placeholder="// Paste your Solidity, Rust, or Promela code here…"
+                    style="resize: vertical; min-height: 220px"
+                ></textarea>
+            </div>
+            <div class="form-group-row">
+                <label
+                    for="paste-filename"
+                    class="form-label"
+                    style="margin: 0; white-space: nowrap"
+                    >Filename:</label
+                >
+                <input
+                    type="text"
+                    id="paste-filename"
+                    name="paste_filename"
+                    class="input input-sm"
+                    placeholder="contract.sol"
+                    style="max-width: 220px"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Tool Selection ── -->
+    <div class="card" style="margin-bottom: 1.25rem">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa-solid fa-screwdriver-wrench"></i> Verification
+                Tools
+            </h2>
+            <div style="display: flex; gap: 0.5rem">
+                <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    id="btn-select-all"
+                >
+                    Select all
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    id="btn-select-none"
+                >
+                    Clear
+                </button>
+            </div>
+        </div>
+        <p class="form-hint" style="margin-bottom: 1rem">
+            Select one or more tools. SPIN is fast and recommended for first
+            runs. Tools marked
+            <span style="color: var(--text2)">Simulated</span> use deterministic
+            output until the binary is installed.
+        </p>
+
+        <div class="tools-checkbox-grid">
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="SPIN" checked />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">SPIN</span>
+                    <span class="tool-checkbox-desc"
+                        >Model checker · Promela · LTL</span
+                    >
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="COQ" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Coq</span>
+                    <span class="tool-checkbox-desc"
+                        >Theorem prover · Gallina</span
+                    >
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="LEAN" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Lean 4</span>
+                    <span class="tool-checkbox-desc"
+                        >Proof assistant · Mathlib</span
+                    >
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="CERTORA" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Certora</span>
+                    <span class="tool-checkbox-desc"
+                        >CVL verifier · Solidity</span
+                    >
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="KANI" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Kani</span>
+                    <span class="tool-checkbox-desc"
+                        >Bounded model checking · Rust</span
+                    >
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="PRUSTI" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Prusti</span>
+                    <span class="tool-checkbox-desc"
+                        >Deductive verifier · Rust</span
+                    >
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="CREUSOT" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Creusot</span>
+                    <span class="tool-checkbox-desc">Why3 backend · Rust</span>
+                </span>
+            </label>
+
+            <label class="tool-checkbox-card">
+                <input type="checkbox" name="tools" value="VERUS" />
+                <span class="tool-checkbox-body">
+                    <span class="tool-checkbox-name">Verus</span>
+                    <span class="tool-checkbox-desc">SMT-based · Rust</span>
+                </span>
+            </label>
+        </div>
+    </div>
+
+    <!-- ── Specifications (optional) ── -->
+    <div class="card" style="margin-bottom: 1.25rem">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa-solid fa-list-check"></i> Specifications
+            </h2>
+            <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                id="btn-load-spec"
+            >
+                Load saved spec
+            </button>
+        </div>
+        <p class="form-hint" style="margin-bottom: 1rem">
+            Optional: Provide LTL (for SPIN) or CVL (for Certora)
+            specifications. Leave empty to use auto-generated defaults.
+        </p>
+        <div class="form-group">
+            <label for="spec-text" class="form-label"
+                >Custom specifications</label
+            >
+            <textarea
+                id="spec-text"
+                name="spec_text"
+                class="input font-mono"
+                rows="8"
+                spellcheck="false"
+                placeholder="ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }&#10;ltl no_reentrancy { [] !(lock && amount > 100) }"
+                style="resize: vertical; min-height: 120px"
+            ></textarea>
+        </div>
+        <div class="form-group">
+            <label for="spec-file" class="form-label"
+                >Upload Spec File (optional)</label
+            >
+            <input
+                type="file"
+                id="spec-file"
+                name="spec_file"
+                class="input"
+                accept=".txt,.spec,.ltl"
+            />
+            <small class="form-hint"
+                >Upload a specification file instead of or in addition to the
+                text above.</small
+            >
+        </div>
+        <div class="form-group-row" style="align-items: center; gap: 1rem">
+            <label class="checkbox-label">
+                <input type="checkbox" id="use-llm-spec" name="use_llm_spec" />
+                <span>Generate spec automatically with AI</span>
+            </label>
+            <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                id="btn-ai-generate"
+                style="margin-left: auto"
+            >
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generate
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Progress (hidden until submit) ── -->
+    <div id="run-progress" class="run-progress" hidden>
+        <div class="progress-bar-track">
+            <div
+                class="progress-bar-fill"
+                id="run-progress-fill"
+                style="width: 0%"
+            ></div>
+        </div>
+        <p class="progress-label" id="run-progress-label">Initialising…</p>
+    </div>
+
+    <!-- ── Actions ── -->
+    <div class="form-actions">
+        <button
+            type="submit"
+            class="btn btn-primary btn-lg"
+            id="btn-run-submit"
+        >
+            <i class="fa-solid fa-play"></i> Run Verification
+        </button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">Cancel</a>
+    </div>
+</form>
+{% endblock %} {% block extra_js %}
+<script>
+    (function () {
+      'use strict';
+
+      // ── Source tab switching ───────────────────────────────────────────────
+      document.querySelectorAll('[data-input-tab]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var target = this.dataset.inputTab;
+          document.querySelectorAll('[data-input-tab]').forEach(function (b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          document.querySelectorAll('.tab-input-panel').forEach(function (p) {
+            p.hidden = true;
+          });
+          this.classList.add('active');
+          this.setAttribute('aria-selected', 'true');
+          var panel = document.getElementById('panel-' + target);
+          if (panel) panel.hidden = false;
+        });
+      });
+
+      // ── Select all / none ─────────────────────────────────────────────────
+      document.getElementById('btn-select-all').addEventListener('click', function () {
+        document.querySelectorAll('input[name="tools"]').forEach(function (cb) { cb.checked = true; });
+      });
+      document.getElementById('btn-select-none').addEventListener('click', function () {
+        document.querySelectorAll('input[name="tools"]').forEach(function (cb) { cb.checked = false; });
+      });
+
+      // ── File drop zone ────────────────────────────────────────────────────
+      var dropZone  = document.getElementById('file-drop-zone');
+      var fileInput = document.getElementById('file-input');
+      var fileNameEl= document.getElementById('file-selected-name');
+
+      function showFileName(name) {
+        if (fileNameEl) { fileNameEl.textContent = '📄 ' + name; fileNameEl.hidden = false; }
+      }
+
+      if (fileInput) {
+        fileInput.addEventListener('change', function () {
+          if (this.files && this.files[0]) showFileName(this.files[0].name);
+        });
+      }
+
+      if (dropZone) {
+        dropZone.addEventListener('dragover',  function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', function ()  { this.classList.remove('drag-over'); });
+        dropZone.addEventListener('drop', function (e) {
+          e.preventDefault();
+          this.classList.remove('drag-over');
+          var files = e.dataTransfer.files;
+          if (files && files[0] && fileInput) {
+            // DataTransfer.files is read-only; show name manually
+            showFileName(files[0].name);
+            // Store file reference for submission
+            dropZone._droppedFile = files[0];
+          }
+        });
+      }
+
+       // ── AI Spec Generation ───────────────────────────────────────────────────
+       var useLLMSpecCheckbox = document.getElementById('use-llm-spec');
+       var aiGenerateButton = document.getElementById('btn-ai-generate');
+
+       function updateAIGenerateButton() {
+         if (!useLLMSpecCheckbox || !aiGenerateButton) return;
+         aiGenerateButton.disabled = !useLLMSpecCheckbox.checked;
+         aiGenerateButton.title = useLLMSpecCheckbox.checked
+           ? 'Generate spec with AI'
+           : 'Check the box to enable AI spec generation';
+       }
+
+       if (useLLMSpecCheckbox) {
+         useLLMSpecCheckbox.addEventListener('change', updateAIGenerateButton);
+       }
+       updateAIGenerateButton();
+
+       document.getElementById('btn-ai-generate').addEventListener('click', function () {
+         if (useLLMSpecCheckbox && !useLLMSpecCheckbox.checked) {
+           if (window.DGSocket) {
+             window.DGSocket.showToast('', 'Enable AI generation first.', 'warning');
+           } else {
+             alert('Enable AI generation first.');
+           }
+           return;
+         }
+         var isUpload = !document.getElementById('panel-upload').hidden;
+         var getContract = function() {
+           if (isUpload) {
+             var file = (dropZone && dropZone._droppedFile) || (fileInput && fileInput.files[0]);
+             if (!file) return null;
+             return file;
+           } else {
+             var code = document.getElementById('code-paste').value.trim();
+             if (!code) return null;
+             return code;
+           }
+         };
+         var contract = getContract();
+         if (!contract) {
+           if (window.DGSocket) window.DGSocket.showToast('', 'Upload or paste a contract first to generate specs.', 'warning');
+           else alert('Upload or paste a contract first.');
+           return;
+         }
+
+         if (isUpload) {
+           var reader = new FileReader();
+           reader.onload = function(e) {
+             var code = e.target.result;
+             fetch('/api/generate-spec', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ prompt: 'Generate LTL properties for this contract', tool: 'LTL', contract: code }),
+               credentials: 'same-origin'
+             })
+             .then(r => r.ok ? r.json() : Promise.reject('Failed'))
+             .then(data => {
+               var specText = data.spec || data.ltl;
+               if (specText) {
+                 document.getElementById('spec-text').value = specText;
+                 if (window.DGSocket) window.DGSocket.showToast('', 'LTL spec generated', 'success');
+               } else {
+                 var errorMessage = data.error || 'Spec generation failed';
+                 if (window.DGSocket) window.DGSocket.showToast('', errorMessage, 'error');
+               }
+             })
+             .catch(() => { if (window.DGSocket) window.DGSocket.showToast('', 'Spec generation failed', 'error'); });
+           };
+           reader.readAsText(contract);
+         } else {
+           fetch('/api/generate-spec', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ prompt: 'Generate LTL properties for this contract', tool: 'LTL', contract: contract }),
+             credentials: 'same-origin'
+           })
+           .then(r => r.ok ? r.json() : Promise.reject('Failed'))
+           .then(data => {
+             var specText = data.spec || data.ltl;
+             if (specText) {
+               document.getElementById('spec-text').value = specText;
+               if (window.DGSocket) window.DGSocket.showToast('', 'LTL spec generated', 'success');
+             } else {
+               var errorMessage = data.error || 'Spec generation failed';
+               if (window.DGSocket) window.DGSocket.showToast('', errorMessage, 'error');
+             }
+           })
+           .catch(() => { if (window.DGSocket) window.DGSocket.showToast('', 'Spec generation failed', 'error'); });
+         }
+       });
+
+       // ── Load Saved Spec ─────────────────────────────────────────────────────
+       document.getElementById('btn-load-spec').addEventListener('click', function () {
+         fetch('/api/specs', { credentials: 'same-origin' })
+           .then(r => r.ok ? r.json() : Promise.reject('Failed'))
+           .then(specs => {
+             if (!specs.length) {
+               alert('No saved specifications found in generated/specs/');
+               return;
+             }
+             var list = specs.map(s => s.name).join('\n');
+             var name = prompt('Available specs:\n\n' + list + '\n\nEnter spec filename to load:');
+             if (name) {
+               fetch('/api/specs/' + encodeURIComponent(name), { credentials: 'same-origin' })
+                 .then(r => r.ok ? r.json() : Promise.reject('Not found'))
+                 .then(data => {
+                   if (data.content !== undefined) {
+                     document.getElementById('spec-text').value = data.content;
+                     if (window.DGSocket) window.DGSocket.showToast('', 'Spec loaded', 'success');
+                   } else {
+                     alert('Spec not found.');
+                   }
+                 })
+                 .catch(() => alert('Failed to load spec.'));
+             }
+           })
+           .catch(() => alert('Failed to fetch spec list.'));
+       });
+
+       // ── Form submission ───────────────────────────────────────────────────
+       var form        = document.getElementById('run-form');
+       var submitBtn   = document.getElementById('btn-run-submit');
+       var progressEl  = document.getElementById('run-progress');
+       var progressFill= document.getElementById('run-progress-fill');
+       var progressLbl = document.getElementById('run-progress-label');
+
+       function setProgress(pct, label) {
+         if (progressFill) progressFill.style.width = pct + '%';
+         if (progressLbl)  progressLbl.textContent  = label;
+       }
+
+       form.addEventListener('submit', function (e) {
+         e.preventDefault();
+
+         var tools = Array.from(form.querySelectorAll('input[name="tools"]:checked'))
+                          .map(function (c) { return c.value; });
+         if (!tools.length) {
+           if (window.DGSocket) window.DGSocket.showToast('', 'Select at least one tool.', 'warning');
+           else alert('Select at least one tool.');
+           return;
+         }
+
+         var isUpload = !document.getElementById('panel-upload').hidden;
+         var total = tools.length;
+         var done  = 0;
+         var lastAuditId = null;
+         var lastJobId   = null;
+         var spec_text = document.getElementById('spec-text').value.trim() || '';
+
+         function pollJob(jobId, tool, idx, formData, filename) {
+           setProgress(Math.round(10 + (idx / total) * 85), 'Running ' + tool + '\u2026 (verifying)');
+           var pollInterval = setInterval(function () {
+             fetch('/api/job/' + jobId, { credentials: 'same-origin' })
+               .then(function (r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
+               .then(function (jobData) {
+                 if (jobData.status === 'completed' || jobData.status === 'failed') {
+                   clearInterval(pollInterval);
+                   if (jobData.result && jobData.result.counterexample_found) {
+                     if (window.DGSocket) window.DGSocket.showToast('', tool + ': Counterexample found!', 'warning');
+                   }
+                   runNext(idx + 1, formData, filename);
+                 } else if (jobData.status === 'running') {
+                   setProgress(Math.round(10 + (idx / total) * 85), 'Running ' + tool + '\u2026 (in progress)');
+                 } else if (jobData.status === 'error') {
+                   clearInterval(pollInterval);
+                   setProgress(0, 'Error on ' + tool + ': ' + (jobData.message || 'unknown'));
+                   submitBtn.disabled = false;
+                   submitBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Verification';
+                 }
+               })
+               .catch(function (err) {
+                 clearInterval(pollInterval);
+                 setProgress(0, 'Polling failed for ' + tool + ': ' + err);
+                 submitBtn.disabled = false;
+                 submitBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Verification';
+               });
+           }, 2000);
+         }
+
+         function runNext(idx, formData, filename) {
+           if (idx >= total) {
+             setProgress(100, 'All tools complete!');
+             setTimeout(function () {
+               window.location.href = lastJobId
+                 ? '/artifacts/' + lastJobId
+                 : (lastAuditId ? '/counterexample/' + lastAuditId : '/counterexample/latest');
+             }, 800);
+             return;
+           }
+           var tool = tools[idx];
+           setProgress(Math.round(10 + (idx / total) * 85), 'Running ' + tool + '…');
+
+           // Clone FormData for each request and add tool
+           var requestData = new FormData();
+           for (var [key, value] of formData.entries()) {
+             requestData.append(key, value);
+           }
+           requestData.append('tool', tool);
+
+           fetch('/api/run', {
+             method: 'POST',
+             credentials: 'same-origin',
+             body: requestData
+           })
+           .then(function (r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
+           .then(function (data) {
+             done++;
+             if (data.audit_id) lastAuditId = data.audit_id;
+             if (data.job_id)   lastJobId   = data.job_id;
+
+             // If async job, poll for completion
+             if (data.status === 'accepted' && data.job_id) {
+               pollJob(data.job_id, tool, idx, formData, filename);
+             } else {
+               runNext(idx + 1, formData, filename);
+             }
+           })
+           .catch(function (err) {
+             setProgress(0, 'Error on ' + tool + ': ' + err);
+             submitBtn.disabled = false;
+             submitBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Verification';
+           });
+         }
+
+         // Start — gather source code then kick off sequential runs
+         submitBtn.disabled = true;
+         submitBtn.innerHTML = '<span class="spinner-sm"></span> Running…';
+         progressEl.hidden = false;
+         setProgress(10, 'Preparing source…');
+
+         var formData = new FormData();
+         formData.append('spec_text', spec_text);
+
+         // Add spec file if uploaded
+         var specFile = document.getElementById('spec-file').files[0];
+         if (specFile) {
+           formData.append('spec_file', specFile);
+         }
+
+         if (isUpload) {
+           var file = (dropZone && dropZone._droppedFile) || (fileInput && fileInput.files[0]);
+           if (!file) {
+             if (window.DGSocket) window.DGSocket.showToast('', 'Please select a file.', 'warning');
+             else alert('Please select a file.');
+             submitBtn.disabled = false;
+             return;
+           }
+           formData.append('file', file);
+           var filename = file.name;
+           setProgress(25, 'Running verification…');
+           runNext(0, formData, filename);
+         } else {
+           var code  = document.getElementById('code-paste').value.trim();
+           var fname = (document.getElementById('paste-filename').value.trim() || 'contract.sol');
+           if (!code) {
+             if (window.DGSocket) window.DGSocket.showToast('', 'Please paste some code.', 'warning');
+             else alert('Please paste some code.');
+             submitBtn.disabled = false;
+             return;
+           }
+           formData.append('code', code);
+           formData.append('filename', fname);
+           setProgress(25, 'Running verification…');
+           runNext(0, formData, fname);
+         }
+       });
+
+    })();
+</script>
+{% endblock %}

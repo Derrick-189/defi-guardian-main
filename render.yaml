@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: defi-guardian-portal
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd web_portal && python app.py
+    envVars:
+      - key: VSERVER_URL
+        value: ""  # Will fill with tunnel URL
+      - key: VSERVER_TOKEN
+        value: ""  # Set later

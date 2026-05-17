@@ -1,0 +1,455 @@
+{% extends "base.html" %} {% block title %}Specifications — DeFi Guardian{%
+endblock %} {% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1 class="page-title">
+            <i class="fa-solid fa-file-code"></i> Specifications
+        </h1>
+        <p class="page-subtitle">
+            Write and generate LTL and CVL formal specifications for your
+            contracts.
+        </p>
+    </div>
+</div>
+
+<div class="specs-layout">
+    <!-- ── Left: full-height editor ── -->
+    <div class="specs-col-main">
+        <div
+            class="card"
+            style="
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                min-height: 600px;
+            "
+        >
+            <div
+                class="card-header"
+                style="
+                    padding: 0.85rem 1.25rem;
+                    margin-bottom: 0;
+                    border-radius: 8px 8px 0 0;
+                "
+            >
+                <h2 class="card-title">
+                    <i class="fa-solid fa-pen-to-square"></i> Specification
+                    Editor
+                </h2>
+                <div class="card-header-actions">
+                    <div class="tab-group" role="tablist">
+                        <button
+                            class="tab active"
+                            role="tab"
+                            data-spec-tab="ltl"
+                            id="spec-tab-ltl"
+                            aria-selected="true"
+                        >
+                            LTL
+                        </button>
+                        <button
+                            class="tab"
+                            role="tab"
+                            data-spec-tab="cvl"
+                            id="spec-tab-cvl"
+                            aria-selected="false"
+                        >
+                            CVL
+                        </button>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="btn-save-spec">
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+                </div>
+            </div>
+
+            <!-- LTL panel -->
+            <div
+                class="spec-editor-panel active"
+                id="spec-panel-ltl"
+                role="tabpanel"
+                aria-labelledby="spec-tab-ltl"
+                style="flex: 1"
+            >
+                <textarea
+                    id="spec-editor-ltl"
+                    name="spec_ltl"
+                    class="spec-textarea"
+                    spellcheck="false"
+                    placeholder="-- LTL properties&#10;-- Example: [] (balance >= 0)&#10;&#10;ltl no_negative_balance { [] (balance >= 0) }&#10;ltl no_reentrancy { [] !(locked &amp;&amp; calling) }&#10;ltl liveness { &lt;&gt; (state == 2) }"
+                >
+{{ contract_src if contract_src and contract_src is string else '' }}</textarea
+                >
+            </div>
+
+            <!-- CVL panel -->
+            <div
+                class="spec-editor-panel"
+                id="spec-panel-cvl"
+                role="tabpanel"
+                aria-labelledby="spec-tab-cvl"
+                hidden
+                style="flex: 1"
+            >
+                <textarea
+                    id="spec-editor-cvl"
+                    name="spec_cvl"
+                    class="spec-textarea"
+                    spellcheck="false"
+                    placeholder='// CVL specification&#10;// Example:&#10;rule noOverflow(uint256 a, uint256 b) {&#10;    require a + b >= a;&#10;    assert a + b >= a, "Overflow";&#10;}'
+                ></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Right: LLM + reference ── -->
+    <div class="specs-col-side">
+        <!-- LLM Generator -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> LLM
+                    Generator
+                </h2>
+            </div>
+            <div class="card-body" style="padding-top: 0">
+                <div class="form-group">
+                    <label for="llm-prompt" class="form-label"
+                        >Describe the property in plain English</label
+                    >
+                    <textarea
+                        id="llm-prompt"
+                        class="input textarea"
+                        rows="4"
+                        placeholder="e.g. The token balance should never go negative after a transfer…"
+                        style="min-height: 100px"
+                    ></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="llm-spec-type" class="form-label"
+                        >Output format</label
+                    >
+                    <select id="llm-spec-type" class="input select">
+                        <option value="LTL">LTL (SPIN)</option>
+                        <option value="CVL">CVL (Certora)</option>
+                    </select>
+                </div>
+                <button
+                    class="btn btn-primary btn-block"
+                    id="btn-generate-spec"
+                >
+                    <i class="fa-solid fa-bolt"></i> Generate
+                </button>
+
+                <div id="llm-output-section" style="margin-top: 1rem" hidden>
+                    <label class="form-label">Generated Specification</label>
+                    <pre
+                        id="llm-output"
+                        class="code-block"
+                        style="
+                            min-height: 60px;
+                            max-height: 200px;
+                            overflow-y: auto;
+                        "
+                    ></pre>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem">
+                        <button
+                            class="btn btn-secondary btn-sm"
+                            id="btn-copy-to-editor"
+                            style="flex: 1"
+                        >
+                            <i class="fa-solid fa-copy"></i> Copy to Editor
+                        </button>
+                        <button
+                            class="btn btn-ghost btn-sm"
+                            id="btn-copy-raw"
+                            title="Copy to clipboard"
+                        >
+                            <i class="fa-solid fa-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                <div
+                    id="llm-error"
+                    class="alert alert-danger"
+                    style="margin-top: 0.75rem"
+                    hidden
+                ></div>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-book-open"></i> LTL Quick Reference
+                </h2>
+            </div>
+            <div class="card-body" style="padding-top: 0">
+                <table class="table" style="font-size: 0.82rem">
+                    <thead>
+                        <tr>
+                            <th>Operator</th>
+                            <th>Meaning</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono">[] p</td>
+                            <td>Always p</td>
+                            <td class="font-mono text-muted">[] (x >= 0)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">&lt;&gt; p</td>
+                            <td>Eventually p</td>
+                            <td class="font-mono text-muted">
+                                &lt;&gt; (done)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">p U q</td>
+                            <td>p Until q</td>
+                            <td class="font-mono text-muted">lock U unlock</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">X p</td>
+                            <td>Next p</td>
+                            <td class="font-mono text-muted">X (state==1)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">! p</td>
+                            <td>Not p</td>
+                            <td class="font-mono text-muted">!(lock && x>0)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">p -> q</td>
+                            <td>Implies</td>
+                            <td class="font-mono text-muted">
+                                p -> &lt;&gt; q
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+    (function () {
+        "use strict";
+
+        // ── Tab switching ──────────────────────────────────────────────────────
+        document.querySelectorAll("[data-spec-tab]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var target = this.dataset.specTab;
+                document
+                    .querySelectorAll("[data-spec-tab]")
+                    .forEach(function (b) {
+                        b.classList.remove("active");
+                        b.setAttribute("aria-selected", "false");
+                    });
+                document
+                    .querySelectorAll(".spec-editor-panel")
+                    .forEach(function (p) {
+                        p.classList.remove("active");
+                        p.hidden = true;
+                    });
+                this.classList.add("active");
+                this.setAttribute("aria-selected", "true");
+                var panel = document.getElementById("spec-panel-" + target);
+                if (panel) {
+                    panel.classList.add("active");
+                    panel.hidden = false;
+                }
+            });
+        });
+
+        // ── Save ───────────────────────────────────────────────────────────────
+        document
+            .getElementById("btn-save-spec")
+            .addEventListener("click", function () {
+                var ltl = document.getElementById("spec-editor-ltl").value;
+                var cvl = document.getElementById("spec-editor-cvl").value;
+                // Derive a name from the first ltl/rule name found, or use a timestamp
+                var nameMatch =
+                    ltl.match(/ltl\s+(\w+)/) || cvl.match(/rule\s+(\w+)/);
+                var specName = nameMatch
+                    ? nameMatch[1]
+                    : "spec_" + new Date().toISOString().slice(0, 10);
+                var btn = this;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
+                fetch("/api/save-spec", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ltl: ltl,
+                        cvl: cvl,
+                        name: specName,
+                    }),
+                })
+                    .then(function (r) {
+                        return r.json();
+                    })
+                    .then(function (data) {
+                        btn.innerHTML =
+                            '<i class="fa-solid fa-check"></i> Saved';
+                        var saved = data.saved || [];
+                        // Show the unique .spec files only (deduplicate by basename)
+                        var specFiles = saved.filter(function (p) {
+                            return p.endsWith(".spec");
+                        });
+                        var uniqueNames = [];
+                        var seen = {};
+                        specFiles.forEach(function (p) {
+                            var base = p.split("/").pop();
+                            if (!seen[base]) {
+                                seen[base] = true;
+                                uniqueNames.push(base);
+                            }
+                        });
+                        var locs = specFiles.map(function (p) {
+                            // Show path relative to project root (last 3 segments)
+                            var parts = p.replace(/\\/g, "/").split("/");
+                            return parts.slice(-3).join("/");
+                        });
+                        var msg = uniqueNames.join(", ");
+                        var detail = locs.length
+                            ? "\nSaved to:\n" + locs.join("\n")
+                            : "";
+                        if (window.DGSocket) {
+                            window.DGSocket.showToast(
+                                "\uD83D\uDCBE Specification saved",
+                                msg +
+                                    (locs.length
+                                        ? " \u2192 " +
+                                          locs.length +
+                                          " location(s)"
+                                        : ""),
+                                "success",
+                            );
+                        }
+                        setTimeout(function () {
+                            btn.disabled = false;
+                            btn.innerHTML =
+                                '<i class="fa-solid fa-floppy-disk"></i> Save';
+                        }, 2500);
+                    })
+                    .catch(function () {
+                        btn.disabled = false;
+                        btn.innerHTML =
+                            '<i class="fa-solid fa-floppy-disk"></i> Save';
+                        if (window.DGSocket)
+                            window.DGSocket.showToast(
+                                "Save failed",
+                                "Could not save specification.",
+                                "danger",
+                            );
+                    });
+            });
+
+        // ── LLM Generate ──────────────────────────────────────────────────────
+        document
+            .getElementById("btn-generate-spec")
+            .addEventListener("click", function () {
+                var prompt = document.getElementById("llm-prompt").value.trim();
+                var specType = document.getElementById("llm-spec-type").value;
+                var outputSection =
+                    document.getElementById("llm-output-section");
+                var outputPre = document.getElementById("llm-output");
+                var errorEl = document.getElementById("llm-error");
+                var btn = this;
+
+                if (!prompt) {
+                    if (window.DGSocket)
+                        window.DGSocket.showToast(
+                            "",
+                            "Please describe the property first.",
+                            "warning",
+                        );
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-sm"></span> Generating…';
+                outputSection.hidden = true;
+                errorEl.hidden = true;
+
+                fetch("/api/generate-spec", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: prompt, tool: specType }),
+                })
+                    .then(function (r) {
+                        if (!r.ok) throw new Error("Server error " + r.status);
+                        return r.json();
+                    })
+                    .then(function (data) {
+                        outputPre.textContent =
+                            data.spec || "-- No output returned";
+                        outputSection.hidden = false;
+                        btn.disabled = false;
+                        btn.innerHTML =
+                            '<i class="fa-solid fa-bolt"></i> Generate';
+                        var modelBadge = data.model
+                            ? ' <span class="badge badge-tool" style="font-size:0.65rem;">' +
+                              data.model +
+                              "</span>"
+                            : "";
+                        document.querySelector(
+                            "#llm-output-section .form-label",
+                        ).innerHTML = "Generated Specification" + modelBadge;
+                    })
+                    .catch(function (err) {
+                        errorEl.textContent =
+                            "Generation failed: " + err.message;
+                        errorEl.hidden = false;
+                        btn.disabled = false;
+                        btn.innerHTML =
+                            '<i class="fa-solid fa-bolt"></i> Generate';
+                    });
+            });
+
+        // ── Copy to editor ─────────────────────────────────────────────────────
+        document
+            .getElementById("btn-copy-to-editor")
+            .addEventListener("click", function () {
+                var generated =
+                    document.getElementById("llm-output").textContent;
+                var specType = document
+                    .getElementById("llm-spec-type")
+                    .value.toLowerCase();
+                var editorId =
+                    specType === "cvl" ? "spec-editor-cvl" : "spec-editor-ltl";
+                var editor = document.getElementById(editorId);
+                if (editor) {
+                    editor.value =
+                        (editor.value ? editor.value + "\n\n" : "") + generated;
+                    var tabBtn = document.querySelector(
+                        '[data-spec-tab="' + specType + '"]',
+                    );
+                    if (tabBtn) tabBtn.click();
+                    editor.focus();
+                    editor.scrollTop = editor.scrollHeight;
+                }
+            });
+
+        // ── Copy raw to clipboard ──────────────────────────────────────────────
+        document
+            .getElementById("btn-copy-raw")
+            .addEventListener("click", function () {
+                var text = document.getElementById("llm-output").textContent;
+                navigator.clipboard.writeText(text).then(function () {
+                    if (window.DGSocket)
+                        window.DGSocket.showToast(
+                            "Copied",
+                            "Specification copied to clipboard.",
+                            "success",
+                        );
+                });
+            });
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+# ── Web Portal ────────────────────────────────────────────────────────────────
+Flask==3.1.0
+Flask-Login==0.6.3
+Flask-SocketIO==5.6.0
+Flask-WTF==1.2.2
+python-socketio==5.16.0
+Werkzeug==3.1.5
+requests==2.32.3
+
+# ── Desktop App ───────────────────────────────────────────────────────────────
+customtkinter>=5.2.0
+pillow>=10.0.0
+
+# ── Streamlit (legacy dashboard, optional) ───────────────────────────────────
+streamlit>=1.28.0
+plotly>=5.18.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# ── Verification tools (Python bindings) ─────────────────────────────────────
+graphviz>=0.20.0
+networkx>=3.0
+
+# ── LLM spec generation (optional) ───────────────────────────────────────────
+# anthropic>=0.25.0
+# openai>=1.30.0
+
+# ── Reporting ─────────────────────────────────────────────────────────────────
+reportlab>=4.0.0

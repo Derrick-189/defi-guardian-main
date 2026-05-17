@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% block title %}Streamlit Dashboard - DeFi Guardian{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --accent: #00ffcc;
+  --bg:     #0a0e17;
+  --panel:  #131a26;
+  --border: #1e2a3a;
+  --text:   #e6edf3;
+  --dim:    #8b949e;
+}
+
+/* ── Make the streamlit page fill the full viewport ── */
+/* Remove default <main> padding added by base styles  */
+main { padding: 0 !important; margin: 0 !important; }
+
+/* The control bar sits flush at the top of the content area.
+   Fixed navbar ≈ 56px + auth-toolbar ≈ 42px = 98px total offset. */
+#st-controlbar {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  padding: .55rem 1rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 98px;
+  z-index: 900;
+}
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .3rem .8rem; border-radius: 20px;
+  font-size: .8rem; font-weight: 700;
+}
+.status-pill.running  { background: rgba(35,134,54,.2);  color: #2ea043; border: 1px solid #2ea043; }
+.status-pill.stopped  { background: rgba(218,54,51,.2);  color: #f85149; border: 1px solid #f85149; }
+.status-pill.starting { background: rgba(210,153,34,.2); color: #d29922; border: 1px solid #d29922; }
+
+/* ── Full-viewport iframe ── */
+#iframe-shell {
+  position: relative;
+  /* navbar ≈ 56px + auth-toolbar ≈ 42px + controlbar ≈ 46px = 144px */
+  height: calc(100dvh - 144px);
+  min-height: 500px;
+  margin-top: 98px; /* push below fixed navbar + auth toolbar */
+}
+
+#streamlitFrame {
+  width:  100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: var(--bg);
+}
+
+/* ── Splash overlay (shown while stopped / starting) ── */
+#overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,14,23,.93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+#overlay.hidden { display: none; }
+
+.overlay-content {
+  text-align: center;
+  color: var(--text);
+  padding: 2rem;
+  max-width: 480px;
+}
+.overlay-content i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+/* Feature cards shown in the splash */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: .75rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+.feature-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .85rem;
+  transition: border-color .2s;
+}
+.feature-card:hover { border-color: var(--accent); }
+.feature-icon { font-size: 1.4rem; color: var(--accent); margin-bottom: .35rem; }
+.feature-title { font-weight: 700; font-size: .9rem; margin-bottom: .2rem; }
+.feature-desc  { font-size: .78rem; color: var(--dim); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── Slim control bar ── -->
+<div id="st-controlbar">
+  <button class="btn btn-sm btn-success" id="startBtn" onclick="startStreamlit()">
+    <i class="fas fa-play me-1"></i> Start
+  </button>
+  <button class="btn btn-sm btn-warning" id="stopBtn" onclick="stopStreamlit()" disabled>
+    <i class="fas fa-stop me-1"></i> Stop
+  </button>
+  <button class="btn btn-sm btn-outline-info" onclick="openNewTab()">
+    <i class="fas fa-external-link-alt me-1"></i> New Tab
+  </button>
+  <div class="status-pill stopped" id="statusPill">
+    <i class="fas fa-circle"></i> <span id="statusText">Stopped</span>
+  </div>
+  <span style="margin-left:auto;font-size:.78rem;color:var(--dim);">
+    <i class="fas fa-chart-line me-1" style="color:var(--accent)"></i>
+    Streamlit Analytics Suite
+  </span>
+</div>
+
+<!-- ── Full-viewport iframe shell ── -->
+<div id="iframe-shell">
+  <iframe id="streamlitFrame" src="about:blank" allowfullscreen></iframe>
+
+  <!-- Splash overlay -->
+  <div id="overlay">
+    <div class="overlay-content" id="overlayContent">
+      <i class="fas fa-chart-line" style="color:var(--accent)"></i>
+      <h5>Streamlit Dashboard</h5>
+      <p style="color:var(--dim)">Click <strong>Start</strong> to launch the analytics suite.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
+          <div class="feature-title">State Diagrams</div>
+          <div class="feature-desc">Interactive state transition graphs</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-cube"></i></div>
+          <div class="feature-title">3D Visualization</div>
+          <div class="feature-desc">Three-dimensional state space</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chart-area"></i></div>
+          <div class="feature-title">Performance Metrics</div>
+          <div class="feature-desc">Real-time verification analysis</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-bug"></i></div>
+          <div class="feature-title">Counterexample Analysis</div>
+          <div class="feature-desc">Detailed error path examination</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const PORT = 8501;
+const URL  = `http://localhost:${PORT}`;
+let polling = null;
+
+function setStatus(state) {
+  const pill     = document.getElementById('statusPill');
+  const txt      = document.getElementById('statusText');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn  = document.getElementById('stopBtn');
+  pill.className = `status-pill ${state}`;
+  txt.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+  startBtn.disabled = (state !== 'stopped');
+  stopBtn.disabled  = (state === 'stopped');
+}
+
+function showOverlay(html) {
+  document.getElementById('overlayContent').innerHTML = html;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function hideOverlay() {
+  document.getElementById('overlay').classList.add('hidden');
+}
+
+async function startStreamlit() {
+  setStatus('starting');
+  showOverlay(`
+    <div class="spinner-border mb-3" style="color:var(--accent)"></div>
+    <h5>Starting Streamlit…</h5>
+    <p style="color:var(--dim)">This may take 10–30 seconds on first run.</p>
+  `);
+  try {
+    const r = await fetch('/api/streamlit/start');
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    waitForStreamlit();
+  } catch(e) {
+    setStatus('stopped');
+    showOverlay(`
+      <i class="fas fa-exclamation-triangle" style="color:#f85149"></i>
+      <h5>Failed to Start</h5>
+      <p style="color:var(--dim)">${e.message}</p>
+      <button class="btn btn-primary mt-2" onclick="startStreamlit()">Retry</button>
+    `);
+  }
+}
+
+async function stopStreamlit() {
+  clearInterval(polling);
+  await fetch('/api/streamlit/stop').catch(() => {});
+  document.getElementById('streamlitFrame').src = 'about:blank';
+  setStatus('stopped');
+  showOverlay(`
+    <i class="fas fa-stop-circle" style="color:var(--dim)"></i>
+    <h5>Dashboard Stopped</h5>
+    <p style="color:var(--dim)">Click <strong>Start</strong> to resume.</p>
+  `);
+}
+
+function openNewTab() {
+  window.open(URL, '_blank');
+}
+
+function waitForStreamlit() {
+  let attempts = 0;
+  const max = 60; // 30 s
+  clearInterval(polling);
+  polling = setInterval(async () => {
+    attempts++;
+    try {
+      const r = await fetch('/api/streamlit/status');
+      const d = await r.json();
+      if (d.running) {
+        clearInterval(polling);
+        setStatus('running');
+        document.getElementById('streamlitFrame').src = URL;
+        setTimeout(hideOverlay, 3000);
+        return;
+      }
+    } catch(_) {}
+    if (attempts >= max) {
+      clearInterval(polling);
+      setStatus('stopped');
+      showOverlay(`
+        <i class="fas fa-clock" style="color:#d29922"></i>
+        <h5>Timed Out</h5>
+        <p style="color:var(--dim)">Streamlit didn't start in 30 s.</p>
+        <button class="btn btn-primary mt-2" onclick="startStreamlit()">Retry</button>
+        <a class="btn btn-secondary mt-2 ms-2" href="${URL}" target="_blank">Try Direct Link</a>
+      `);
+    }
+  }, 500);
+}
+
+// On page load — check if already running
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const r = await fetch('/api/streamlit/status');
+    const d = await r.json();
+    if (d.running) {
+      setStatus('running');
+      document.getElementById('streamlitFrame').src = URL;
+      setTimeout(hideOverlay, 2000);
+    }
+  } catch(_) {}
+});
+
+// Keep status in sync every 15 s
+setInterval(async () => {
+  try {
+    const r = await fetch('/api/streamlit/status');
+    const d = await r.json();
+    const current = document.getElementById('statusText').textContent.toLowerCase();
+    if (d.running && current === 'stopped') {
+      setStatus('running');
+      if (document.getElementById('streamlitFrame').src.includes('blank')) {
+        document.getElementById('streamlitFrame').src = URL;
+        setTimeout(hideOverlay, 2000);
+      }
+    } else if (!d.running && current === 'running') {
+      setStatus('stopped');
+      document.getElementById('streamlitFrame').src = 'about:blank';
+      showOverlay(`
+        <i class="fas fa-stop-circle" style="color:var(--dim)"></i>
+        <h5>Dashboard Stopped</h5>
+        <p style="color:var(--dim)">Click <strong>Start</strong> to resume.</p>
+      `);
+    }
+  } catch(_) {}
+}, 15000);
+</script>
+{% endblock %}

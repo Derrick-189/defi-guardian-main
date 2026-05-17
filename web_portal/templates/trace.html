@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Trace Viewer — DeFi Guardian{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">
+      <i class="fa-solid fa-chart-line"></i> Execution Trace
+    </h1>
+    {% if audit %}
+    <div class="audit-info-inline">
+      <span class="font-mono text-sm">{{ audit.filename }}</span>
+      <span class="badge badge-tool">{{ audit.tool }}</span>
+      {% if audit.status == 'pass' or audit.status == 'verified' %}
+        <span class="badge badge-success">{{ audit.status }}</span>
+      {% elif audit.status == 'fail' or audit.status == 'error' %}
+        <span class="badge badge-danger">{{ audit.status }}</span>
+      {% else %}
+        <span class="badge badge-neutral">{{ audit.status }}</span>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="page-subtitle text-muted">No audit selected</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Playback Controls -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-sliders"></i> Playback Controls</h2>
+  </div>
+  <div class="card-body">
+    <div class="controls-row">
+      <div class="playback-buttons">
+        <button class="btn btn-icon btn-secondary" id="btn-reset" title="Reset (R)">
+          <i class="fa-solid fa-stop"></i>
+        </button>
+        <button class="btn btn-icon btn-secondary" id="btn-backward" title="Step backward (←)">
+          <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <button class="btn btn-icon btn-primary" id="btn-play-toggle" title="Play / Pause (Space)">
+          <i class="fa-solid fa-play" id="play-icon"></i>
+        </button>
+        <button class="btn btn-icon btn-secondary" id="btn-forward" title="Step forward (→)">
+          <i class="fa-solid fa-forward-step"></i>
+        </button>
+      </div>
+
+      <div class="speed-control">
+        <label for="speed-slider" class="control-label">Speed</label>
+        <input type="range" id="speed-slider" class="range-slider"
+               min="1" max="10" value="5" step="1"
+               aria-label="Playback speed" />
+        <span id="speed-label" class="speed-value">5×</span>
+      </div>
+    </div>
+
+    <div class="keyboard-hints">
+      <span class="kbd-hint"><kbd>Space</kbd> play/pause</span>
+      <span class="kbd-hint"><kbd>←</kbd> step back</span>
+      <span class="kbd-hint"><kbd>→</kbd> step forward</span>
+      <span class="kbd-hint"><kbd>R</kbd> reset</span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+  <div class="stat-mini">
+    <div class="stat-mini-label">Total Steps</div>
+    <div class="stat-mini-value" id="stat-total-steps">—</div>
+  </div>
+  <div class="stat-mini">
+    <div class="stat-mini-label">Current</div>
+    <div class="stat-mini-value" id="stat-current-step">—</div>
+  </div>
+  <div class="stat-mini stat-mini-danger">
+    <div class="stat-mini-label">Error States</div>
+    <div class="stat-mini-value" id="stat-error-states">—</div>
+  </div>
+  <div class="stat-mini">
+    <div class="stat-mini-label">Transitions</div>
+    <div class="stat-mini-value" id="stat-transitions">—</div>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-timeline"></i> Timeline</h2>
+  </div>
+  <div class="card-body card-body-flush">
+    <div id="trace-timeline" class="trace-timeline" aria-label="Execution trace timeline">
+      <p class="text-muted text-sm text-center" style="padding: 2rem;">
+        <i class="fa-solid fa-hourglass-half"></i> No trace data loaded
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.DG_AUDIT_ID = "{{ audit.id if audit else '' }}";
+</script>
+<script src="{{ url_for('static', filename='js/trace.js') }}"></script>
+{% endblock %}

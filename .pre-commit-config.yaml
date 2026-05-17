@@ -1,0 +1,36 @@
+# .pre-commit-config.yaml
+# DeFi Guardian - Pre-Commit Formal Verification Hooks
+# Install with: pre-commit install
+
+repos:
+  # ============================================================================
+  # Hook 1: LTL Property Validation
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: verify-ltl-properties
+        name: 🛡️ Verify LTL Properties
+        description: Check that smart contracts generate valid LTL properties
+        entry: python3 scripts/pre_commit_verify.py
+        language: python
+        files: \.(sol|rs)$
+        pass_filenames: true
+        additional_dependencies: ['-rrequirements.txt']
+        
+      - id: check-reentrancy-pattern
+        name: 🔒 Check Reentrancy Pattern
+        description: Detect missing reentrancy guards in Solidity
+        entry: python3 scripts/check_reentrancy.py
+        language: python
+        files: \.sol$
+        pass_filenames: true
+        
+      - id: run-spin-quick
+        name: ⚡ Quick SPIN Verification
+        description: Run fast SPIN check (bounded depth)
+        entry: python3 scripts/quick_spin_verify.py
+        language: python
+        files: \.(sol|rs)$
+        pass_filenames: true
+        additional_dependencies: ['-rrequirements.txt']
+        stages: [pre-push]  # Only on push, not every commit

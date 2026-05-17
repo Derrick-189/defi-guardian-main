@@ -1,0 +1,1269 @@
+{
+  "name": "defi-guardian-main",
+  "type": "folder",
+  "children": [
+    {
+      "name": "app",
+      "type": "folder",
+      "children": [
+        {
+          "name": "memory",
+          "type": "folder",
+          "children": [
+            {
+              "name": "test_credentials.md",
+              "type": "file",
+              "icon": "file",
+              "path": "app/memory/test_credentials.md",
+              "size": 1102
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "certora",
+      "type": "folder",
+      "children": [
+        {
+          "name": "confs",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Account.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/Account.conf",
+              "size": 380
+            },
+            {
+              "name": "IERC1363Spender.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/IERC1363Spender.conf",
+              "size": 419
+            },
+            {
+              "name": "IERC3156FlashBorrower.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/IERC3156FlashBorrower.conf",
+              "size": 426
+            },
+            {
+              "name": "Kabvote.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/Kabvote.conf",
+              "size": 380
+            },
+            {
+              "name": "lending_pool.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/lending_pool.conf",
+              "size": 478
+            },
+            {
+              "name": "SimpleLending.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/SimpleLending.conf",
+              "size": 394
+            },
+            {
+              "name": "VestingWallet.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/VestingWallet.conf",
+              "size": 394
+            },
+            {
+              "name": "VestingWalletCliff.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/VestingWalletCliff.conf",
+              "size": 431
+            }
+          ]
+        },
+        {
+          "name": "contracts",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Account.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/Account.sol",
+              "size": 5555
+            },
+            {
+              "name": "IERC1363Spender.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/IERC1363Spender.sol",
+              "size": 1119
+            },
+            {
+              "name": "IERC3156FlashBorrower.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/IERC3156FlashBorrower.sol",
+              "size": 900
+            },
+            {
+              "name": "Kabvote.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/Kabvote.sol",
+              "size": 13380
+            },
+            {
+              "name": "SimpleLending.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/SimpleLending.sol",
+              "size": 4115
+            },
+            {
+              "name": "VestingWallet.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/VestingWallet.sol",
+              "size": 6057
+            },
+            {
+              "name": "VestingWalletCliff.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/VestingWalletCliff.sol",
+              "size": 2018
+            }
+          ]
+        },
+        {
+          "name": "specs",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Account.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/Account.spec",
+              "size": 848
+            },
+            {
+              "name": "IERC1363Spender.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/IERC1363Spender.spec",
+              "size": 856
+            },
+            {
+              "name": "IERC3156FlashBorrower.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/IERC3156FlashBorrower.spec",
+              "size": 862
+            },
+            {
+              "name": "Kabvote.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/Kabvote.spec",
+              "size": 1518
+            },
+            {
+              "name": "SimpleLending.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/SimpleLending.spec",
+              "size": 854
+            },
+            {
+              "name": "SimpleLendingPool.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/SimpleLendingPool.spec",
+              "size": 5165
+            },
+            {
+              "name": "VestingWallet.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/VestingWallet.spec",
+              "size": 854
+            },
+            {
+              "name": "VestingWalletCliff.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/VestingWalletCliff.spec",
+              "size": 859
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "console_exports",
+      "type": "folder",
+      "children": []
+    },
+    {
+      "name": "generated",
+      "type": "folder",
+      "children": [
+        {
+          "name": "images",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "models",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "reports",
+          "type": "folder",
+          "children": [
+            {
+              "name": "traces",
+              "type": "folder",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "logs",
+      "type": "folder",
+      "children": [
+        {
+          "name": "certora",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "coq",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "lean",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "rust_tools",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "spin",
+          "type": "folder",
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "scripts",
+      "type": "folder",
+      "children": [
+        {
+          "name": "vscode-extension",
+          "type": "folder",
+          "children": [
+            {
+              "name": "extension.js",
+              "type": "file",
+              "icon": "file",
+              "path": "scripts/vscode-extension/extension.js",
+              "size": 10633
+            },
+            {
+              "name": "package.json",
+              "type": "file",
+              "icon": "json",
+              "path": "scripts/vscode-extension/package.json",
+              "size": 2008
+            }
+          ]
+        },
+        {
+          "name": "check_reentrancy.py",
+          "type": "file",
+          "icon": "python",
+          "path": "scripts/check_reentrancy.py",
+          "size": 2204
+        },
+        {
+          "name": "pre_commit_verify.py",
+          "type": "file",
+          "icon": "python",
+          "path": "scripts/pre_commit_verify.py",
+          "size": 1935
+        }
+      ]
+    },
+    {
+      "name": "tests",
+      "type": "folder",
+      "children": [
+        {
+          "name": "test_parsers.py",
+          "type": "file",
+          "icon": "python",
+          "path": "tests/test_parsers.py",
+          "size": 10890
+        }
+      ]
+    },
+    {
+      "name": "trace_parsers",
+      "type": "folder",
+      "children": [
+        {
+          "name": "__init__.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/__init__.py",
+          "size": 2654
+        },
+        {
+          "name": "certora_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/certora_parser.py",
+          "size": 3656
+        },
+        {
+          "name": "coq_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/coq_parser.py",
+          "size": 5980
+        },
+        {
+          "name": "lean_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/lean_parser.py",
+          "size": 4170
+        },
+        {
+          "name": "rust_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/rust_parser.py",
+          "size": 18709
+        },
+        {
+          "name": "spin_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/spin_parser.py",
+          "size": 8776
+        },
+        {
+          "name": "verus_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/verus_parser.py",
+          "size": 3850
+        }
+      ]
+    },
+    {
+      "name": "web_portal",
+      "type": "folder",
+      "children": [
+        {
+          "name": "scripts",
+          "type": "folder",
+          "children": [
+            {
+              "name": "add_trace_data_column.py",
+              "type": "file",
+              "icon": "python",
+              "path": "web_portal/scripts/add_trace_data_column.py",
+              "size": 856
+            },
+            {
+              "name": "backfill_trace_data.py",
+              "type": "file",
+              "icon": "python",
+              "path": "web_portal/scripts/backfill_trace_data.py",
+              "size": 1683
+            }
+          ]
+        },
+        {
+          "name": "static",
+          "type": "folder",
+          "children": [
+            {
+              "name": "css",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "components.css",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/css/components.css",
+                  "size": 10545
+                },
+                {
+                  "name": "style.css",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/css/style.css",
+                  "size": 46506
+                }
+              ]
+            },
+            {
+              "name": "js",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "counterexample.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/counterexample.js",
+                  "size": 20916
+                },
+                {
+                  "name": "dashboard.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/dashboard.js",
+                  "size": 10342
+                },
+                {
+                  "name": "main.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/main.js",
+                  "size": 1191
+                },
+                {
+                  "name": "socket.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/socket.js",
+                  "size": 7420
+                },
+                {
+                  "name": "theme.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/theme.js",
+                  "size": 4474
+                },
+                {
+                  "name": "tools.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/tools.js",
+                  "size": 10640
+                },
+                {
+                  "name": "trace.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/trace.js",
+                  "size": 12552
+                },
+                {
+                  "name": "websocket-client.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/websocket-client.js",
+                  "size": 1055
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "templates",
+          "type": "folder",
+          "children": [
+            {
+              "name": "404.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/404.html",
+              "size": 1041
+            },
+            {
+              "name": "about.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/about.html",
+              "size": 9631
+            },
+            {
+              "name": "active.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/active.html",
+              "size": 16445
+            },
+            {
+              "name": "artifacts.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/artifacts.html",
+              "size": 4188
+            },
+            {
+              "name": "base.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/base.html",
+              "size": 13333
+            },
+            {
+              "name": "benchmarks.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/benchmarks.html",
+              "size": 11313
+            },
+            {
+              "name": "contact.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/contact.html",
+              "size": 6946
+            },
+            {
+              "name": "counterexample.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/counterexample.html",
+              "size": 18850
+            },
+            {
+              "name": "dashboard.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/dashboard.html",
+              "size": 25127
+            },
+            {
+              "name": "desktop_app.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/desktop_app.html",
+              "size": 17605
+            },
+            {
+              "name": "index.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/index.html",
+              "size": 8868
+            },
+            {
+              "name": "login.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/login.html",
+              "size": 3245
+            },
+            {
+              "name": "logs.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/logs.html",
+              "size": 13844
+            },
+            {
+              "name": "new_run.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/new_run.html",
+              "size": 26888
+            },
+            {
+              "name": "register.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/register.html",
+              "size": 5112
+            },
+            {
+              "name": "services.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/services.html",
+              "size": 8156
+            },
+            {
+              "name": "settings.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/settings.html",
+              "size": 14343
+            },
+            {
+              "name": "specifications.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/specifications.html",
+              "size": 19726
+            },
+            {
+              "name": "streamlit.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/streamlit.html",
+              "size": 9416
+            },
+            {
+              "name": "terms.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/terms.html",
+              "size": 2045
+            },
+            {
+              "name": "tools.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/tools.html",
+              "size": 1946
+            },
+            {
+              "name": "trace.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/trace.html",
+              "size": 3896
+            },
+            {
+              "name": "visualization.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/visualization.html",
+              "size": 34351
+            }
+          ]
+        },
+        {
+          "name": "uploads",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "verification_results",
+          "type": "folder",
+          "children": [
+            {
+              "name": "01bdacf1",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Account.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/verification_results/01bdacf1/Account.sol",
+                  "size": 5555
+                }
+              ]
+            },
+            {
+              "name": "30fd0bc6",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Account.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/verification_results/30fd0bc6/Account.sol",
+                  "size": 5555
+                }
+              ]
+            },
+            {
+              "name": "9ce484d0",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Account.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/verification_results/9ce484d0/Account.sol",
+                  "size": 5555
+                }
+              ]
+            },
+            {
+              "name": "b018cb6f",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Account.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/verification_results/b018cb6f/Account.sol",
+                  "size": 5555
+                }
+              ]
+            },
+            {
+              "name": "cd4d4617",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Account.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/verification_results/cd4d4617/Account.sol",
+                  "size": 5555
+                }
+              ]
+            },
+            {
+              "name": "d53734ac",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Account.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/verification_results/d53734ac/Account.sol",
+                  "size": 5555
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "__init__.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/__init__.py",
+          "size": 0
+        },
+        {
+          "name": "app.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/app.py",
+          "size": 80257
+        },
+        {
+          "name": "audit_db.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/audit_db.py",
+          "size": 9032
+        },
+        {
+          "name": "defi_guardian.db",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/defi_guardian.db",
+          "size": 1114112
+        },
+        {
+          "name": "llm_spec.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/llm_spec.py",
+          "size": 5641
+        },
+        {
+          "name": "queue_manager.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/queue_manager.py",
+          "size": 1976
+        },
+        {
+          "name": "trace_parsers.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/trace_parsers.py",
+          "size": 32883
+        },
+        {
+          "name": "verification_queue.db",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/verification_queue.db",
+          "size": 16384
+        },
+        {
+          "name": "verification_server.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/verification_server.py",
+          "size": 16284
+        },
+        {
+          "name": "verification_simulator.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/verification_simulator.py",
+          "size": 30170
+        }
+      ]
+    },
+    {
+      "name": "aeneas_integration.py",
+      "type": "file",
+      "icon": "python",
+      "path": "aeneas_integration.py",
+      "size": 2150
+    },
+    {
+      "name": "annotated_output.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "annotated_output.rs",
+      "size": 996
+    },
+    {
+      "name": "app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "app.py",
+      "size": 146442
+    },
+    {
+      "name": "check_tools.py",
+      "type": "file",
+      "icon": "python",
+      "path": "check_tools.py",
+      "size": 7607
+    },
+    {
+      "name": "check_tools.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "check_tools.sh",
+      "size": 0
+    },
+    {
+      "name": "cookies.txt",
+      "type": "file",
+      "icon": "text",
+      "path": "cookies.txt",
+      "size": 233
+    },
+    {
+      "name": "coq_verifier.py",
+      "type": "file",
+      "icon": "python",
+      "path": "coq_verifier.py",
+      "size": 31480
+    },
+    {
+      "name": "counterexample_analyzer.py",
+      "type": "file",
+      "icon": "python",
+      "path": "counterexample_analyzer.py",
+      "size": 10598
+    },
+    {
+      "name": "create_custom_icon.py",
+      "type": "file",
+      "icon": "python",
+      "path": "create_custom_icon.py",
+      "size": 14210
+    },
+    {
+      "name": "create_defi_icon.py",
+      "type": "file",
+      "icon": "python",
+      "path": "create_defi_icon.py",
+      "size": 1471
+    },
+    {
+      "name": "deepseek_python_20260506_b2360f.py",
+      "type": "file",
+      "icon": "python",
+      "path": "deepseek_python_20260506_b2360f.py",
+      "size": 47886
+    },
+    {
+      "name": "defi-guardian.desktop",
+      "type": "file",
+      "icon": "file",
+      "path": "defi-guardian.desktop",
+      "size": 606
+    },
+    {
+      "name": "defi_vault.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "defi_vault.rs",
+      "size": 15649
+    },
+    {
+      "name": "DeFiGuardian.desktop",
+      "type": "file",
+      "icon": "file",
+      "path": "DeFiGuardian.desktop",
+      "size": 1888
+    },
+    {
+      "name": "desktop_app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "desktop_app.py",
+      "size": 264604
+    },
+    {
+      "name": "desktop_bridge.py",
+      "type": "file",
+      "icon": "python",
+      "path": "desktop_bridge.py",
+      "size": 2937
+    },
+    {
+      "name": "desktop_console.log",
+      "type": "file",
+      "icon": "log",
+      "path": "desktop_console.log",
+      "size": 58
+    },
+    {
+      "name": "Dockerfile",
+      "type": "file",
+      "icon": "file",
+      "path": "Dockerfile",
+      "size": 628
+    },
+    {
+      "name": "events.py",
+      "type": "file",
+      "icon": "python",
+      "path": "events.py",
+      "size": 6724
+    },
+    {
+      "name": "file_tree.json",
+      "type": "file",
+      "icon": "json",
+      "path": "file_tree.json",
+      "size": 153599
+    },
+    {
+      "name": "FIXES.md",
+      "type": "file",
+      "icon": "file",
+      "path": "FIXES.md",
+      "size": 3489
+    },
+    {
+      "name": "formal-verification.yml",
+      "type": "file",
+      "icon": "file",
+      "path": "formal-verification.yml",
+      "size": 10445
+    },
+    {
+      "name": "install.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "install.sh",
+      "size": 15678
+    },
+    {
+      "name": "install_icons.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "install_icons.sh",
+      "size": 1561
+    },
+    {
+      "name": "launch.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "launch.sh",
+      "size": 270
+    },
+    {
+      "name": "launch_desktop_app.desktop",
+      "type": "file",
+      "icon": "file",
+      "path": "launch_desktop_app.desktop",
+      "size": 319
+    },
+    {
+      "name": "launch_desktop_app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "launch_desktop_app.py",
+      "size": 1409
+    },
+    {
+      "name": "launch_portal.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "launch_portal.sh",
+      "size": 1257
+    },
+    {
+      "name": "launcher.py",
+      "type": "file",
+      "icon": "python",
+      "path": "launcher.py",
+      "size": 20863
+    },
+    {
+      "name": "lean_verifier.py",
+      "type": "file",
+      "icon": "python",
+      "path": "lean_verifier.py",
+      "size": 5818
+    },
+    {
+      "name": "llm_spec_generator.py",
+      "type": "file",
+      "icon": "python",
+      "path": "llm_spec_generator.py",
+      "size": 9404
+    },
+    {
+      "name": "metrics.py",
+      "type": "file",
+      "icon": "python",
+      "path": "metrics.py",
+      "size": 5277
+    },
+    {
+      "name": "my_contract.verify.yaml",
+      "type": "file",
+      "icon": "file",
+      "path": "my_contract.verify.yaml",
+      "size": 699
+    },
+    {
+      "name": "PROJECT_STRUCTURE.md",
+      "type": "file",
+      "icon": "file",
+      "path": "PROJECT_STRUCTURE.md",
+      "size": 5250
+    },
+    {
+      "name": "property_inference.py",
+      "type": "file",
+      "icon": "python",
+      "path": "property_inference.py",
+      "size": 1397
+    },
+    {
+      "name": "README.md",
+      "type": "file",
+      "icon": "file",
+      "path": "README.md",
+      "size": 587
+    },
+    {
+      "name": "repro_prusti.py",
+      "type": "file",
+      "icon": "python",
+      "path": "repro_prusti.py",
+      "size": 579
+    },
+    {
+      "name": "requirements.txt",
+      "type": "file",
+      "icon": "text",
+      "path": "requirements.txt",
+      "size": 1436
+    },
+    {
+      "name": "run_defi_guardian.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "run_defi_guardian.sh",
+      "size": 378
+    },
+    {
+      "name": "run_verification_server.py",
+      "type": "file",
+      "icon": "python",
+      "path": "run_verification_server.py",
+      "size": 879
+    },
+    {
+      "name": "rust_verifiers.py",
+      "type": "file",
+      "icon": "python",
+      "path": "rust_verifiers.py",
+      "size": 36702
+    },
+    {
+      "name": "SimpleLending.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "SimpleLending.sol",
+      "size": 4115
+    },
+    {
+      "name": "spec_generator.py",
+      "type": "file",
+      "icon": "python",
+      "path": "spec_generator.py",
+      "size": 11324
+    },
+    {
+      "name": "test.v",
+      "type": "file",
+      "icon": "file",
+      "path": "test.v",
+      "size": 62
+    },
+    {
+      "name": "test_contract.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "test_contract.rs",
+      "size": 1487
+    },
+    {
+      "name": "test_import.py",
+      "type": "file",
+      "icon": "python",
+      "path": "test_import.py",
+      "size": 575
+    },
+    {
+      "name": "test_report.py",
+      "type": "file",
+      "icon": "python",
+      "path": "test_report.py",
+      "size": 748
+    },
+    {
+      "name": "theme_config.json",
+      "type": "file",
+      "icon": "json",
+      "path": "theme_config.json",
+      "size": 27
+    },
+    {
+      "name": "themes.py",
+      "type": "file",
+      "icon": "python",
+      "path": "themes.py",
+      "size": 2997
+    },
+    {
+      "name": "TOOL_INTEGRATION_GUIDE.md",
+      "type": "file",
+      "icon": "file",
+      "path": "TOOL_INTEGRATION_GUIDE.md",
+      "size": 3921
+    },
+    {
+      "name": "TRACE_SCHEMA.md",
+      "type": "file",
+      "icon": "file",
+      "path": "TRACE_SCHEMA.md",
+      "size": 1579
+    },
+    {
+      "name": "translated_output.pml.trail",
+      "type": "file",
+      "icon": "file",
+      "path": "translated_output.pml.trail",
+      "size": 150
+    },
+    {
+      "name": "translator.py",
+      "type": "file",
+      "icon": "python",
+      "path": "translator.py",
+      "size": 30193
+    },
+    {
+      "name": "triangulation.py",
+      "type": "file",
+      "icon": "python",
+      "path": "triangulation.py",
+      "size": 12891
+    },
+    {
+      "name": "user_lending.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "user_lending.rs",
+      "size": 941
+    },
+    {
+      "name": "verification_cache.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verification_cache.py",
+      "size": 1397
+    },
+    {
+      "name": "verification_service.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verification_service.py",
+      "size": 13718
+    },
+    {
+      "name": "verification_state.json",
+      "type": "file",
+      "icon": "json",
+      "path": "verification_state.json",
+      "size": 23109
+    },
+    {
+      "name": "verification_worker.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verification_worker.py",
+      "size": 5814
+    },
+    {
+      "name": "verifier_plugins.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verifier_plugins.py",
+      "size": 4092
+    },
+    {
+      "name": "verify_installation.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verify_installation.py",
+      "size": 2092
+    },
+    {
+      "name": "verify_rust.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verify_rust.py",
+      "size": 785
+    },
+    {
+      "name": "verus_integration.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verus_integration.py",
+      "size": 2307
+    },
+    {
+      "name": "websocket_server.py",
+      "type": "file",
+      "icon": "python",
+      "path": "websocket_server.py",
+      "size": 1012
+    }
+  ]
+}

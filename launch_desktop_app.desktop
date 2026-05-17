@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DeFi Guardian Launcher
+Comment=Start DeFi Guardian desktop app with embedded launch sequence
+Exec=python3 /home/slade/emergent-main/launch_desktop_app.py
+Terminal=false
+StartupNotify=true
+Categories=Development;Security;
+Keywords=formal verification;DeFi;SPIN;desktop;

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}DeFi Guardian{% endblock %}</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}" />
+
+  <!-- Apply saved theme immediately to avoid flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('dg-theme');
+      if (!t) {
+        t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════ NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="{{ url_for('index') }}" class="navbar-brand">
+        <span class="brand-icon">⛨</span>
+        <span class="brand-name">DeFi Guardian</span>
+      </a>
+
+      {% if current_user.is_authenticated %}
+      <div class="navbar-links">
+        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="{{ url_for('tools') }}" class="nav-link {% if request.path == '/tools' %}active{% endif %}">
+          <i class="fa-solid fa-wrench"></i> Tools
+        </a>
+        <a href="{{ url_for('visualization') }}" class="nav-link {% if request.path == '/visualization' %}active{% endif %}">
+          <i class="fa-solid fa-diagram-project"></i> Visualization
+        </a>
+        <a href="{{ url_for('specifications') }}" class="nav-link {% if request.path == '/specifications' %}active{% endif %}">
+          <i class="fa-solid fa-file-code"></i> Specifications
+        </a>
+        <a href="{{ url_for('logs') }}" class="nav-link {% if request.path == '/logs' %}active{% endif %}">
+          <i class="fa-solid fa-scroll"></i> Logs
+        </a>
+      </div>
+      {% else %}
+      <div class="navbar-links">
+        <a href="{{ url_for('about') }}" class="nav-link {% if request.path == '/about' %}active{% endif %}">About</a>
+        <a href="{{ url_for('services') }}" class="nav-link {% if request.path == '/services' %}active{% endif %}">Services</a>
+        <a href="{{ url_for('contact') }}" class="nav-link {% if request.path == '/contact' %}active{% endif %}">Contact</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="navbar-right user-menu">
+      <!-- Theme Toggle -->
+      <button class="btn btn-icon" data-theme-toggle title="Toggle theme" aria-label="Toggle theme">
+        <i class="fa-solid fa-moon" id="theme-icon"></i>
+      </button>
+
+      {% if current_user.is_authenticated %}
+      <!-- User Dropdown -->
+      <div class="dropdown">
+        <button class="btn btn-ghost dropdown-toggle" id="user-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+          <i class="fa-solid fa-circle-user"></i>
+          <span class="username-label">{{ current_user.username }}</span>
+          <i class="fa-solid fa-chevron-down dropdown-caret"></i>
+        </button>
+        <div class="dropdown-menu" id="user-dropdown-menu" role="menu">
+          <a href="{{ url_for('settings') }}" class="dropdown-item" role="menuitem">
+            <i class="fa-solid fa-gear"></i> Settings
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="{{ url_for('logout') }}" class="dropdown-item dropdown-item-danger" role="menuitem">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </a>
+        </div>
+      </div>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-ghost">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-primary">Register</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════ FLASH MESSAGES -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container" role="alert" aria-live="polite">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}" data-flash>
+      <span class="flash-message">{{ message }}</span>
+      <button class="flash-close" aria-label="Dismiss">&times;</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- ═══════════════════════════════════════════════════════════ APP SHELL -->
+  <div class="app-shell {% if current_user.is_authenticated %}has-sidebar{% endif %}">
+
+    {% if current_user.is_authenticated %}
+    <!-- ═══════════════════════════════════════════════════════════ SIDEBAR -->
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+
+      <nav class="sidebar-nav">
+
+        <div class="sidebar-section">
+          <span class="sidebar-section-label">ANALYSIS</span>
+          <a href="{{ url_for('dashboard') }}"
+             class="sidebar-link {% if request.path == '/dashboard' %}active{% endif %}">
+            <span class="sidebar-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="{{ url_for('active_verification') }}"
+             class="sidebar-link {% if request.path == '/active' %}active{% endif %}">
+            <span class="sidebar-icon">⚡</span>
+            <span>Active Run</span>
+          </a>
+          <a href="{{ url_for('tools') }}"
+             class="sidebar-link {% if request.path == '/tools' %}active{% endif %}">
+            <span class="sidebar-icon">🔧</span>
+            <span>Tools</span>
+          </a>
+          <a href="{{ url_for('new_run') }}"
+             class="sidebar-link {% if request.path == '/new-run' %}active{% endif %}">
+            <span class="sidebar-icon">▶</span>
+            <span>New Run</span>
+          </a>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="sidebar-section-label">RESULTS</span>
+          <a href="{{ url_for('counterexample_latest') }}"
+             class="sidebar-link {% if '/counterexample' in request.path %}active{% endif %}">
+            <span class="sidebar-icon">🔍</span>
+            <span>Counterexample</span>
+          </a>
+          <a href="{{ url_for('trace_latest') }}"
+             class="sidebar-link {% if '/trace' in request.path %}active{% endif %}">
+            <span class="sidebar-icon">📈</span>
+            <span>Trace Viewer</span>
+          </a>
+          <a href="{{ url_for('visualization') }}"
+             class="sidebar-link {% if request.path == '/visualization' %}active{% endif %}">
+            <span class="sidebar-icon">🌐</span>
+            <span>Visualization</span>
+          </a>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="sidebar-section-label">SPECIFICATIONS</span>
+          <a href="{{ url_for('specifications') }}"
+             class="sidebar-link {% if request.path == '/specifications' %}active{% endif %}">
+            <span class="sidebar-icon">📝</span>
+            <span>Specifications</span>
+          </a>
+          <a href="{{ url_for('benchmarks') }}"
+             class="sidebar-link {% if request.path == '/benchmarks' %}active{% endif %}">
+            <span class="sidebar-icon">📊</span>
+            <span>Benchmarks</span>
+          </a>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="sidebar-section-label">SYSTEM</span>
+          <a href="{{ url_for('logs') }}"
+             class="sidebar-link {% if request.path == '/logs' %}active{% endif %}">
+            <span class="sidebar-icon">📋</span>
+            <span>Logs</span>
+          </a>
+          <a href="{{ url_for('settings') }}"
+             class="sidebar-link {% if request.path == '/settings' %}active{% endif %}">
+            <span class="sidebar-icon">⚙</span>
+            <span>Settings</span>
+          </a>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="sidebar-section-label">INFO</span>
+          <a href="{{ url_for('about') }}"
+             class="sidebar-link {% if request.path == '/about' %}active{% endif %}">
+            <span class="sidebar-icon">ℹ</span>
+            <span>About</span>
+          </a>
+          <a href="{{ url_for('services') }}"
+             class="sidebar-link {% if request.path == '/services' %}active{% endif %}">
+            <span class="sidebar-icon">💼</span>
+            <span>Services</span>
+          </a>
+          <a href="{{ url_for('contact') }}"
+             class="sidebar-link {% if request.path == '/contact' %}active{% endif %}">
+            <span class="sidebar-icon">✉</span>
+            <span>Contact</span>
+          </a>
+        </div>
+
+      </nav>
+    </aside>
+    {% endif %}
+
+    <!-- ═══════════════════════════════════════════════════ MAIN CONTENT -->
+    <main class="main-content" id="main-content">
+      <div class="page-content">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+  </div><!-- /.app-shell -->
+
+  <!-- ═══════════════════════════════════════════════════════════ FOOTER -->
+  {% if not current_user.is_authenticated %}
+  <footer class="site-footer">
+    <div class="footer-inner" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <p class="footer-copy" style="margin:0;">&copy; {{ current_year }} DeFi Guardian. All rights reserved.</p>
+      <nav style="display:flex;gap:1.25rem;">
+        <a href="{{ url_for('about') }}"    style="color:var(--text2);text-decoration:none;font-size:0.82rem;">About</a>
+        <a href="{{ url_for('services') }}" style="color:var(--text2);text-decoration:none;font-size:0.82rem;">Services</a>
+        <a href="{{ url_for('contact') }}"  style="color:var(--text2);text-decoration:none;font-size:0.82rem;">Contact</a>
+      </nav>
+    </div>
+  </footer>
+  {% endif %}
+
+  <!-- ═══════════════════════════════════════════════════════════ SCRIPTS -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+
+  {% block extra_js %}{% endblock %}
+
+  <script>
+    // ── Flash auto-dismiss ──────────────────────────────────────────────
+    (function () {
+      const flashes = document.querySelectorAll('[data-flash]');
+      flashes.forEach(function (el) {
+        // Auto-dismiss after 5 seconds
+        setTimeout(function () {
+          el.classList.add('flash-hiding');
+          setTimeout(function () { el.remove(); }, 400);
+        }, 5000);
+
+        // Manual close button
+        const btn = el.querySelector('.flash-close');
+        if (btn) {
+          btn.addEventListener('click', function () {
+            el.classList.add('flash-hiding');
+            setTimeout(function () { el.remove(); }, 400);
+          });
+        }
+      });
+    })();
+
+    // ── User dropdown toggle ────────────────────────────────────────────
+    (function () {
+      const toggleBtn = document.getElementById('user-dropdown-btn');
+      const menu = document.getElementById('user-dropdown-menu');
+      if (!toggleBtn || !menu) return;
+
+      toggleBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const open = menu.classList.toggle('open');
+        toggleBtn.setAttribute('aria-expanded', open);
+      });
+
+      document.addEventListener('click', function () {
+        menu.classList.remove('open');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+      });
+    })();
+  </script>
+
+</body>
+</html>
