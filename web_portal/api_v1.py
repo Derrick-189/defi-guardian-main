@@ -920,7 +920,8 @@ def _check_tool_available(tool: str) -> bool:
         try:
             r = subprocess.run(
                 PROBE_CMDS[tool],
-                capture_output=True, timeout=5
+                capture_output=True, timeout=5,
+                env={**os.environ, "PATH": os.environ.get("PATH", "")}
             )
             if r.returncode == 0:
                 return True

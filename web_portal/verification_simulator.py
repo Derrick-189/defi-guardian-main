@@ -27,7 +27,45 @@ TOOL_CMDS = {
 }
 
 def tool_available(tool: str) -> bool:
-    return shutil.which(TOOL_CMDS.get(tool.upper(), "")) is not None
+    """Check if tool is available on PATH or as a cargo subcommand."""
+    tool_up = tool.upper()
+    
+    # Primary binary names
+    PRIMARY = {
+        "SPIN":    ["spin"],
+        "COQ":     ["coqc"],
+        "LEAN":    ["lean"],
+        "CERTORA": ["certoraRun", "certora"],
+        "KANI":    ["cargo-kani", "kani"],
+        "PRUSTI":  ["prusti-rustc", "cargo-prusti"],
+        "CREUSOT": ["cargo-creusot", "creusot"],
+        "VERUS":   ["verus"],
+    }
+    
+    # Check primary binaries first
+    for binary in PRIMARY.get(tool_up, []):
+        if shutil.which(binary):
+            return True
+    
+    # Fallback subprocess probes for cargo subcommands
+    PROBE_CMDS = {
+        "KANI":    ["cargo", "kani", "--version"],
+        "PRUSTI":  ["cargo", "prusti", "--version"],
+        "CREUSOT": ["cargo", "creusot", "--version"],
+    }
+    
+    if tool_up in PROBE_CMDS:
+        try:
+            r = subprocess.run(
+                PROBE_CMDS[tool_up],
+                capture_output=True, timeout=5,
+                env={**os.environ, "PATH": os.environ.get("PATH", "")}
+            )
+            return r.returncode == 0
+        except Exception:
+            pass
+    
+    return False
 
 
 # ── Simulated outputs ─────────────────────────────────────────────────────────
@@ -226,11 +264,135 @@ def simulate(tool: str, contract_name: str = "Contract") -> dict:
     return {"output": f"[{tool}] No simulator available.", "success": False}
 
 
+def _run_real(tool: str, source_path: str, specs: str = "") -> dict:
+    """Attempt to run the real binary. Raises on failure."""
+    tool_up = tool.upper()
+    cmd_map = {
+        "SPIN":    ["spin", "-a", source_path],
+        "COQ":     ["coqc", source_path],
+        "LEAN":    ["lean", source_path],
+        "CERTORA": ["certoraRun", source_path],
+        "KANI":    ["cargo", "kani", "--harness", "verify"],
+        "PRUSTI":  ["cargo", "prusti"],
+        "CREUSOT": ["cargo", "creusot"],
+        "VERUS":   ["verus", source_path],
+    }
+    cmd = cmd_map.get(tool_up, [])
+    if not cmd:
+        raise ValueError(f"No command for {tool_up}")
+
+    LOGS_DIR = PROJECT_DIR / "logs" / tool_up.lower()
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    MODELS_DIR = PROJECT_DIR / "generated" / "models"
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+
+    if tool_up == "SPIN":
+        # SPIN-specific handling
+        src_path = Path(source_path)
+        verify_file = ""
+        
+        # Translate if needed
+        if src_path.suffix in ('.sol', '.rs'):
+            try:
+                from translator import VerifiedTranslator, DeFiTranslator
+                with open(src_path, 'r', encoding='utf-8') as f:
+                    src_content = f.read()
+                if src_path.suffix == '.sol':
+                    translated = DeFiTranslator.translate_solidity(src_content)
+                else:
+                    translated = DeFiTranslator.translate_rust(src_content)
+                pml_path = MODELS_DIR / f"{src_path.stem}_translated.pml"
+                with open(pml_path, 'w', encoding='utf-8') as f:
+                    f.write(translated)
+                verify_file = str(pml_path)
+            except Exception as e:
+                return {"output": f"Translation error: {e}", "success": False}
+        else:
+            verify_file = source_path
+
+        # Inject custom specs if provided
+        if specs and specs.strip():
+            try:
+                with open(verify_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                cleaned = re.sub(r'ltl\s+\w+\s*\{[^}]*\}', '', content, flags=re.DOTALL)
+                combined = cleaned + "\n\n/* === CUSTOM SPECIFICATIONS === */\n" + specs
+                verify_file_tmp = MODELS_DIR / f"{src_path.stem}_with_specs.pml"
+                with open(verify_file_tmp, 'w', encoding='utf-8') as f:
+                    f.write(combined)
+                verify_file = str(verify_file_tmp)
+            except Exception:
+                pass
+
+        # Step 1: Generate pan.c
+        r = subprocess.run(["spin", "-a", verify_file], capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR)
+        if r.returncode != 0:
+            return {"output": r.stdout + r.stderr, "success": False}
+
+        # Step 2: Compile pan
+        compile_r = subprocess.run(
+            ["gcc", "-O3", "-o", str(LOGS_DIR / "pan"), "pan.c"],
+            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
+        )
+        if compile_r.returncode != 0:
+            return {"output": compile_r.stdout + compile_r.stderr, "success": False}
+
+        # Step 3: Run verification
+        run_r = subprocess.run(
+            [str(LOGS_DIR / "pan"), "-a"],
+            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
+        )
+        combined = run_r.stdout + run_r.stderr
+
+        # Parse stats
+        states_match = re.search(r"(\d+) states, stored", combined)
+        trans_match = re.search(r"(\d+) transitions", combined)
+        depth_match = re.search(r"depth reached (\d+)", combined)
+        states_stored = int(states_match.group(1)) if states_match else 0
+        transitions = int(trans_match.group(1)) if trans_match else 0
+        depth = int(depth_match.group(1)) if depth_match else 0
+
+        # Determine success
+        has_violations = (
+            run_r.returncode != 0 or
+            bool(re.search(r"errors:\s*[1-9]", combined)) or
+            "acceptance cycle" in combined.lower() or
+            "assertion violated" in combined.lower()
+        )
+        success = not has_violations
+
+        # Save log
+        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+        log_path = str(LOGS_DIR / f"spin_verification_{ts}.log")
+        try:
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write(f"=== SPIN VERIFICATION LOG ===\ntimestamp: {datetime.now().isoformat()}\nfile: {source_path}\nspecs: {specs}\n\n--- STDOUT ---\n{combined}\n\n--- STDERR ---\n{run_r.stderr}")
+        except Exception:
+            pass
+
+        return {
+            "output": combined,
+            "success": success,
+            "states_stored": states_stored,
+            "transitions": transitions,
+            "depth": depth,
+            "log_path": log_path,
+            "ltl_results": _parse_spin_ltl(combined),
+        }
+
+    else:
+        # Non-SPIN tools: run directly
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        return {
+            "output": r.stdout + r.stderr,
+            "success": r.returncode == 0,
+        }
+
+
 def run_or_simulate(tool: str, contract_name: str = "Contract",
                     source_path: str = "", specs: str = "") -> dict:
     """
     Try real binary first; fall back to simulator.
-    For SPIN, inject custom specs if provided.
     Returns unified dict with keys: output, success, tool, simulated, log_path, trace_path.
     """
     tool_up = tool.upper()
@@ -262,471 +424,3 @@ def run_or_simulate(tool: str, contract_name: str = "Contract",
             pass
 
     return result
-
-
-def _run_real(tool: str, source_path: str, specs: str = "") -> dict:
-    """Attempt to run the real binary. Raises on failure."""
-    import subprocess
-    import shutil
-    from pathlib import Path
-    from datetime import datetime
-
-    PROJECT_DIR = Path(__file__).parent.parent
-    LOGS_DIR   = PROJECT_DIR / "logs" / "spin"
-    LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    MODELS_DIR = PROJECT_DIR / "generated" / "models"
-    MODELS_DIR.mkdir(parents=True, exist_ok=True)
-
-    cmd_map = {
-        "SPIN":    ["spin", "-a", source_path],
-        "COQ":     ["coqc", source_path],
-        "LEAN":    ["lean", source_path],
-        "CERTORA": ["certoraRun", source_path],
-        "KANI":    ["cargo", "kani", "--harness", "verify"],
-        "PRUSTI":  ["cargo", "prusti"],
-        "CREUSOT": ["cargo", "creusot"],
-        "VERUS":   ["verus", source_path],
-    }
-    cmd = cmd_map.get(tool, [])
-    if not cmd:
-        raise ValueError(f"No command for {tool}")
-
-    if tool == "SPIN":
-        src_path = Path(source_path)
-        base_content = ""
-        base_file    = None
-
-        # Step A: obtain Promela model
-        if src_path.suffix in ('.sol', '.rs'):
-            try:
-                from translator import VerifiedTranslator, DeFiTranslator
-                with open(src_path, 'r', encoding='utf-8') as f:
-                    src_content = f.read()
-                if src_path.suffix == '.sol':
-                    # Try enhanced translator first
-                    if hasattr(VerifiedTranslator, 'translate_with_proof'):
-                        base_content, _ = VerifiedTranslator().translate_with_proof(src_content)
-                    else:
-                        base_content = DeFiTranslator.translate_solidity(src_content)
-                else:
-                    base_content = DeFiTranslator.translate_rust(src_content)
-            except Exception as e:
-                return {"output": f"Translation error: {e}", "success": False}
-            # Save base model (without custom specs)
-            base_file = MODELS_DIR / f"{src_path.stem}_base.pml"
-            with open(base_file, 'w', encoding='utf-8') as f:
-                f.write(base_content)
-        else:
-            # Already a .pml model — read content
-            try:
-                with open(src_path, 'r', encoding='utf-8') as f:
-                    base_content = f.read()
-            except Exception as e:
-                return {"output": f"Read error: {e}", "success": False}
-            base_file = src_path
-
-        # Step B: inject custom specs if provided
-        verify_file = base_file
-        if specs and specs.strip():
-            # Strip any existing LTL blocks to avoid duplicates
-            cleaned = re.sub(r'ltl\s+\w+\s*\{[^}]*\}', '', base_content, flags=re.DOTALL)
-            combined = cleaned + "\n\n/* === CUSTOM SPECIFICATIONS === */\n" + specs
-            verify_file = MODELS_DIR / f"{src_path.stem}_with_specs.pml"
-            with open(verify_file, 'w', encoding='utf-8') as f:
-                f.write(combined)
-
-        # Step C: SPIN generation
-        r = subprocess.run(["spin", "-a", str(verify_file)], capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR)
-        if r.returncode != 0:
-            return {"output": r.stdout + r.stderr, "success": False}
-
-        # Step D: compile pan
-        compile_r = subprocess.run(
-            ["gcc", "-O3", "-o", str(LOGS_DIR / "pan"), "pan.c"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        if compile_r.returncode != 0:
-            return {"output": compile_r.stdout + compile_r.stderr, "success": False}
-
-        # Step E: run model checker
-        run_r = subprocess.run(
-            [str(LOGS_DIR / "pan"), "-a"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        combined = run_r.stdout + run_r.stderr
-
-        # Step F: parse statistics
-        states_match = re.search(r"(\d+) states, stored", combined)
-        trans_match  = re.search(r"(\d+) transitions", combined)
-        depth_match  = re.search(r"depth reached (\d+)", combined)
-        states_stored = int(states_match.group(1)) if states_match else 0
-        transitions  = int(trans_match.group(1)) if trans_match else 0
-        depth        = int(depth_match.group(1)) if depth_match else 0
-
-        # Step G: determine success (SPIN returns 0 even on property violations)
-        has_violations = False
-        if run_r.returncode != 0:
-            has_violations = True
-        else:
-            err_match = re.search(r"errors:\s*([1-9]\d*)", combined)
-            if err_match or "acceptance cycle" in combined.lower() or "assertion violated" in combined.lower():
-                has_violations = True
-        success = not has_violations
-
-        # Step H: preserve trail file if failed
-        trace_path = ""
-        if not success:
-            for trail_name in ["pan.trail", "translated_output.pml.trail"]:
-                src_trail = PROJECT_DIR / trail_name
-                if src_trail.exists():
-                    dest_trail = LOGS_DIR / trail_name
-                    root_trail = PROJECT_DIR / trail_name
-                    try:
-                        shutil.copy2(src_trail, dest_trail)
-                        if src_trail != root_trail:
-                            shutil.copy2(src_trail, root_trail)
-                        trace_path = str(dest_trail)
-                    except Exception:
-                        pass
-                    break
-
-        # Step I: save log
-        ts      = datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_path = str(LOGS_DIR / f"spin_verification_{ts}.log")
-        try:
-            with open(log_path, "w", encoding="utf-8") as f:
-                f.write(
-                    f"=== SPIN VERIFICATION LOG ===\n"
-                    f"timestamp: {datetime.now().isoformat()}\n"
-                    f"file: {source_path}\n"
-                    f"specs: {specs}\n\n"
-                    f"--- STDOUT ---\n{combined}\n\n--- STDERR ---\n{run_r.stderr}"
-                )
-        except Exception:
-            pass
-
-        return {
-            "output":       combined,
-            "success":      success,
-            "states_stored": states_stored,
-            "transitions":  transitions,
-            "depth":        depth,
-            "log_path":     log_path,
-            "trace_path":   trace_path,
-            "ltl_results":  _parse_spin_ltl(combined),
-        }
-
-    else:
-        # Non-SPIN tools: run directly
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        return {
-            "output": r.stdout + r.stderr,
-            "success": r.returncode == 0,
-        }
-    cmd = cmd_map.get(tool, [])
-    if not cmd:
-        raise ValueError(f"No command for {tool}")
-
-    if tool == "SPIN":
-        # SPIN: ensure .pml model, translate if needed, inject custom specs
-        src_path = Path(source_path)
-        verify_file = ""
-        if src_path.suffix in ('.sol', '.rs'):
-            try:
-                from translator import VerifiedTranslator, DeFiTranslator
-                with open(src_path, 'r', encoding='utf-8') as f:
-                    src_content = f.read()
-                if src_path.suffix == '.sol':
-                    translated_content, _ = VerifiedTranslator().translate_with_proof(src_content) \
-                        if hasattr(VerifiedTranslator, 'translate_with_proof') else (DeFiTranslator.translate_solidity(src_content), [])
-                else:  # .rs
-                    translated_content = DeFiTranslator.translate_rust(src_content)
-            except Exception as e:
-                return {"output": f"Translation error: {e}", "success": False}
-            pml_path = MODELS_DIR / f"{src_path.stem}_translated.pml"
-            with open(pml_path, 'w', encoding='utf-8') as f:
-                f.write(translated_content)
-            verify_file = str(pml_path)
-        else:
-            verify_file = source_path
-            with open(verify_file, 'r', encoding='utf-8') as f:
-                translated_content = f.read()
-
-        # Inject custom LTL specs if provided
-        if specs.strip():
-            # Remove existing auto-generated LTL blocks to avoid duplicates
-            cleaned = re.sub(r'ltl\s+\w+\s*\{[^}]*\}', '', translated_content, flags=re.DOTALL)
-            # Append user specs
-            verify_content = cleaned + "\n\n/* === CUSTOM SPECIFICATIONS === */\n" + specs
-            verify_file_tmp = MODELS_DIR / f"{src_path.stem}_with_specs.pml"
-            with open(verify_file_tmp, 'w', encoding='utf-8') as f:
-                f.write(verify_content)
-            verify_file = str(verify_file_tmp)
-
-        # Step 1: Generate pan.c
-        r = subprocess.run(["spin", "-a", verify_file], capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR)
-        if r.returncode != 0:
-            return {"output": r.stdout + r.stderr, "success": False}
-
-        # Step 2: Compile pan
-        compile_r = subprocess.run(
-            ["gcc", "-O3", "-o", str(LOGS_DIR / "pan"), "pan.c"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        if compile_r.returncode != 0:
-            return {"output": compile_r.stdout + compile_r.stderr, "success": False}
-
-        # Step 3: Run verification
-        run_r = subprocess.run(
-            [str(LOGS_DIR / "pan"), "-a"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        combined = run_r.stdout + run_r.stderr
-
-        # Parse stats
-        states_match = re.search(r"(\d+) states, stored", combined)
-        trans_match  = re.search(r"(\d+) transitions", combined)
-        depth_match  = re.search(r"depth reached (\d+)", combined)
-        states_stored = int(states_match.group(1)) if states_match else 0
-        transitions  = int(trans_match.group(1)) if trans_match else 0
-        depth        = int(depth_match.group(1)) if depth_match else 0
-
-        # Determine success (SPIN returns 0 even on property violations)
-        has_violations = False
-        if run_r.returncode != 0:
-            has_violations = True
-        else:
-            err_match = re.search(r"errors:\s*([1-9]\d*)", combined)
-            if err_match or "acceptance cycle" in combined.lower() or "assertion violated" in combined.lower():
-                has_violations = True
-        success = not has_violations
-
-        # Preserve trail file if verification failed
-        trace_path = ""
-        if not success:
-            for trail_name in ["pan.trail", "translated_output.pml.trail"]:
-                src_trail = PROJECT_DIR / trail_name
-                if src_trail.exists():
-                    dest_trail = LOGS_DIR / trail_name
-                    root_trail = PROJECT_DIR / trail_name
-                    try:
-                        shutil.copy2(src_trail, dest_trail)
-                        if src_trail != root_trail:
-                            shutil.copy2(src_trail, root_trail)
-                        trace_path = str(dest_trail)
-                    except Exception:
-                        pass
-                    break
-
-        # Save log
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_path = str(LOGS_DIR / f"spin_verification_{ts}.log")
-        try:
-            with open(log_path, "w", encoding="utf-8") as f:
-                f.write(f"=== SPIN VERIFICATION LOG ===\ntimestamp: {datetime.now().isoformat()}\nfile: {source_path}\nspecs: {specs}\n\n--- STDOUT ---\n{combined}\n\n--- STDERR ---\n{run_r.stderr}")
-        except Exception:
-            pass
-
-        return {
-            "output": combined,
-            "success": success,
-            "states_stored": states_stored,
-            "transitions": transitions,
-            "depth": depth,
-            "log_path": log_path,
-            "trace_path": trace_path,
-            "ltl_results": _parse_spin_ltl(combined),
-        }
-    else:
-        # For other tools, just run the command
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        return {
-            "output": r.stdout + r.stderr,
-            "success": r.returncode == 0,
-        }
-    cmd = cmd_map.get(tool, [])
-    if not cmd:
-        raise ValueError(f"No command for {tool}")
-    
-    if tool == "SPIN":
-        # For SPIN, ensure we have a .pml model. Translate if needed.
-        src_path = Path(source_path)
-        if src_path.suffix in ('.sol', '.rs'):
-            # Translate to Promela
-            try:
-                # Try to use the enhanced translator if available
-                try:
-                    from translator import VerifiedTranslator
-                    translator = VerifiedTranslator()
-                    translated_content, _ = translator.translate_with_proof(src_content)
-                except (ImportError, AttributeError):
-                    # Fall back to basic DeFiTranslator
-                    from translator import DeFiTranslator
-                    if src_path.suffix == '.sol':
-                        translated_content = DeFiTranslator.translate_solidity(src_content)
-                    else:
-                        translated_content = DeFiTranslator.translate_rust(src_content)
-            except Exception as e:
-                return {"output": f"Translation error: {e}", "success": False}
-            
-            # Save translated model
-            pml_path = MODELS_DIR / f"{src_path.stem}_translated.pml"
-            with open(pml_path, 'w', encoding='utf-8') as f:
-                f.write(translated_content)
-            verify_file = str(pml_path)
-        else:
-            verify_file = source_path
-        
-        # Step 1: Generate pan.c
-        r = subprocess.run(["spin", "-a", verify_file], capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR)
-        if r.returncode != 0:
-            return {"output": r.stdout + r.stderr, "success": False}
-        
-        # Step 2: Compile pan
-        compile_r = subprocess.run(
-            ["gcc", "-O3", "-o", str(LOGS_DIR / "pan"), "pan.c"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        if compile_r.returncode != 0:
-            return {"output": compile_r.stdout + compile_r.stderr, "success": False}
-        
-        # Step 3: Run verification
-        run_r = subprocess.run(
-            [str(LOGS_DIR / "pan"), "-a"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        combined = run_r.stdout + run_r.stderr
-        
-        # Parse stats
-        states_match = re.search(r"(\d+) states, stored", combined)
-        trans_match  = re.search(r"(\d+) transitions", combined)
-        depth_match  = re.search(r"depth reached (\d+)", combined)
-        states_stored = int(states_match.group(1)) if states_match else 0
-        transitions  = int(trans_match.group(1)) if trans_match else 0
-        depth        = int(depth_match.group(1)) if depth_match else 0
-        
-        # Determine success (SPIN returns 0 even on property violations)
-        has_violations = False
-        if run_r.returncode != 0:
-            has_violations = True
-        else:
-            err_match = re.search(r"errors:\s*([1-9]\d*)", combined)
-            if err_match or "acceptance cycle" in combined.lower() or "assertion violated" in combined.lower():
-                has_violations = True
-        success = not has_violations
-        
-        # Preserve trail file if verification failed
-        trace_path = ""
-        if not success:
-            for trail_name in ["pan.trail", "translated_output.pml.trail"]:
-                src_trail = PROJECT_DIR / trail_name
-                if src_trail.exists():
-                    dest_trail = LOGS_DIR / trail_name
-                    root_trail = PROJECT_DIR / trail_name
-                    try:
-                        shutil.copy2(src_trail, dest_trail)
-                        if src_trail != root_trail:
-                            shutil.copy2(src_trail, root_trail)
-                        trace_path = str(dest_trail)
-                    except Exception:
-                        pass
-                    break
-        
-        # Save log
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_path = str(LOGS_DIR / f"spin_verification_{ts}.log")
-        try:
-            with open(log_path, "w", encoding="utf-8") as f:
-                f.write(f"=== SPIN VERIFICATION LOG ===\ntimestamp: {datetime.now().isoformat()}\nfile: {source_path}\n\n--- STDOUT ---\n{combined}\n\n--- STDERR ---\n{run_r.stderr}")
-        except Exception:
-            pass
-        
-        return {
-            "output": combined,
-            "success": success,
-            "states_stored": states_stored,
-            "transitions": transitions,
-            "depth": depth,
-            "log_path": log_path,
-            "trace_path": trace_path,
-            "ltl_results": _parse_spin_ltl(combined),
-        }
-    else:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        return {
-            "output": r.stdout + r.stderr,
-            "success": r.returncode == 0,
-        }
-    cmd = cmd_map.get(tool, [])
-    if not cmd:
-        raise ValueError(f"No command for {tool}")
-    
-    if tool == "SPIN":
-        # Step 1: Generate pan.c
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR)
-        if r.returncode != 0:
-            return {"output": r.stdout + r.stderr, "success": False}
-        
-        # Step 2: Compile pan
-        compile_r = subprocess.run(
-            ["gcc", "-O3", "-o", str(LOGS_DIR / "pan"), "pan.c"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        if compile_r.returncode != 0:
-            return {"output": compile_r.stdout + compile_r.stderr, "success": False}
-        
-        # Step 3: Run verification
-        run_r = subprocess.run(
-            [str(LOGS_DIR / "pan"), "-a"],
-            capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
-        )
-        combined = run_r.stdout + run_r.stderr
-        
-        # Parse stats
-        states_stored = int(re.search(r"(\d+) states, stored", combined).group(1)) if re.search(r"(\d+) states, stored", combined) else 0
-        transitions = int(re.search(r"(\d+) transitions", combined).group(1)) if re.search(r"(\d+) transitions", combined) else 0
-        depth = int(re.search(r"depth reached (\d+)", combined).group(1)) if re.search(r"depth reached (\d+)", combined) else 0
-        
-        # Preserve trail file if verification failed
-        trace_path = ""
-        success = (run_r.returncode == 0) and ("errors: 0" in combined or not re.search(r"errors:\s*[1-9]", combined))
-        
-        if not success:
-            # Look for trail in common locations
-            for trail_name in ["pan.trail", "translated_output.pml.trail"]:
-                src_trail = PROJECT_DIR / trail_name
-                if src_trail.exists():
-                    dest_trail = LOGS_DIR / trail_name
-                    shutil.copy2(src_trail, dest_trail)
-                    trace_path = str(dest_trail)
-                    # Also copy to root for compatibility
-                    root_trail = PROJECT_DIR / trail_name
-                    if src_trail != root_trail:
-                        shutil.copy2(src_trail, root_trail)
-                    break
-        
-        # Save log
-        log_path = str(LOGS_DIR / f"spin_verification_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
-        try:
-            with open(log_path, "w") as f:
-                f.write(f"=== SPIN VERIFICATION LOG ===\ntimestamp: {datetime.now().isoformat()}\nfile: {source_path}\n\n--- STDOUT ---\n{combined}\n\n--- STDERR ---\n{run_r.stderr}")
-        except Exception:
-            pass
-        
-        return {
-            "output": combined,
-            "success": success,
-            "states_stored": states_stored,
-            "transitions": transitions,
-            "depth": depth,
-            "log_path": log_path,
-            "trace_path": trace_path,
-            "ltl_results": _parse_spin_ltl(combined),
-        }
-    else:
-        # For other tools, just run the command
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        return {
-            "output": r.stdout + r.stderr,
-            "success": r.returncode == 0,
-        }
