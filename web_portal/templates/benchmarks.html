@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Benchmarks — DeFi Guardian{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title"><i class="fa-solid fa-chart-bar"></i> Benchmarks</h1>
+    <p class="page-subtitle">Performance and accuracy benchmarks across all verification tools.</p>
+  </div>
+  {% if results %}
+  <div class="page-header-right">
+    <button class="btn btn-secondary btn-sm" id="btn-export-csv">
+      <i class="fa-solid fa-download"></i> Export CSV
+    </button>
+  </div>
+  {% endif %}
+</div>
+
+{% if results %}
+
+<!-- KPI row -->
+<div class="kpi-grid" style="margin-bottom:1.25rem;">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Runs</div>
+    <div class="kpi-value">{{ results | length }}</div>
+  </div>
+  <div class="kpi-card kpi-card-success">
+    <div class="kpi-label">Avg Success Rate</div>
+    <div class="kpi-value text-success">
+      {% if results %}
+        {% set ns = namespace(v=0) %}
+        {% for r in results %}{% set ns.v = ns.v + r.rate %}{% endfor %}
+        {{ "%.0f"|format(ns.v / results|length) }}%
+      {% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Avg Time</div>
+    <div class="kpi-value">
+      {% if results %}
+        {% set ns = namespace(v=0) %}
+        {% for r in results %}{% set ns.v = ns.v + r.time %}{% endfor %}
+        {{ "%.2f"|format(ns.v / results|length) }}s
+      {% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Tools Tested</div>
+    <div class="kpi-value">{{ results | map(attribute='tool') | unique | list | length }}</div>
+  </div>
+</div>
+
+<!-- Charts row -->
+<div class="bench-charts-grid">
+  <div class="chart-card">
+    <div class="chart-card-title"><i class="fa-solid fa-chart-pie"></i> Pass / Fail by Tool</div>
+    <div class="chart-canvas-wrap"><canvas id="chart-pass-fail"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-title"><i class="fa-solid fa-stopwatch"></i> Verification Time (s)</div>
+    <div class="chart-canvas-wrap"><canvas id="chart-time"></canvas></div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-table"></i> Results</h2>
+    <div class="card-header-actions">
+      <select id="bench-tool-filter" class="input select input-sm" aria-label="Filter by tool">
+        <option value="">All Tools</option>
+        {% for tool in results | map(attribute='tool') | unique | sort %}
+        <option value="{{ tool }}">{{ tool }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="card-body card-body-flush">
+    <div class="table-responsive">
+      <table class="table" id="bench-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Contract</th>
+            <th>Time (s)</th>
+            <th>States</th>
+            <th>Success Rate</th>
+            <th>Result</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="bench-tbody">
+          {% for r in results %}
+          <tr class="bench-row" data-tool="{{ r.tool | upper }}">
+            <td><span class="badge badge-tool">{{ r.tool }}</span></td>
+            <td class="font-mono text-sm">{{ r.contract | truncate(32) }}</td>
+            <td class="font-mono">{{ "%.3f"|format(r.time) }}</td>
+            <td class="font-mono">{{ r.states if r.states else '—' }}</td>
+            <td>
+              <div class="progress-bar-inline">
+                <div class="progress-bar-track-sm">
+                  <div class="progress-bar-fill-sm {% if r.rate >= 80 %}fill-success{% elif r.rate >= 50 %}fill-warning{% else %}fill-danger{% endif %}"
+                       style="width:{{ r.rate }}%"></div>
+                </div>
+                <span class="progress-label-sm">{{ "%.0f"|format(r.rate) }}%</span>
+              </div>
+            </td>
+            <td>
+              {% if r.passed %}<span class="badge badge-pass">Passed</span>
+              {% else %}<span class="badge badge-fail">Failed</span>{% endif %}
+            </td>
+            <td class="text-muted text-sm">{{ r.date }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<!-- Empty state -->
+<div class="card">
+  <div class="card-body">
+    <div class="empty-state">
+      <span class="empty-state-icon"><i class="fa-solid fa-chart-bar"></i></span>
+      <p class="empty-state-title">No benchmark data yet</p>
+      <p class="empty-state-sub">Run benchmarks from the desktop app. Results appear here automatically.</p>
+      <div class="empty-state-actions">
+        <a href="{{ url_for('new_run') }}" class="btn btn-primary"><i class="fa-solid fa-play"></i> Run Verification</a>
+        <a href="{{ url_for('about') }}" class="btn btn-ghost"><i class="fa-solid fa-book-open"></i> Learn More</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if results %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ── Raw data from Jinja ────────────────────────────────────────────────
+  var RAW = {{ results | tojson }};
+
+  // ── Chart.js global defaults ───────────────────────────────────────────
+  var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  var gridColor  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+  var labelColor = isDark ? '#8b949e' : '#656d76';
+  var textColor  = isDark ? '#e6edf3' : '#1f2328';
+
+  Chart.defaults.color = labelColor;
+  Chart.defaults.borderColor = gridColor;
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.size = 12;
+
+  // ── Aggregate by tool ──────────────────────────────────────────────────
+  var toolMap = {};
+  RAW.forEach(function (r) {
+    var t = r.tool || 'Unknown';
+    if (!toolMap[t]) toolMap[t] = { pass: 0, fail: 0, times: [] };
+    if (r.passed) toolMap[t].pass++;
+    else          toolMap[t].fail++;
+    toolMap[t].times.push(r.time || 0);
+  });
+
+  var tools    = Object.keys(toolMap).sort();
+  var passes   = tools.map(function (t) { return toolMap[t].pass; });
+  var fails    = tools.map(function (t) { return toolMap[t].fail; });
+  var avgTimes = tools.map(function (t) {
+    var ts = toolMap[t].times;
+    return ts.length ? (ts.reduce(function (a, b) { return a + b; }, 0) / ts.length) : 0;
+  });
+
+  var PALETTE = ['#58a6ff','#3fb950','#f78166','#d29922','#bc8cff','#79c0ff','#56d364','#ff7b72'];
+
+  // ── Chart 1: Grouped bar — Pass / Fail by tool ─────────────────────────
+  var ctx1 = document.getElementById('chart-pass-fail');
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: tools,
+        datasets: [
+          {
+            label: 'Passed',
+            data: passes,
+            backgroundColor: 'rgba(63,185,80,0.75)',
+            borderColor: '#3fb950',
+            borderWidth: 1,
+            borderRadius: 4,
+          },
+          {
+            label: 'Failed',
+            data: fails,
+            backgroundColor: 'rgba(248,81,73,0.65)',
+            borderColor: '#f85149',
+            borderWidth: 1,
+            borderRadius: 4,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: labelColor } },
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1, color: labelColor },
+            grid: { color: gridColor }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Chart 2: Horizontal bar — Avg time per tool ────────────────────────
+  var ctx2 = document.getElementById('chart-time');
+  if (ctx2) {
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: tools,
+        datasets: [{
+          label: 'Avg Time (s)',
+          data: avgTimes.map(function (v) { return +v.toFixed(4); }),
+          backgroundColor: tools.map(function (_, i) { return PALETTE[i % PALETTE.length] + 'bb'; }),
+          borderColor:     tools.map(function (_, i) { return PALETTE[i % PALETTE.length]; }),
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) { return ' ' + ctx.parsed.x.toFixed(4) + 's'; }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: gridColor },
+            ticks: { color: labelColor }
+          },
+          y: { grid: { display: false }, ticks: { color: labelColor } }
+        }
+      }
+    });
+  }
+
+  // ── Table filter ───────────────────────────────────────────────────────
+  var filterSel = document.getElementById('bench-tool-filter');
+  var results = Array.from(document.querySelectorAll('.bench-row'));
+
+  if (filterSel) {
+    filterSel.addEventListener('change', function () {
+      var tool = this.value.toUpperCase();
+      results.forEach(function (row) {
+        row.style.display = (!tool || row.dataset.tool === tool) ? '' : 'none';
+      });
+    });
+  }
+
+  // ── CSV export ─────────────────────────────────────────────────────────
+  var exportBtn = document.getElementById('btn-export-csv');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function () {
+      var headers = ['Tool','Contract','Time (s)','States','Success Rate','Result','Date'];
+      var lines = [headers.join(',')];
+      results.forEach(function (row) {
+        var cells = Array.from(row.querySelectorAll('td')).map(function (td) {
+          return '"' + td.textContent.trim().replace(/"/g, '""') + '"';
+        });
+        lines.push(cells.join(','));
+      });
+      var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'benchmarks.csv';
+      a.click();
+    });
+  }
+
+  // ── Re-theme charts when theme toggles ────────────────────────────────
+  document.addEventListener('dg:theme_changed', function () {
+    // Simple page reload to re-render charts with new colours
+    location.reload();
+  });
+
+})();
+</script>
+{% endif %}
+{% endblock %}

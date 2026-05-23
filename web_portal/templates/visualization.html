@@ -1,0 +1,1431 @@
+{% extends "base.html" %} {% block title %}State Visualization — DeFi Guardian{%
+endblock %} {% block extra_css %}
+<style>
+    .viz-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        align-items: stretch;
+    }
+    .viz-main-area {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 1.25rem;
+        align-items: start;
+    }
+    .viz-state-machine-section {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1.25rem;
+    }
+    .mermaid-wrap {
+        background: #0a0e17;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        display: flex;
+        justify-content: center;
+        min-height: 200px;
+    }
+    .viz-canvas-wrap {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .viz-canvas-wrap {
+        background: #0a0e17;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        height: 650px;
+        flex-grow: 1;
+    }
+    .highlight-node {
+        box-shadow: 0 0 20px #fff;
+        stroke: #fff !important;
+        stroke-width: 4px !important;
+    }
+    .trace-link {
+        stroke: var(--accent) !important;
+        stroke-width: 3px !important;
+        stroke-dasharray: 5, 5;
+        animation: dash 1s linear infinite;
+    }
+    .selected-node circle {
+        stroke: #fff !important;
+        stroke-width: 4px !important;
+    }
+    @keyframes dash {
+        to { stroke-dashoffset: -10; }
+    }
+    .badge-tool {
+        background: var(--bg3);
+        color: var(--text1);
+        font-size: 0.6rem;
+        padding: 1px 4px;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+    }
+    [data-theme="light"] .viz-canvas-wrap {
+        background: #f0f4f8;
+    }
+
+    /* Controls bar */
+    .viz-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .viz-controls label {
+        font-size: 0.78rem;
+        color: var(--text2);
+        margin: 0;
+        white-space: nowrap;
+    }
+    .viz-controls select,
+    .viz-controls input[type="range"] {
+        width: auto;
+    }
+
+    /* Node info panel */
+    .node-info-panel {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .node-info-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text2);
+    }
+    .node-info-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        font-family: "JetBrains Mono", monospace;
+    }
+    .node-info-type {
+        font-size: 0.78rem;
+    }
+    .node-info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        padding: 0.35rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .node-info-row:last-child {
+        border-bottom: none;
+    }
+    .node-info-key {
+        color: var(--text2);
+    }
+    .node-info-val {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text);
+    }
+
+    /* Legend */
+    .viz-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+        color: var(--text2);
+    }
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    /* Stats mini row */
+    .viz-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+    }
+    .viz-stat {
+        background: var(--bg3);
+        border-radius: 6px;
+        padding: 0.6rem;
+        text-align: center;
+    }
+    .viz-stat-val {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1;
+    }
+    .viz-stat-lbl {
+        font-size: 0.68rem;
+        color: var(--text2);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.2rem;
+    }
+
+    /* Tooltip */
+    .viz-tooltip {
+        position: absolute;
+        background: rgba(13, 17, 23, 0.95);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.78rem;
+        color: var(--text);
+        pointer-events: none;
+        display: none;
+        z-index: 10;
+        max-width: 200px;
+        font-family: "JetBrains Mono", monospace;
+    }
+
+    @media (max-width: 900px) {
+        .viz-layout {
+            grid-template-columns: 1fr;
+        }
+        .viz-canvas-wrap {
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1 class="page-title">
+            <i class="fa-solid fa-diagram-project"></i> State Visualization
+        </h1>
+        <p class="page-subtitle">
+            Real-time state space exploration for: <span id="viz-filename" class="font-mono" style="color: var(--accent);">Loading...</span>
+        </p>
+    </div>
+</div>
+
+<-V Controls -->
+<div class="viz-controls">
+    <label>Mode:</label>
+    <div
+        style="
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        "
+    >
+        <input
+            type="radio"
+            name="viz-mode"
+            id="mode-2d"
+            value="2d"
+            checked
+            style="display: none"
+        />
+        <label
+            for="mode-2d"
+            class="btn btn-sm"
+            id="lbl-2d"
+            style="
+                border-radius: 0;
+                border: none;
+                margin: 0;
+                cursor: pointer;
+                background: var(--accent2);
+                color: #fff;
+            "
+            >2D</label
+        >
+        <input
+            type="radio"
+            name="viz-mode"
+            id="mode-3d"
+            value="3d"
+            style="display: none"
+        />
+        <label
+            for="mode-3d"
+            class="btn btn-sm"
+            id="lbl-3d"
+            style="border-radius: 0; border: none; margin: 0; cursor: pointer"
+            >3D</label
+        >
+    </div>
+
+    <label>Layout:</label>
+    <select id="layout-sel" class="input select input-sm" style="width: 150px">
+        <option value="force">Force-directed</option>
+        <option value="hierarchical">Hierarchical</option>
+        <option value="circular">Circular</option>
+        <option value="grid">Grid</option>
+    </select>
+
+    <label>Node size:</label>
+    <input
+        type="range"
+        id="node-size"
+        min="8"
+        max="28"
+        value="16"
+        style="width: 80px"
+    />
+
+    <div style="display: flex; gap: 0.4rem; align-items: center">
+        <input type="checkbox" id="show-labels" checked style="width: auto" />
+        <label for="show-labels" style="margin: 0">Labels</label>
+    </div>
+    <div style="display: flex; gap: 0.4rem; align-items: center">
+        <input type="checkbox" id="show-errors" checked style="width: auto" />
+        <label for="show-errors" style="margin: 0">Errors</label>
+    </div>
+    <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; max-width: 420px;">
+        <input type="search" id="node-search" class="input input-sm" placeholder="Search node..." style="width: 180px;" />
+        <label style="margin: 0; font-size: 0.78rem; color: var(--text2);">Filter:</label>
+        <label style="margin: 0; font-size: 0.78rem;"><input type="checkbox" id="filter-initial" checked style="width: auto; margin-right: 0.2rem;" />Init</label>
+        <label style="margin: 0; font-size: 0.78rem;"><input type="checkbox" id="filter-normal" checked style="width: auto; margin-right: 0.2rem;" />Normal</label>
+        <label style="margin: 0; font-size: 0.78rem;"><input type="checkbox" id="filter-accept" checked style="width: auto; margin-right: 0.2rem;" />Accept</label>
+        <label style="margin: 0; font-size: 0.78rem;"><input type="checkbox" id="filter-deadlock" checked style="width: auto; margin-right: 0.2rem;" />Deadlock</label>
+    </div>
+
+    <div style="margin-left: auto; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+        <button class="btn btn-sm btn-secondary" id="btn-animate">
+            <i class="fa-solid fa-play"></i> Animate
+        </button>
+        <button class="btn btn-sm btn-ghost" id="btn-fit">
+            <i class="fa-solid fa-compress-arrows-alt"></i> Fit
+        </button>
+        <div style="display:flex;gap:0.5rem;align-items:center;min-width:220px;">
+          <input type="range" id="trace-step-slider" min="0" max="0" value="0" style="width:150px;" disabled />
+          <span id="trace-step-label" style="font-size:0.78rem;color:var(--text2);white-space:nowrap;">Step 0/0</span>
+        </div>
+        <button class="btn btn-sm btn-ghost" id="btn-reset-viz">
+            <i class="fa-solid fa-arrows-rotate"></i>
+        </button>
+        <button class="btn btn-sm btn-ghost" id="btn-export-viz">
+            <i class="fa-solid fa-download"></i>
+        </button>
+    </div>
+</div>
+
+<div class="viz-layout">
+    <-V Stats row -->
+    <div class="viz-stats">
+        <div class="viz-stat">
+            <div class="viz-stat-val" id="vs-nodes">—</div>
+            <div class="viz-stat-lbl">States</div>
+        </div>
+        <div class="viz-stat">
+            <div class="viz-stat-val" id="vs-edges">—</div>
+            <div class="viz-stat-lbl">Transitions</div>
+        </div>
+        <div class="viz-stat">
+            <div class="viz-stat-val text-danger" id="vs-errors">—</div>
+            <div class="viz-stat-lbl">Error States</div>
+        </div>
+        <div class="viz-stat">
+            <div class="viz-stat-val" id="vs-depth">—</div>
+            <div class="viz-stat-lbl">Max Depth</div>
+        </div>
+    </div>
+
+    <div class="viz-main-area">
+        <div class="viz-column-left">
+            <div class="viz-section-label"><i class="fa-solid fa-eye"></i> Canvas</div>
+            <div class="viz-canvas-wrap" id="viz-canvas">
+                <div
+                    id="viz-loading"
+                    style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100%;
+                        color: var(--text2);
+                    "
+                >
+                    <span class="spinner"></span>&nbsp; Building graph…
+                </div>
+            </div>
+            <div class="viz-tooltip" id="viz-tooltip"></div>
+
+            <div class="viz-legend" style="margin-top: 0.75rem">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #4ade80"></div>
+                    Initial
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #58a6ff"></div>
+                    Normal
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #f59e0b"></div>
+                    Accept
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #f85149"></div>
+                    Error
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #bc8cff"></div>
+                    Deadlock
+                </div>
+                <div
+                    class="legend-item"
+                    style="
+                        margin-left: auto;
+                        font-size: 0.72rem;
+                        color: var(--text2);
+                    "
+                >
+                    Drag nodes · Scroll to zoom · Click for details
+                </div>
+            </div>
+        </div>
+
+        <div class="viz-column-right" style="display: flex; flex-direction: column; gap: 1rem">
+            <div class="viz-section-label"><i class="fa-solid fa-circle-info"></i> Details</div>
+            <div class="node-info-panel">
+                <div class="node-info-title">Node Details</div>
+                <div id="node-info-content">
+                    <p
+                        class="text-muted text-sm"
+                        style="text-align: center; padding: 1rem 0"
+                    >
+                        Click a node to inspect
+                    </p>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 0">
+                <div
+                    class="card-header"
+                    style="padding: 0.75rem 1rem; margin-bottom: 0"
+                >
+                    <h2 class="card-title" style="font-size: 0.85rem">
+                        <i class="fa-solid fa-list-check"></i> LTL Properties
+                    </h2>
+                </div>
+                <div id="viz-ltl-list" style="max-height: 220px; overflow-y: auto">
+                    <p
+                        class="text-muted text-sm"
+                        style="padding: 1rem; text-align: center"
+                    >
+                        Loading…
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <-V State Machine Diagram Section -->
+    <div class="viz-state-machine-section">
+        <div class="viz-section-label">
+            <i class="fa-solid fa-diagram-nested"></i> State Machine Diagram
+            <button class="btn btn-xs btn-ghost" id="btn-refresh-sm" style="margin-left: auto">
+                <i class="fa-solid fa-arrows-rotate"></i> Sync
+            </button>
+        </div>
+        <div class="mermaid-wrap" id="mermaid-container">
+            <div class="mermaid" id="state-machine-diagram">
+                stateDiagram-v2
+                [*] --> Loading
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+    (function () {
+      'use strict';
+
+      var graphData = { nodes: [], links: [] };
+      var ltlData = [];
+      var sim = null, threeCtx = null, animating = false;
+      var currentMode = '2d', currentLayout = 'force', nodeRadius = 16;
+      var showLabels = true, showErrors = true;
+      var nodeSearch = '';
+      var nodeFilters = {
+        initial: true,
+        normal: true,
+        accept: true,
+        error: true,
+        deadlock: true,
+      };
+
+      var currentTracePath = [];
+      var currentTraceStep = 0;
+      var currentTraceTarget = null;
+      var currentNodePositions = null;
+
+      var NODE_COLORS = {
+        initial: '#4ade80', normal: '#58a6ff', accept: '#f59e0b',
+        error: '#f85149', deadlock: '#bc8cff'
+      };
+
+      // Initialize Mermaid
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        state: {
+          useMaxWidth: true,
+          padding: 15
+        }
+      });
+
+      // ── Load graph ─────────────────────────────────────────────────────────
+      function loadGraph() {
+        // Use /visualization/current to get the correct contract name and audit_id
+        // instead of the stale global verification_state.json
+        fetch('/api/v1/visualization/current', { credentials: 'same-origin' })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(meta) {
+            if (meta && meta.model_name) {
+              var fnEl = document.getElementById('viz-filename');
+              if (fnEl) fnEl.textContent = meta.model_name;
+            }
+            // Fetch graph for the specific audit, not always "0"
+            var graphAuditId = (meta && meta.audit_id) ? String(meta.audit_id) : 'latest';
+            return Promise.all([
+              fetch('/api/v1/state-graph/' + graphAuditId, { credentials: 'same-origin' }).then(function(r) { return r.ok ? r.json() : {}; }),
+              fetch('/api/v1/ltl-properties', { credentials: 'same-origin' }).then(function(r) { return r.ok ? r.json() : []; })
+            ]);
+          })
+          .then(function(results) {
+            var rawGraph = results[0];
+            ltlData = results[1];
+            graphData = normalise(rawGraph, ltlData);
+            init();
+            renderStateMachine();
+            renderLTLList(ltlData);
+          })
+          .catch(function(err) {
+            console.error('Failed to load visualization data:', err);
+            // Fallback to current state if graph API fails
+            fetch('/api/v1/state/current', { credentials: 'same-origin' })
+              .then(function (r) { return r.ok ? r.json() : null; })
+              .then(function (d) { 
+                graphData = d ? buildFromState(d) : demo(); 
+                init(); 
+                renderStateMachine();
+              });
+          });
+      }
+
+      function renderStateMachine() {
+        var container = document.getElementById('mermaid-container');
+        if (!container) return;
+        
+        // Build mermaid syntax
+        var lines = ['stateDiagram-v2'];
+        var nodes = graphData.nodes.filter(function(n) { return !n.id.startsWith('LTL'); });
+        var nodeIds = new Set(nodes.map(function(n) { return n.id; }));
+        
+        // Find if any LTL property associated with these nodes failed
+        var failedProps = new Set(ltlData.filter(function(p) { return p.success === false; }).map(function(p) { return p.name; }));
+
+        nodes.forEach(function(n) {
+          var label = n.label.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+          lines.push('    state "' + n.label + '" as ' + label);
+          
+          if (n.type === 'initial') {
+            lines.push('    [*] --> ' + label);
+            lines.push('    class ' + label + ' initialState');
+          } else if (n.type === 'accept') {
+            lines.push('    class ' + label + ' acceptState');
+          } else if (n.type === 'deadlock') {
+            lines.push('    class ' + label + ' deadlockState');
+          } else if (n.type === 'error' || failedProps.has(n.label)) {
+            lines.push('    class ' + label + ' failedState');
+          }
+        });
+        
+        graphData.links.forEach(function(l) {
+          var sid = typeof l.source === 'object' ? l.source.id : String(l.source);
+          var tid = typeof l.target === 'object' ? l.target.id : String(l.target);
+          if (nodeIds.has(sid) && nodeIds.has(tid)) {
+            var sLabel = sid.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+            var tLabel = tid.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+            var edgeLabel = l.label ? ' : ' + l.label : '';
+            lines.push('    ' + sLabel + ' --> ' + tLabel + edgeLabel);
+          }
+        });
+
+        if (lines.length === 1) lines.push('    [*] --> NoData');
+        
+        // Add styling for states
+        lines.push('    classDef initialState fill:#4ade80,stroke:#fff,stroke-width:2px,color:#000');
+        lines.push('    classDef failedState fill:#f85149,stroke:#fff,stroke-width:2px,color:#fff');
+        lines.push('    classDef acceptState fill:#f59e0b,stroke:#fff,stroke-width:2px,color:#fff');
+        lines.push('    classDef deadlockState fill:#bc8cff,stroke:#fff,stroke-width:2px,color:#fff');
+        lines.push('    classDef activeState stroke:#fff,stroke-width:4px,stroke-dasharray: 5 5');
+
+        var code = lines.join('\n');
+        var output = document.getElementById('state-machine-diagram');
+        
+        // Re-render mermaid
+        try {
+          output.removeAttribute('data-processed');
+          output.innerHTML = code;
+          mermaid.run({ 
+            nodes: [output],
+            postRender: function(id) {
+              setupMermaidNodeClicks();
+              if (currentTracePath.length) highlightMermaidTrace();
+            }
+          });
+        } catch (e) {
+          console.error('Mermaid render failed:', e);
+        }
+      }
+
+      function highlightMermaidTrace() {
+        if (!currentTracePath.length) return;
+        var svg = document.querySelector('#state-machine-diagram svg');
+        if (!svg) return;
+        
+        var activeIds = new Set(currentTracePath.slice(0, currentTraceStep + 1).map(function(id) {
+          return id.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        }));
+
+        svg.querySelectorAll('.node').forEach(function(node) {
+          var idMatch = node.id.match(/state-([^-]+)-\d+/);
+          var id = idMatch ? idMatch[1] : null;
+          if (id && activeIds.has(id)) {
+            node.classList.add('activeState');
+          } else {
+            node.classList.remove('activeState');
+          }
+        });
+      }
+
+      function setupMermaidNodeClicks() {
+        var svg = document.querySelector('#state-machine-diagram svg');
+        if (!svg) return;
+
+        svg.querySelectorAll('.node').forEach(function(group) {
+          var idMatch = group.id.match(/state-([^-]+)-\d+/);
+          var label = idMatch ? idMatch[1] : '';
+          
+          if (!label) return;
+          group.style.cursor = 'pointer';
+          group.addEventListener('click', function() {
+            // Find the original node to get the true label/id
+            var originalNode = graphData.nodes.find(function(n) {
+              return n.id.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '') === label;
+            });
+            if (originalNode) zoomToNode(originalNode.id);
+          });
+        });
+      }
+
+      function zoomToNode(id) {
+        var targetId = String(id);
+        if (!graphData.nodes.some(function(n) { return n.label === targetId || n.id === targetId; })) {
+          console.warn('Cannot zoom, node not found:', targetId);
+          return;
+        }
+        currentTraceTarget = targetId;
+        currentTracePath = findTracePathToNode(targetId);
+        currentTraceStep = 0;
+        updateTraceSlider();
+        highlightTrace(currentTracePath, currentTraceStep);
+      }
+
+      function findTracePathToNode(nodeId) {
+        var path = [];
+        var parents = {};
+        var start = graphData.nodes.find(function(n) { return n.type === 'initial'; }) || graphData.nodes[0] || { id: 'INIT' };
+        var queue = [String(start.id)];
+        var visited = new Set([String(start.id)]);
+        var nodeById = {};
+        graphData.nodes.forEach(function(n) { nodeById[n.id] = n; });
+
+        while (queue.length) {
+          var current = queue.shift();
+          if (current === nodeId || (nodeById[current] && nodeById[current].label === nodeId)) break;
+          graphData.links.forEach(function(link) {
+            var sid = String(link.source);
+            var tid = String(link.target);
+            if (sid === current && !visited.has(tid)) {
+              visited.add(tid);
+              parents[tid] = current;
+              queue.push(tid);
+            }
+          });
+        }
+
+        var found = null;
+        if (graphData.nodes.some(function(n) { return n.id === nodeId; })) {
+          found = nodeId;
+        } else {
+          found = graphData.nodes.find(function(n) { return n.label === nodeId; });
+          found = found ? found.id : null;
+        }
+
+        if (!found) return [];
+        while (found) {
+          path.unshift(found);
+          if (found === 'INIT') break;
+          found = parents[found];
+        }
+        return path;
+      }
+
+      function updateTraceSlider() {
+        var slider = document.getElementById('trace-step-slider');
+        var label = document.getElementById('trace-step-label');
+        if (!slider || !label) return;
+        if (currentTracePath.length <= 1) {
+          slider.disabled = true;
+          slider.min = 0;
+          slider.max = 0;
+          slider.value = 0;
+          label.textContent = 'Step 0/0';
+          return;
+        }
+        slider.disabled = false;
+        slider.min = 0;
+        slider.max = currentTracePath.length - 1;
+        slider.value = currentTraceStep;
+        label.textContent = 'Step ' + (currentTraceStep + 1) + ' / ' + currentTracePath.length;
+      }
+
+      function highlightTrace(path, step) {
+        var svg = document.querySelector('#viz-canvas svg');
+        if (!svg) return;
+        var activeIds = new Set(path.slice(0, step + 1));
+
+        svg.querySelectorAll('line').forEach(function(line) {
+          var source = line.getAttribute('data-source');
+          var target = line.getAttribute('data-target');
+          var highlight = false;
+          for (var i = 0; i < path.length - 1; i++) {
+            if (path[i] === source && path[i + 1] === target) {
+              highlight = i <= step - 1;
+              break;
+            }
+          }
+          line.classList.toggle('trace-link', highlight);
+        });
+
+        svg.querySelectorAll('g').forEach(function(group) {
+          var title = group.querySelector('title');
+          var label = title ? title.textContent.trim() : (group.querySelector('text') ? group.querySelector('text').textContent.trim() : '');
+          if (!label) return;
+          group.classList.toggle('selected-node', activeIds.has(label) || activeIds.has(group.getAttribute('id')));
+        });
+      }
+
+      function clearTraceHighlight() {
+        currentTracePath = [];
+        currentTraceStep = 0;
+        currentTraceTarget = null;
+        updateTraceSlider();
+        var svg = document.querySelector('#viz-canvas svg');
+        if (!svg) return;
+        svg.querySelectorAll('line').forEach(function(line) { line.classList.remove('trace-link'); });
+        svg.querySelectorAll('g').forEach(function(g) { g.classList.remove('selected-node'); });
+      }
+
+      function normalise(d, ltlResults) {
+        var failedProps = new Set((ltlResults || []).filter(function(p) { return p.success === false; }).map(function(p) { return p.name; }));
+
+        var nodes = (d.nodes || []).map(function (n, i) {
+          var id = typeof n === 'string' ? n : (n.id || String(i));
+          var label = n.label || id;
+          
+          // Determine type with error correlation
+          var type = n.type;
+          if (!type) {
+            var isLtl = id.startsWith('LTL_');
+            var propName = isLtl ? id.replace('LTL_', '') : label;
+            
+            if (failedProps.has(propName) || id.toLowerCase().includes('error')) {
+              type = 'error';
+            } else if (id.toLowerCase().includes('accept')) {
+              type = 'accept';
+            } else if (i === 0 || id.toLowerCase().includes('init')) {
+              type = 'initial';
+            } else if (id.toLowerCase().includes('deadlock')) {
+              type = 'deadlock';
+            } else {
+              type = 'normal';
+            }
+          }
+
+          return { id: id, label: label, type: type, depth: n.depth || 0, data: n };
+        });
+        var nodeSet = new Set(nodes.map(function (n) { return n.id; }));
+        var links = (d.edges || d.links || [])
+          .filter(function (e) {
+            var s = String(e.source || e.from);
+            var t = String(e.target || e.to);
+            return nodeSet.has(s) && nodeSet.has(t);
+          })
+          .map(function (e) {
+            return {
+              source: String(e.source || e.from),
+              target: String(e.target || e.to),
+              label: e.label || ''
+            };
+          });
+        return { nodes: nodes, links: links };
+      }
+
+      function buildFromState(d) {
+        var nodes = [{ id: 'INIT', label: 'INIT', type: 'initial', depth: 0 }];
+        var links = [];
+        var ltl = d.ltl_results || [];
+        ltl.forEach(function (r, i) {
+          var id = 'S' + (i + 1);
+          nodes.push({ id: id, label: r.name || id, type: r.success ? 'accept' : 'error', depth: 1 });
+          links.push({ source: 'INIT', target: id, label: r.name || '' });
+        });
+        if (!ltl.length) {
+          nodes.push({ id: 'S1', label: 'State 1', type: 'normal', depth: 1 });
+          links.push({ source: 'INIT', target: 'S1', label: 'init' });
+        }
+        return { nodes: nodes, links: links };
+      }
+
+      function demo() {
+        var types = ['initial','normal','normal','accept','error','normal','deadlock','normal','normal','accept','error','normal'];
+        var nodes = types.map(function (t, i) { return { id: 'S'+i, label: 'S'+i, type: t, depth: Math.floor(i/3) }; });
+        var pairs = [[0,1],[0,2],[1,3],[2,3],[3,4],[3,5],[4,6],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[5,11],[2,7]];
+        var links = pairs.map(function (p) { return { source: 'S'+p[0], target: 'S'+p[1], label: 'τ' }; });
+        return { nodes: nodes, links: links };
+      }
+
+      function init() {
+        updateStats();
+        document.getElementById('viz-loading').style.display = 'none';
+        render();
+      }
+
+      function updateStats() {
+        var errors = graphData.nodes.filter(function (n) { return n.type === 'error'; }).length;
+        var maxDepth = graphData.nodes.reduce(function (m, n) { return Math.max(m, n.depth || 0); }, 0);
+        setText('vs-nodes',  graphData.nodes.length);
+        setText('vs-edges',  graphData.links.length);
+        setText('vs-errors', errors);
+        setText('vs-depth',  maxDepth);
+      }
+
+      function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+
+      function render() {
+        clearCanvas();
+        if (currentMode === '3d') render3D();
+        else {
+          render2D();
+          if (currentTracePath.length) {
+            highlightTrace(currentTracePath, currentTraceStep);
+          }
+        }
+      }
+
+      function clearCanvas() {
+        if (sim) { sim.stop(); sim = null; }
+        if (threeCtx) {
+          cancelAnimationFrame(threeCtx.animId);
+          if (threeCtx.controls) threeCtx.controls.dispose();
+          threeCtx.renderer.dispose();
+          if (threeCtx.renderer.domElement.parentNode)
+            threeCtx.renderer.domElement.parentNode.removeChild(threeCtx.renderer.domElement);
+          threeCtx = null;
+        }
+        var canvas = document.getElementById('viz-canvas');
+        Array.from(canvas.children).forEach(function (c) {
+          if (c.id !== 'viz-loading' && c.id !== 'viz-tooltip') canvas.removeChild(c);
+        });
+      }
+
+      // ── 2D D3 ─────────────────────────────────────────────────────────────
+      function render2D() {
+        var container = document.getElementById('viz-canvas');
+        var rect = container.getBoundingClientRect();
+        var W = rect.width || 800, H = rect.height || 580;
+        var tooltip = document.getElementById('viz-tooltip');
+
+        var nodes = graphData.nodes.filter(function (n) {
+          if (!nodeFilters[n.type]) return false;
+          if (n.type === 'error' && !showErrors) return false;
+          if (nodeSearch && !n.label.toLowerCase().includes(nodeSearch)) return false;
+          return true;
+        }).map(function(n) { return Object.assign({}, n); });
+        var nodeIds = new Set(nodes.map(function (n) { return n.id; }));
+        var links = graphData.links.filter(function (l) { return nodeIds.has(l.source) && nodeIds.has(l.target); })
+                      .map(function(l) { return Object.assign({}, l); });
+
+        // Cap data for performance if too many nodes
+        if (nodes.length > 300) {
+          nodes = nodes.slice(0, 300);
+          var cappedIds = new Set(nodes.map(function(n) { return n.id; }));
+          links = links.filter(function(l) { return cappedIds.has(l.source) && cappedIds.has(l.target); });
+        }
+
+        var svg = d3.select('#viz-canvas').append('svg')
+          .attr('width', W).attr('height', H).style('background', 'transparent');
+
+        var g = svg.append('g');
+        svg.call(d3.zoom().scaleExtent([0.1, 8]).on('zoom', function (e) { g.attr('transform', e.transform); }));
+
+        var defs = svg.append('defs');
+        ['normal','error'].forEach(function (t) {
+          defs.append('marker').attr('id', 'arr-' + t)
+            .attr('viewBox', '0 -5 10 10').attr('refX', nodeRadius + 6).attr('refY', 0)
+            .attr('markerWidth', 6).attr('markerHeight', 6).attr('orient', 'auto')
+            .append('path').attr('d', 'M0,-5L10,0L0,5')
+            .attr('fill', t === 'error' ? '#f85149' : '#4b5563');
+        });
+
+        var forceLink = d3.forceLink(links).id(function (d) { return d.id; }).distance(100);
+
+        if (currentLayout === 'hierarchical') {
+          nodes.forEach(function (n) { n.fy = (n.depth || 0) * 120 + 60; });
+        } else if (currentLayout === 'circular') {
+          nodes.forEach(function (n, i) {
+            var a = (2 * Math.PI * i) / nodes.length;
+            var r = Math.min(W, H) * 0.35;
+            n.fx = W/2 + r * Math.cos(a); n.fy = H/2 + r * Math.sin(a);
+          });
+        } else if (currentLayout === 'grid') {
+          var cols = Math.ceil(Math.sqrt(nodes.length));
+          nodes.forEach(function (n, i) { n.fx = 80 + (i % cols) * 110; n.fy = 80 + Math.floor(i / cols) * 110; });
+        }
+
+        sim = d3.forceSimulation(nodes)
+          .force('link', forceLink)
+          .force('charge', d3.forceManyBody().strength(-300))
+          .force('center', d3.forceCenter(W/2, H/2))
+          .force('collision', d3.forceCollide(nodeRadius + 10));
+
+        var link = g.append('g').selectAll('line').data(links).join('line')
+          .attr('data-source', function (d) { return d.source; })
+          .attr('data-target', function (d) { return d.target; })
+          .attr('stroke', function (d) { return d.label && d.label.includes('err') ? '#f85149' : '#374151'; })
+          .attr('stroke-width', 1.5)
+          .attr('marker-end', function (d) { return 'url(#arr-' + (d.label && d.label.includes('err') ? 'error' : 'normal') + ')'; });
+
+        var edgeLabel = g.append('g').selectAll('text').data(links).join('text')
+          .text(function (d) { return d.label || ''; })
+          .attr('font-size', 9).attr('fill', '#6b7280').attr('text-anchor', 'middle')
+          .style('display', showLabels ? null : 'none');
+
+        var node = g.append('g').selectAll('g').data(nodes).join('g')
+          .style('cursor', 'pointer')
+          .call(d3.drag()
+            .on('start', function (e, d) { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+            .on('drag',  function (e, d) { d.fx = e.x; d.fy = e.y; })
+            .on('end',   function (e, d) { if (!e.active) sim.alphaTarget(0); if (currentLayout === 'force') { d.fx = null; d.fy = null; } }))
+          .on('click', function (e, d) { showNodeInfo(d); })
+          .on('mouseover', function (e, d) {
+            if (!tooltip) return;
+            tooltip.style.display = 'block';
+            tooltip.style.left = (e.offsetX + 14) + 'px';
+            tooltip.style.top  = (e.offsetY - 10) + 'px';
+            tooltip.innerHTML = '<strong>' + d.label + '</strong><br>Type: ' + d.type + '<br>Depth: ' + (d.depth || 0);
+          })
+          .on('mouseout', function () { if (tooltip) tooltip.style.display = 'none'; });
+
+        node.append('circle')
+          .attr('r', nodeRadius)
+          .attr('fill', function (d) { return NODE_COLORS[d.type] || NODE_COLORS.normal; })
+          .attr('stroke', function (d) {
+            return nodeSearch && d.label.toLowerCase().includes(nodeSearch) ? '#ffffff' : '#0a0e17';
+          })
+          .attr('stroke-width', function (d) {
+            return nodeSearch && d.label.toLowerCase().includes(nodeSearch) ? 4 : 2;
+          })
+          .style('filter', function (d) { return 'drop-shadow(0 0 5px ' + (NODE_COLORS[d.type] || NODE_COLORS.normal) + '88)'; });
+
+        if (showLabels) {
+          node.append('text')
+            .text(function (d) { return d.label.length > 8 ? d.label.slice(0, 7) + '…' : d.label; })
+            .attr('text-anchor', 'middle').attr('dy', nodeRadius + 14)
+            .attr('font-size', 10).attr('fill', '#9ca3af')
+            .attr('pointer-events', 'none');
+        }
+
+        sim.on('tick', function () {
+          link.attr('x1', function (d) { return d.source.x; }).attr('y1', function (d) { return d.source.y; })
+              .attr('x2', function (d) { return d.target.x; }).attr('y2', function (d) { return d.target.y; });
+          edgeLabel.attr('x', function (d) { return (d.source.x + d.target.x) / 2; })
+                   .attr('y', function (d) { return (d.source.y + d.target.y) / 2; });
+          node.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+        });
+      }
+
+      // ── 3D Three.js ───────────────────────────────────────────────────────
+      function render3D() {
+        var container = document.getElementById('viz-canvas');
+        var rect = container.getBoundingClientRect();
+        var W = rect.width || 800, H = rect.height || 580;
+
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x060c14);
+        scene.fog = new THREE.FogExp2(0x060c14, 0.0015);
+
+        var camera = new THREE.PerspectiveCamera(55, W/H, 1, 3000);
+        camera.position.set(0, 100, 450);
+
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(W, H);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // OrbitControls
+        var controls = null;
+        if (typeof THREE.OrbitControls === 'function') {
+          controls = new THREE.OrbitControls(camera, renderer.domElement);
+        } else if (window.OrbitControls) {
+          controls = new window.OrbitControls(camera, renderer.domElement);
+        }
+        
+        if (controls) {
+          controls.enableDamping = true;
+          controls.dampingFactor = 0.05;
+        }
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        var dir = new THREE.DirectionalLight(0xffffff, 1.0);
+        dir.position.set(200, 300, 200); scene.add(dir);
+
+        var grid = new THREE.GridHelper(800, 20, 0x1e2a3a, 0x1e2a3a);
+        grid.position.y = -180; scene.add(grid);
+
+        var nodes = graphData.nodes.filter(function (n) {
+          if (!nodeFilters[n.type]) return false;
+          if (n.type === 'error' && !showErrors) return false;
+          if (nodeSearch && !n.label.toLowerCase().includes(nodeSearch)) return false;
+          return true;
+        });
+        
+        // Cap data for performance in 3D
+        if (nodes.length > 500) {
+          nodes = nodes.slice(0, 500);
+        }
+        
+        var count = nodes.length;
+        var positions = nodes.map(function (n, i) {
+          if (currentLayout === 'hierarchical') {
+            var cols = Math.ceil(Math.sqrt(count));
+            return { x: (i % cols - cols/2) * 120, y: -(n.depth || 0) * 90, z: (Math.floor(i/cols) - cols/2) * 120 };
+          } else if (currentLayout === 'circular') {
+            var a = (2 * Math.PI * i) / count;
+            return { x: 220 * Math.cos(a), y: (n.depth || 0) * -40, z: 220 * Math.sin(a) };
+          } else if (currentLayout === 'grid') {
+            var s = Math.ceil(Math.cbrt(count));
+            return { x: (i % s - s/2) * 120, y: (Math.floor(i/s)%s - s/2) * 120, z: (Math.floor(i/(s*s)) - s/2) * 120 };
+          } else {
+            var r = 150 + (n.depth || 0) * 50;
+            var a = (2 * Math.PI * i) / count;
+            return { x: r * Math.cos(a), y: (n.depth || 0) * -60, z: r * Math.sin(a) };
+          }
+        });
+
+        var nodeMap = {};
+        nodes.forEach(function (n, i) { nodeMap[n.id] = positions[i]; });
+
+        var meshes = [];
+        nodes.forEach(function (n, i) {
+          var color = parseInt((NODE_COLORS[n.type] || NODE_COLORS.normal).replace('#', ''), 16);
+          var geo = new THREE.SphereGeometry(12, 24, 24);
+          var mat = new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2, shininess: 80 });
+          var mesh = new THREE.Mesh(geo, mat);
+          var p = positions[i];
+          mesh.position.set(p.x, p.y, p.z);
+          mesh.userData = n;
+          scene.add(mesh);
+          meshes.push(mesh);
+
+          // Text labels for 3D
+          if (showLabels) {
+            var labelSprite = createTextSprite(n.label);
+            labelSprite.position.set(p.x, p.y + 20, p.z);
+            scene.add(labelSprite);
+          }
+        });
+
+        graphData.links.forEach(function (l) {
+          // Robust source/target lookup (handles D3 mutated objects)
+          var sid = typeof l.source === 'object' ? l.source.id : String(l.source);
+          var tid = typeof l.target === 'object' ? l.target.id : String(l.target);
+          var sp = nodeMap[sid], tp = nodeMap[tid];
+          if (!sp || !tp) return;
+          var pts = [new THREE.Vector3(sp.x, sp.y, sp.z), new THREE.Vector3(tp.x, tp.y, tp.z)];
+          var geo = new THREE.BufferGeometry().setFromPoints(pts);
+          var isErr = l.label && l.label.toLowerCase().includes('err');
+          var mat = new THREE.LineBasicMaterial({ color: isErr ? 0xf85149 : 0x374151, linewidth: 2 });
+          scene.add(new THREE.Line(geo, mat));
+        });
+
+        var raycaster = new THREE.Raycaster();
+        var mouse = new THREE.Vector2();
+        renderer.domElement.addEventListener('click', function (e) {
+          var rect = renderer.domElement.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+          mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+          raycaster.setFromCamera(mouse, camera);
+          var hits = raycaster.intersectObjects(meshes);
+          if (hits.length) showNodeInfo(hits[0].object.userData);
+        });
+
+        threeCtx = { renderer: renderer, controls: controls, animId: null, scene: scene, camera: camera };
+
+        function animate3D() {
+          threeCtx.animId = requestAnimationFrame(animate3D);
+          if (controls) controls.update();
+          if (animating) {
+            scene.rotation.y += 0.003;
+            meshes.forEach(function (m, i) {
+              m.position.y = positions[i].y + Math.sin(Date.now() * 0.0015 + i) * 6;
+            });
+          }
+          renderer.render(scene, camera);
+        }
+        animate3D();
+
+        window.addEventListener('resize', function () {
+          var nW = container.clientWidth;
+          camera.aspect = nW / H;
+          camera.updateProjectionMatrix();
+          renderer.setSize(nW, H);
+        });
+      }
+
+      function showNodeInfo(d) {
+        var panel = document.getElementById('node-info-content');
+        if (!panel) return;
+        var color = NODE_COLORS[d.type] || NODE_COLORS.normal;
+        var outgoing = graphData.links.filter(function (l) {
+          return String(l.source) === d.id || (l.source && l.source.id === d.id);
+        }).length;
+        var incoming = graphData.links.filter(function (l) {
+          return String(l.target) === d.id || (l.target && l.target.id === d.id);
+        }).length;
+        var rows = [
+          ['ID', d.id],
+          ['Type', d.type],
+          ['Depth', d.depth !== undefined ? d.depth : '—'],
+          ['Label', d.label],
+          ['Outgoing', outgoing],
+          ['Incoming', incoming]
+        ];
+        if (d.data) {
+          Object.entries(d.data).forEach(function (e) {
+            if (!['id','type','depth','label'].includes(e[0]) && typeof e[1] !== 'object')
+              rows.push([e[0], String(e[1])]);
+          });
+        }
+        panel.innerHTML =
+          '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem;">' +
+            '<span style="width:14px;height:14px;border-radius:50%;background:' + color + ';flex-shrink:0;box-shadow:0 0 6px ' + color + '88;"></span>' +
+            '<span class="node-info-name">' + escHtml(d.label) + '</span>' +
+          '</div>' +
+          rows.map(function (r) {
+            return '<div class="node-info-row"><span class="node-info-key">' + escHtml(r[0]) + '</span>' +
+                   '<span class="node-info-val">' + escHtml(String(r[1])) + '</span></div>';
+          }).join('');
+      }
+
+      function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+      function createTextSprite(text) {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var size = 128;
+        canvas.width = size * 4;
+        canvas.height = size;
+        
+        ctx.font = 'bold 32px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Background for label
+        var textWidth = ctx.measureText(text).width;
+        var padding = 20;
+        ctx.fillStyle = 'rgba(10, 14, 23, 0.8)';
+        ctx.roundRect(canvas.width/2 - textWidth/2 - padding, size/2 - 25, textWidth + padding*2, 50, 10);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(88, 166, 255, 0.5)';
+        ctx.stroke();
+
+        ctx.fillStyle = '#e6edf3';
+        ctx.fillText(text, canvas.width/2, size/2);
+        
+        var texture = new THREE.CanvasTexture(canvas);
+        var mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+        var sprite = new THREE.Sprite(mat);
+        sprite.scale.set(80, 20, 1);
+        return sprite;
+      }
+
+      window.zoomToNode = function(nodeId) {
+        if (currentMode === '3d' && threeCtx) {
+          var targetMesh = null;
+          threeCtx.scene.traverse(function(obj) {
+            if (obj.userData && (obj.userData.id === nodeId || obj.userData.label === nodeId)) {
+              targetMesh = obj;
+            }
+          });
+          if (targetMesh) {
+            var pos = targetMesh.position;
+            var startPos = threeCtx.camera.position.clone();
+            var targetPos = new THREE.Vector3(pos.x, pos.y, pos.z + 180);
+            var duration = 1000;
+            var start = Date.now();
+            function anim() {
+              var elapsed = Date.now() - start;
+              var t = Math.min(1, elapsed / duration);
+              var tEased = t * (2 - t);
+              threeCtx.camera.position.lerpVectors(startPos, targetPos, tEased);
+              if (threeCtx.controls) {
+                threeCtx.controls.target.lerp(pos, tEased);
+                threeCtx.controls.update();
+              }
+              if (t < 1) requestAnimationFrame(anim);
+            }
+            anim();
+            showNodeInfo(targetMesh.userData);
+            highlightTrace(nodeId);
+          }
+        } else {
+          var svg = d3.select('#viz-canvas svg');
+          var g = svg.select('g');
+          var target = g.selectAll('g').filter(function(d) { return d.id === nodeId || d.label === nodeId; });
+          if (!target.empty()) {
+            var d = target.datum();
+            var W = parseInt(svg.attr('width')), H = parseInt(svg.attr('height'));
+            var zoom = d3.zoom().on('zoom', function(e) { g.attr('transform', e.transform); });
+            svg.transition().duration(750).call(
+              zoom.transform,
+              d3.zoomIdentity.translate(W/2, H/2).scale(1.8).translate(-d.x, -d.y)
+            );
+            showNodeInfo(d);
+            highlightTrace(nodeId);
+          }
+        }
+      };
+
+      function fitView() {
+        if (currentMode === '3d' && threeCtx) {
+          threeCtx.camera.position.set(0, 100, 450);
+          if (threeCtx.controls) {
+            threeCtx.controls.target.set(0, 0, 0);
+            threeCtx.controls.update();
+          }
+        } else {
+          var svg = d3.select('#viz-canvas svg');
+          if (svg.empty()) return;
+          var g = svg.select('g');
+          var zoom = d3.zoom().on('zoom', function(e) { g.attr('transform', e.transform); });
+          svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+        }
+      }
+
+      function highlightTrace(nodeId) {
+        // Simple BFS to find path from INIT to target for visual replay
+        var path = findPathToNode('INIT', nodeId);
+        if (!path) return;
+
+        if (currentMode === '2d') {
+          var svg = d3.select('#viz-canvas svg');
+          svg.selectAll('line').classed('trace-link', function(l) {
+            for (var i=0; i<path.length-1; i++) {
+              if (l.source.id === path[i] && l.target.id === path[i+1]) return true;
+            }
+            return false;
+          });
+        }
+        // 3D path highlighting could be added here by changing line materials
+      }
+
+      function findPathToNode(startId, endId) {
+        var queue = [[startId]];
+        var visited = new Set();
+        while (queue.length > 0) {
+          var path = queue.shift();
+          var node = path[path.length - 1];
+          if (node === endId) return path;
+          if (!visited.has(node)) {
+            visited.add(node);
+            graphData.links.forEach(function(l) {
+              var sid = typeof l.source === 'object' ? l.source.id : String(l.source);
+              var tid = typeof l.target === 'object' ? l.target.id : String(l.target);
+              if (sid === node) {
+                var newPath = path.slice();
+                newPath.push(tid);
+                queue.push(newPath);
+              }
+            });
+          }
+        }
+        return null;
+      }
+
+      function renderLTLList(ltl) {
+        var list = document.getElementById('viz-ltl-list');
+        if (!list) return;
+        if (!ltl || !ltl.length) {
+          list.innerHTML = '<p class="text-muted text-sm" style="padding:1rem;text-align:center;">No LTL data</p>';
+          return;
+        }
+        list.innerHTML = ltl.map(function (r) {
+          var pass = r.success === true || r.errors === 0;
+          return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.85rem;border-bottom:1px solid var(--border);font-size:0.8rem;">' +
+            '<span style="width:8px;height:8px;border-radius:50%;background:' + (pass ? 'var(--success)' : 'var(--danger)') + ';flex-shrink:0;"></span>' +
+            '<span class="font-mono truncate" style="flex:1;font-size:0.75rem;">' + escHtml(r.name || '?') + '</span>' +
+            (pass ? '' : '<button class="btn btn-xs btn-primary btn-zoom" onclick="window.zoomToNode(\'LTL_' + r.name + '\')" title="Zoom to error"><i class="fa-solid fa-search-plus"></i></button>') +
+            '<span class="badge ' + (pass ? 'badge-pass' : 'badge-fail') + '" style="font-size:0.62rem;">' + (pass ? 'OK' : 'FAIL') + '</span>' +
+          '</div>';
+        }).join('');
+      }
+
+      document.querySelectorAll('input[name="viz-mode"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          currentMode = this.value;
+          ['lbl-2d','lbl-3d'].forEach(function(id) {
+            var el = document.getElementById(id);
+            var active = (id === 'lbl-' + currentMode);
+            el.style.background = active ? 'var(--accent2)' : '';
+            el.style.color      = active ? '#fff' : '';
+          });
+          render();
+        });
+      });
+
+      document.getElementById('layout-sel').addEventListener('change', function () {
+        currentLayout = this.value; render();
+      });
+
+      document.getElementById('node-size').addEventListener('input', function () {
+        nodeRadius = parseInt(this.value, 10);
+        if (currentMode === '2d') render();
+      });
+
+      document.getElementById('show-labels').addEventListener('change', function () {
+        showLabels = this.checked; render();
+      });
+
+      document.getElementById('show-errors').addEventListener('change', function () {
+        showErrors = this.checked; render();
+      });
+
+      document.getElementById('node-search').addEventListener('input', function () {
+        nodeSearch = this.value.trim().toLowerCase();
+        render();
+      });
+
+      ['initial','normal','accept','deadlock'].forEach(function(type) {
+        var checkbox = document.getElementById('filter-' + type);
+        if (!checkbox) return;
+        checkbox.addEventListener('change', function () {
+          nodeFilters[type] = checkbox.checked;
+          render();
+        });
+      });
+
+      document.getElementById('btn-fit').addEventListener('click', function () {
+        fitView();
+      });
+
+      document.getElementById('btn-animate').addEventListener('click', function () {
+        animating = !animating;
+        this.innerHTML = animating ? '<i class="fa-solid fa-pause"></i> Pause' : '<i class="fa-solid fa-play"></i> Animate';
+        if (currentMode === '2d' && sim) { if (animating) sim.alpha(0.3).restart(); else sim.stop(); }
+      });
+
+      document.getElementById('btn-reset-viz').addEventListener('click', function () {
+        animating = false;
+        currentTracePath = [];
+        currentTraceStep = 0;
+        currentTraceTarget = null;
+        document.getElementById('btn-animate').innerHTML = '<i class="fa-solid fa-play"></i> Animate';
+        clearTraceHighlight();
+        render();
+      });
+
+      var slider = document.getElementById('trace-step-slider');
+      if (slider) {
+        slider.addEventListener('input', function () {
+          currentTraceStep = parseInt(this.value, 10) || 0;
+          highlightTrace(currentTracePath, currentTraceStep);
+          updateTraceSlider();
+        });
+      }
+
+      document.getElementById('btn-refresh-sm').addEventListener('click', function() {
+        renderStateMachine();
+      });
+
+      document.getElementById('btn-export-viz').addEventListener('click', function () {
+        if (currentMode === '3d' && threeCtx) {
+          var url = threeCtx.renderer.domElement.toDataURL('image/png');
+          var a = document.createElement('a'); a.href = url; a.download = 'state-3d.png'; a.click();
+          return;
+        }
+        var svg = document.querySelector('#viz-canvas svg');
+        if (!svg) return;
+        var xml = new XMLSerializer().serializeToString(svg);
+        var svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        var url = URL.createObjectURL(svgBlob);
+        var img = new Image();
+        img.onload = function () {
+          var canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#0a0e17';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob(function (blob) {
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'state-2d.png';
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+        };
+        img.src = url;
+      });
+
+      window.zoomToNode = zoomToNode;
+      document.addEventListener('dg:state_update', function () { loadGraph(); });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        requestAnimationFrame(function () { requestAnimationFrame(loadGraph); });
+      });
+
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,11 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-07T21:54:02.299143
+file: /home/slade/Downloads/IERC3156FlashBorrower.sol
+
+--- STDOUT ---
+
+attribute/flag 'solc': Cannot run solc8.17
+
+
+
+--- STDERR ---

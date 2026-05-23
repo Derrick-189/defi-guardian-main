@@ -1,0 +1,14 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-14T22:08:10.024376
+file: /home/slade/Downloads/Kabvote.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmp365d8hmu.v", line 19, characters 0-42:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmp365d8hmu.v", line 63, characters 6-12:
+Error: The reference amount was not found in the current environment.
+

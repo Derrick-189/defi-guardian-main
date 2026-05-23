@@ -1,0 +1,11 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-04-27T22:41:07.296575
+file: /home/slade/defi_guardian/test_contract.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmp_bz_7r1h.v", line 22, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+

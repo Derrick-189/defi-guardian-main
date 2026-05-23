@@ -1,0 +1,8 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-04-12T16:34:06.796634
+file: /home/slade/HIDING/burn.sol
+
+--- STDOUT ---
+✅ Coq verification successful!
+
+--- STDERR ---

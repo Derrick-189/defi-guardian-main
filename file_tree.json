@@ -1,0 +1,5207 @@
+{
+  "name": "defi-guardian-main",
+  "type": "folder",
+  "children": [
+    {
+      "name": "app",
+      "type": "folder",
+      "children": [
+        {
+          "name": "memory",
+          "type": "folder",
+          "children": [
+            {
+              "name": "test_credentials.md",
+              "type": "file",
+              "icon": "file",
+              "path": "app/memory/test_credentials.md",
+              "size": 1102
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "benchmarks",
+      "type": "folder",
+      "children": [
+        {
+          "name": "contracts",
+          "type": "folder",
+          "children": [
+            {
+              "name": "auction.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "benchmarks/contracts/auction.sol",
+              "size": 62
+            },
+            {
+              "name": "erc20.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "benchmarks/contracts/erc20.sol",
+              "size": 58
+            },
+            {
+              "name": "lending.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "benchmarks/contracts/lending.sol",
+              "size": 70
+            }
+          ]
+        },
+        {
+          "name": "benchmark_results.json",
+          "type": "file",
+          "icon": "json",
+          "path": "benchmarks/benchmark_results.json",
+          "size": 11196
+        },
+        {
+          "name": "run_benchmarks.py",
+          "type": "file",
+          "icon": "python",
+          "path": "benchmarks/run_benchmarks.py",
+          "size": 2806
+        }
+      ]
+    },
+    {
+      "name": "certora",
+      "type": "folder",
+      "children": [
+        {
+          "name": "confs",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Account.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/Account.conf",
+              "size": 380
+            },
+            {
+              "name": "IERC1363Spender.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/IERC1363Spender.conf",
+              "size": 419
+            },
+            {
+              "name": "IERC3156FlashBorrower.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/IERC3156FlashBorrower.conf",
+              "size": 426
+            },
+            {
+              "name": "Kabvote.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/Kabvote.conf",
+              "size": 380
+            },
+            {
+              "name": "lending_pool.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/lending_pool.conf",
+              "size": 478
+            },
+            {
+              "name": "SimpleLending.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/SimpleLending.conf",
+              "size": 394
+            },
+            {
+              "name": "VestingWallet.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/VestingWallet.conf",
+              "size": 394
+            },
+            {
+              "name": "VestingWalletCliff.conf",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/confs/VestingWalletCliff.conf",
+              "size": 431
+            }
+          ]
+        },
+        {
+          "name": "contracts",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Account.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/Account.sol",
+              "size": 5555
+            },
+            {
+              "name": "IERC1363Spender.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/IERC1363Spender.sol",
+              "size": 1119
+            },
+            {
+              "name": "IERC3156FlashBorrower.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/IERC3156FlashBorrower.sol",
+              "size": 900
+            },
+            {
+              "name": "Kabvote.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/Kabvote.sol",
+              "size": 13380
+            },
+            {
+              "name": "SimpleLending.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/SimpleLending.sol",
+              "size": 4115
+            },
+            {
+              "name": "VestingWallet.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/VestingWallet.sol",
+              "size": 6057
+            },
+            {
+              "name": "VestingWalletCliff.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "certora/contracts/VestingWalletCliff.sol",
+              "size": 2018
+            }
+          ]
+        },
+        {
+          "name": "specs",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Account.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/Account.spec",
+              "size": 848
+            },
+            {
+              "name": "IERC1363Spender.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/IERC1363Spender.spec",
+              "size": 856
+            },
+            {
+              "name": "IERC3156FlashBorrower.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/IERC3156FlashBorrower.spec",
+              "size": 862
+            },
+            {
+              "name": "Kabvote.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/Kabvote.spec",
+              "size": 1518
+            },
+            {
+              "name": "SimpleLending.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/SimpleLending.spec",
+              "size": 854
+            },
+            {
+              "name": "SimpleLendingPool.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/SimpleLendingPool.spec",
+              "size": 5165
+            },
+            {
+              "name": "VestingWallet.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/VestingWallet.spec",
+              "size": 854
+            },
+            {
+              "name": "VestingWalletCliff.spec",
+              "type": "file",
+              "icon": "file",
+              "path": "certora/specs/VestingWalletCliff.spec",
+              "size": 859
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "console_exports",
+      "type": "folder",
+      "children": [
+        {
+          "name": "almost.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/almost.txt",
+          "size": 13001
+        },
+        {
+          "name": "analysis.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/analysis.txt",
+          "size": 17530
+        },
+        {
+          "name": "checking.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/checking.txt",
+          "size": 10522
+        },
+        {
+          "name": "checking2.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/checking2.txt",
+          "size": 12021
+        },
+        {
+          "name": "closer.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/closer.txt",
+          "size": 20009
+        },
+        {
+          "name": "counter.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/counter.txt",
+          "size": 16732
+        },
+        {
+          "name": "counterexample_report.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/counterexample_report.txt",
+          "size": 3326
+        },
+        {
+          "name": "deepfake.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/deepfake.txt",
+          "size": 12583
+        },
+        {
+          "name": "failing.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/failing.txt",
+          "size": 8104
+        },
+        {
+          "name": "flash.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/flash.txt",
+          "size": 17977
+        },
+        {
+          "name": "form.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/form.txt",
+          "size": 10700
+        },
+        {
+          "name": "gimme.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/gimme.txt",
+          "size": 18799
+        },
+        {
+          "name": "hmmm.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/hmmm.txt",
+          "size": 13103
+        },
+        {
+          "name": "improve.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/improve.txt",
+          "size": 15704
+        },
+        {
+          "name": "knowing.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/knowing.txt",
+          "size": 17257
+        },
+        {
+          "name": "lint.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/lint.txt",
+          "size": 12583
+        },
+        {
+          "name": "lworks.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/lworks.txt",
+          "size": 12461
+        },
+        {
+          "name": "newway.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/newway.txt",
+          "size": 10535
+        },
+        {
+          "name": "now.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/now.txt",
+          "size": 5637
+        },
+        {
+          "name": "reason.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/reason.txt",
+          "size": 4688
+        },
+        {
+          "name": "reason2.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/reason2.txt",
+          "size": 5110
+        },
+        {
+          "name": "reason3.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/reason3.txt",
+          "size": 3504
+        },
+        {
+          "name": "requirements.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/requirements.txt",
+          "size": 155
+        },
+        {
+          "name": "same.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/same.txt",
+          "size": 16398
+        },
+        {
+          "name": "seven.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/seven.txt",
+          "size": 12121
+        },
+        {
+          "name": "statev.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/statev.txt",
+          "size": 16150
+        },
+        {
+          "name": "statevv.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/statevv.txt",
+          "size": 14635
+        },
+        {
+          "name": "sun.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/sun.txt",
+          "size": 11836
+        },
+        {
+          "name": "trailer.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/trailer.txt",
+          "size": 16982
+        },
+        {
+          "name": "tryit.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/tryit.txt",
+          "size": 14460
+        },
+        {
+          "name": "unknown.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/unknown.txt",
+          "size": 18840
+        },
+        {
+          "name": "using.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/using.txt",
+          "size": 12282
+        },
+        {
+          "name": "whatwhy.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/whatwhy.txt",
+          "size": 11155
+        },
+        {
+          "name": "write.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/write.txt",
+          "size": 16006
+        },
+        {
+          "name": "zara.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/zara.txt",
+          "size": 16646
+        }
+      ]
+    },
+    {
+      "name": "generated",
+      "type": "folder",
+      "children": [
+        {
+          "name": "images",
+          "type": "folder",
+          "children": [
+            {
+              "name": "defi_guardian.ico",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian.ico",
+              "size": 150
+            },
+            {
+              "name": "defi_guardian.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian.png",
+              "size": 3265
+            },
+            {
+              "name": "defi_guardian_128.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_128.png",
+              "size": 3265
+            },
+            {
+              "name": "defi_guardian_128x128.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_128x128.png",
+              "size": 3265
+            },
+            {
+              "name": "defi_guardian_16.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_16.png",
+              "size": 128
+            },
+            {
+              "name": "defi_guardian_16x16.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_16x16.png",
+              "size": 128
+            },
+            {
+              "name": "defi_guardian_22.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_22.png",
+              "size": 160
+            },
+            {
+              "name": "defi_guardian_22x22.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_22x22.png",
+              "size": 160
+            },
+            {
+              "name": "defi_guardian_24.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_24.png",
+              "size": 195
+            },
+            {
+              "name": "defi_guardian_24x24.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_24x24.png",
+              "size": 195
+            },
+            {
+              "name": "defi_guardian_256.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_256.png",
+              "size": 6631
+            },
+            {
+              "name": "defi_guardian_256x256.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_256x256.png",
+              "size": 6631
+            },
+            {
+              "name": "defi_guardian_32.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_32.png",
+              "size": 242
+            },
+            {
+              "name": "defi_guardian_32x32.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_32x32.png",
+              "size": 242
+            },
+            {
+              "name": "defi_guardian_48.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_48.png",
+              "size": 323
+            },
+            {
+              "name": "defi_guardian_48x48.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_48x48.png",
+              "size": 323
+            },
+            {
+              "name": "defi_guardian_512.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_512.png",
+              "size": 13719
+            },
+            {
+              "name": "defi_guardian_64.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_64.png",
+              "size": 1207
+            },
+            {
+              "name": "defi_guardian_64x64.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/defi_guardian_64x64.png",
+              "size": 1207
+            },
+            {
+              "name": "state_diagram_1777654041.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777654041.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777654101.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777654101.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777654161.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777654161.png",
+              "size": 496030
+            },
+            {
+              "name": "state_diagram_1777654678.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777654678.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777911635.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777911635.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777911661.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777911661.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777911951.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777911951.png",
+              "size": 496030
+            },
+            {
+              "name": "state_diagram_1777913911.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777913911.png",
+              "size": 453309
+            },
+            {
+              "name": "state_diagram_1777914089.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777914089.png",
+              "size": 453309
+            },
+            {
+              "name": "state_diagram_1777915636.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777915636.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777916760.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777916760.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777916797.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777916797.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777917210.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777917210.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777917696.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777917696.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777917848.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777917848.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777918178.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777918178.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777918229.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777918229.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777918254.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777918254.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777918365.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777918365.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777918605.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777918605.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777918908.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777918908.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777919090.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777919090.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777919426.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777919426.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777919638.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777919638.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777920118.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777920118.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777920874.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777920874.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777921268.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777921268.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777921643.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777921643.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777922416.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777922416.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777922600.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777922600.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777968826.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777968826.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777969838.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777969838.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777971846.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777971846.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777971872.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777971872.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777971880.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777971880.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777971908.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777971908.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777972735.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777972735.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777972842.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777972842.png",
+              "size": 496030
+            },
+            {
+              "name": "state_diagram_1777972926.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777972926.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777973054.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777973054.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777973651.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777973651.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777974440.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777974440.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1777976782.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1777976782.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778168129.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778168129.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778170505.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778170505.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778170688.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778170688.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778171259.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778171259.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778171277.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778171277.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778171301.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778171301.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778171615.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778171615.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778171666.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778171666.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778182283.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778182283.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778182563.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778182563.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778183149.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778183149.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778183157.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778183157.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1778235076.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778235076.png",
+              "size": 318363
+            },
+            {
+              "name": "state_diagram_1778254399.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778254399.png",
+              "size": 206877
+            },
+            {
+              "name": "state_diagram_1778254431.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778254431.png",
+              "size": 206877
+            },
+            {
+              "name": "state_diagram_1778766590.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1778766590.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779108152.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779108152.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779108256.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779108256.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779293479.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779293479.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779294015.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779294015.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779294133.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779294133.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779294306.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779294306.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779294516.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779294516.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779294680.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779294680.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779298264.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779298264.png",
+              "size": 452933
+            }
+          ]
+        },
+        {
+          "name": "models",
+          "type": "folder",
+          "children": [
+            {
+              "name": "_spin_nvr.tmp",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/models/_spin_nvr.tmp",
+              "size": 1983
+            },
+            {
+              "name": "Account_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/Account_translated.pml",
+              "size": 2366
+            },
+            {
+              "name": "burn_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/burn_translated.pml",
+              "size": 2409
+            },
+            {
+              "name": "defi_vault_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/defi_vault_translated.pml",
+              "size": 1184
+            },
+            {
+              "name": "IERC1363Spender_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/IERC1363Spender_translated.pml",
+              "size": 2366
+            },
+            {
+              "name": "IERC3156FlashBorrower_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/IERC3156FlashBorrower_translated.pml",
+              "size": 2366
+            },
+            {
+              "name": "Kabvote_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/Kabvote_translated.pml",
+              "size": 5149
+            },
+            {
+              "name": "lending_pool_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/lending_pool_translated.pml",
+              "size": 1664
+            },
+            {
+              "name": "lib_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/lib_translated.pml",
+              "size": 1206
+            },
+            {
+              "name": "SimpleLending_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/SimpleLending_translated.pml",
+              "size": 2673
+            },
+            {
+              "name": "test_contract_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/test_contract_translated.pml",
+              "size": 1206
+            },
+            {
+              "name": "test_vault_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/test_vault_translated.pml",
+              "size": 2550
+            },
+            {
+              "name": "translated_output.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/translated_output.pml",
+              "size": 2418
+            },
+            {
+              "name": "translated_output.pml.trail",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/models/translated_output.pml.trail",
+              "size": 59
+            },
+            {
+              "name": "user_lending_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/user_lending_translated.pml",
+              "size": 1184
+            },
+            {
+              "name": "VestingWallet_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/VestingWallet_translated.pml",
+              "size": 2408
+            },
+            {
+              "name": "VestingWalletCliff_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/VestingWalletCliff_translated.pml",
+              "size": 2366
+            }
+          ]
+        },
+        {
+          "name": "reports",
+          "type": "folder",
+          "children": [
+            {
+              "name": "traces",
+              "type": "folder",
+              "children": []
+            },
+            {
+              "name": "active_file.txt",
+              "type": "file",
+              "icon": "text",
+              "path": "generated/reports/active_file.txt",
+              "size": 11
+            },
+            {
+              "name": "audit_log.json",
+              "type": "file",
+              "icon": "json",
+              "path": "generated/reports/audit_log.json",
+              "size": 272301
+            },
+            {
+              "name": "dashboard_users.db",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/reports/dashboard_users.db",
+              "size": 24576
+            },
+            {
+              "name": "file_tree.json",
+              "type": "file",
+              "icon": "json",
+              "path": "generated/reports/file_tree.json",
+              "size": 6623488
+            },
+            {
+              "name": "state_graph.json",
+              "type": "file",
+              "icon": "json",
+              "path": "generated/reports/state_graph.json",
+              "size": 534
+            },
+            {
+              "name": "verification_report.pdf",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/reports/verification_report.pdf",
+              "size": 2931
+            },
+            {
+              "name": "verification_state.json",
+              "type": "file",
+              "icon": "json",
+              "path": "generated/reports/verification_state.json",
+              "size": 23109
+            }
+          ]
+        },
+        {
+          "name": "specs",
+          "type": "folder",
+          "children": []
+        },
+        {
+          "name": "verification_state.json",
+          "type": "file",
+          "icon": "json",
+          "path": "generated/verification_state.json",
+          "size": 4565
+        }
+      ]
+    },
+    {
+      "name": "logs",
+      "type": "folder",
+      "children": [
+        {
+          "name": "certora",
+          "type": "folder",
+          "children": [
+            {
+              "name": "certora_verification_20260427_225151.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260427_225151.log",
+              "size": 310
+            },
+            {
+              "name": "certora_verification_20260501_190253.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260501_190253.log",
+              "size": 298
+            },
+            {
+              "name": "certora_verification_20260501_190254.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260501_190254.log",
+              "size": 298
+            },
+            {
+              "name": "certora_verification_20260504_195103.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260504_195103.log",
+              "size": 293
+            },
+            {
+              "name": "certora_verification_20260504_202548.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260504_202548.log",
+              "size": 310
+            },
+            {
+              "name": "certora_verification_20260504_205245.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260504_205245.log",
+              "size": 298
+            },
+            {
+              "name": "certora_verification_20260504_211219.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260504_211219.log",
+              "size": 303
+            },
+            {
+              "name": "certora_verification_20260505_111307.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260505_111307.log",
+              "size": 310
+            },
+            {
+              "name": "certora_verification_20260506_124317.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_124317.log",
+              "size": 282
+            },
+            {
+              "name": "certora_verification_20260506_130824.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_130824.log",
+              "size": 311
+            },
+            {
+              "name": "certora_verification_20260506_142136.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_142136.log",
+              "size": 282
+            },
+            {
+              "name": "certora_verification_20260506_144142.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_144142.log",
+              "size": 282
+            },
+            {
+              "name": "certora_verification_20260506_183415.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_183415.log",
+              "size": 282
+            },
+            {
+              "name": "certora_verification_20260506_213326.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_213326.log",
+              "size": 282
+            },
+            {
+              "name": "certora_verification_20260506_223556.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260506_223556.log",
+              "size": 282
+            },
+            {
+              "name": "certora_verification_20260507_163125.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260507_163125.log",
+              "size": 297
+            },
+            {
+              "name": "certora_verification_20260507_171657.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260507_171657.log",
+              "size": 281
+            },
+            {
+              "name": "certora_verification_20260507_193121.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260507_193121.log",
+              "size": 304
+            },
+            {
+              "name": "certora_verification_20260507_195527.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260507_195527.log",
+              "size": 294
+            },
+            {
+              "name": "certora_verification_20260507_215402.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260507_215402.log",
+              "size": 203
+            },
+            {
+              "name": "certora_verification_20260507_222829.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260507_222829.log",
+              "size": 189
+            },
+            {
+              "name": "certora_verification_20260508_102743.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260508_102743.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260508_194639.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260508_194639.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260510_162730.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260510_162730.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260511_103155.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260511_103155.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260511_114500.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260511_114500.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260511_171455.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260511_171455.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260512_195003.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260512_195003.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260513_092311.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_092311.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260513_111227.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_111227.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260513_114803.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_114803.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260513_121739.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_121739.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260513_125022.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_125022.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260513_125246.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_125246.log",
+              "size": 199
+            },
+            {
+              "name": "certora_verification_20260513_164100.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_164100.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260513_173834.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260513_173834.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260514_203134.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260514_203134.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260514_220813.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260514_220813.log",
+              "size": 189
+            },
+            {
+              "name": "certora_verification_20260515_120827.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260515_120827.log",
+              "size": 193
+            },
+            {
+              "name": "certora_verification_20260515_194031.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260515_194031.log",
+              "size": 189
+            }
+          ]
+        },
+        {
+          "name": "coq",
+          "type": "folder",
+          "children": [
+            {
+              "name": "coq_verification_20260409_143100.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260409_143100.log",
+              "size": 172
+            },
+            {
+              "name": "coq_verification_20260409_151124.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260409_151124.log",
+              "size": 164
+            },
+            {
+              "name": "coq_verification_20260409_152152.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260409_152152.log",
+              "size": 178
+            },
+            {
+              "name": "coq_verification_20260409_153907.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260409_153907.log",
+              "size": 164
+            },
+            {
+              "name": "coq_verification_20260411_161029.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260411_161029.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260411_165539.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260411_165539.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260412_130922.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260412_130922.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260412_144515.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260412_144515.log",
+              "size": 164
+            },
+            {
+              "name": "coq_verification_20260412_144934.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260412_144934.log",
+              "size": 164
+            },
+            {
+              "name": "coq_verification_20260412_162618.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260412_162618.log",
+              "size": 164
+            },
+            {
+              "name": "coq_verification_20260412_163406.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260412_163406.log",
+              "size": 166
+            },
+            {
+              "name": "coq_verification_20260417_164354.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260417_164354.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260417_165327.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260417_165327.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260417_220038.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260417_220038.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_113805.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_113805.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_121755.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_121755.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_121800.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_121800.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_125312.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_125312.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_125318.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_125318.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_130821.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_130821.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_131555.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_131555.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_132836.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_132836.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_135759.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_135759.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260419_144345.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260419_144345.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260420_171135.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260420_171135.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260420_174411.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260420_174411.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260420_180731.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260420_180731.log",
+              "size": 164
+            },
+            {
+              "name": "coq_verification_20260420_190316.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260420_190316.log",
+              "size": 182
+            },
+            {
+              "name": "coq_verification_20260422_115429.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260422_115429.log",
+              "size": 180
+            },
+            {
+              "name": "coq_verification_20260422_182710.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260422_182710.log",
+              "size": 183
+            },
+            {
+              "name": "coq_verification_20260422_194147.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260422_194147.log",
+              "size": 172
+            },
+            {
+              "name": "coq_verification_20260422_195155.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260422_195155.log",
+              "size": 172
+            },
+            {
+              "name": "coq_verification_20260422_200754.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260422_200754.log",
+              "size": 172
+            },
+            {
+              "name": "coq_verification_20260422_210932.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260422_210932.log",
+              "size": 178
+            },
+            {
+              "name": "coq_verification_20260424_162925.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260424_162925.log",
+              "size": 172
+            },
+            {
+              "name": "coq_verification_20260424_172822.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260424_172822.log",
+              "size": 172
+            },
+            {
+              "name": "coq_verification_20260427_103645.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260427_103645.log",
+              "size": 272
+            },
+            {
+              "name": "coq_verification_20260427_224107.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260427_224107.log",
+              "size": 271
+            },
+            {
+              "name": "coq_verification_20260427_224437.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260427_224437.log",
+              "size": 276
+            },
+            {
+              "name": "coq_verification_20260504_191516.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260504_191516.log",
+              "size": 276
+            },
+            {
+              "name": "coq_verification_20260504_195054.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260504_195054.log",
+              "size": 268
+            },
+            {
+              "name": "coq_verification_20260504_202551.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260504_202551.log",
+              "size": 276
+            },
+            {
+              "name": "coq_verification_20260504_205251.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260504_205251.log",
+              "size": 524
+            },
+            {
+              "name": "coq_verification_20260505_111222.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260505_111222.log",
+              "size": 564
+            },
+            {
+              "name": "coq_verification_20260506_124312.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260506_124312.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260506_142144.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260506_142144.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260506_183411.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260506_183411.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260506_213323.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260506_213323.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260506_223544.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260506_223544.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260507_163102.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_163102.log",
+              "size": 558
+            },
+            {
+              "name": "coq_verification_20260507_165620.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_165620.log",
+              "size": 556
+            },
+            {
+              "name": "coq_verification_20260507_171653.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_171653.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260507_193111.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_193111.log",
+              "size": 561
+            },
+            {
+              "name": "coq_verification_20260507_195522.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_195522.log",
+              "size": 556
+            },
+            {
+              "name": "coq_verification_20260507_215358.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_215358.log",
+              "size": 564
+            },
+            {
+              "name": "coq_verification_20260507_222824.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260507_222824.log",
+              "size": 550
+            },
+            {
+              "name": "coq_verification_20260508_130743.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_130743.log",
+              "size": 430
+            },
+            {
+              "name": "coq_verification_20260508_142702.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_142702.log",
+              "size": 473
+            },
+            {
+              "name": "coq_verification_20260508_154120.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_154120.log",
+              "size": 525
+            },
+            {
+              "name": "coq_verification_20260508_160649.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_160649.log",
+              "size": 156
+            },
+            {
+              "name": "coq_verification_20260508_183020.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_183020.log",
+              "size": 148
+            },
+            {
+              "name": "coq_verification_20260508_191222.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_191222.log",
+              "size": 526
+            },
+            {
+              "name": "coq_verification_20260508_194634.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_194634.log",
+              "size": 560
+            },
+            {
+              "name": "coq_verification_20260508_200223.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_200223.log",
+              "size": 525
+            },
+            {
+              "name": "coq_verification_20260508_203226.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_203226.log",
+              "size": 523
+            },
+            {
+              "name": "coq_verification_20260508_205955.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260508_205955.log",
+              "size": 525
+            },
+            {
+              "name": "coq_verification_20260510_162724.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260510_162724.log",
+              "size": 560
+            },
+            {
+              "name": "coq_verification_20260510_170308.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260510_170308.log",
+              "size": 523
+            },
+            {
+              "name": "coq_verification_20260511_103145.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260511_103145.log",
+              "size": 538
+            },
+            {
+              "name": "coq_verification_20260511_114447.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260511_114447.log",
+              "size": 538
+            },
+            {
+              "name": "coq_verification_20260511_171448.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260511_171448.log",
+              "size": 527
+            },
+            {
+              "name": "coq_verification_20260512_194952.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260512_194952.log",
+              "size": 349
+            },
+            {
+              "name": "coq_verification_20260513_092259.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_092259.log",
+              "size": 349
+            },
+            {
+              "name": "coq_verification_20260513_111223.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_111223.log",
+              "size": 355
+            },
+            {
+              "name": "coq_verification_20260513_114758.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_114758.log",
+              "size": 349
+            },
+            {
+              "name": "coq_verification_20260513_121641.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_121641.log",
+              "size": 349
+            },
+            {
+              "name": "coq_verification_20260513_125014.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_125014.log",
+              "size": 349
+            },
+            {
+              "name": "coq_verification_20260513_125242.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_125242.log",
+              "size": 355
+            },
+            {
+              "name": "coq_verification_20260513_143953.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_143953.log",
+              "size": 149
+            },
+            {
+              "name": "coq_verification_20260513_164054.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_164054.log",
+              "size": 473
+            },
+            {
+              "name": "coq_verification_20260513_164251.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_164251.log",
+              "size": 364
+            },
+            {
+              "name": "coq_verification_20260513_173827.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260513_173827.log",
+              "size": 473
+            },
+            {
+              "name": "coq_verification_20260514_203129.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260514_203129.log",
+              "size": 473
+            },
+            {
+              "name": "coq_verification_20260514_220810.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260514_220810.log",
+              "size": 469
+            },
+            {
+              "name": "coq_verification_20260515_120823.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260515_120823.log",
+              "size": 473
+            },
+            {
+              "name": "coq_verification_20260515_180520.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260515_180520.log",
+              "size": 473
+            },
+            {
+              "name": "coq_verification_20260515_194027.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260515_194027.log",
+              "size": 469
+            }
+          ]
+        },
+        {
+          "name": "lean",
+          "type": "folder",
+          "children": [
+            {
+              "name": "lean_verification_20260411_165833.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260411_165833.log",
+              "size": 323
+            },
+            {
+              "name": "lean_verification_20260412_130955.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_130955.log",
+              "size": 323
+            },
+            {
+              "name": "lean_verification_20260412_132454.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_132454.log",
+              "size": 329
+            },
+            {
+              "name": "lean_verification_20260412_132603.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_132603.log",
+              "size": 323
+            },
+            {
+              "name": "lean_verification_20260412_144554.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_144554.log",
+              "size": 307
+            },
+            {
+              "name": "lean_verification_20260412_144930.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_144930.log",
+              "size": 307
+            },
+            {
+              "name": "lean_verification_20260412_162657.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_162657.log",
+              "size": 307
+            },
+            {
+              "name": "lean_verification_20260412_163447.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260412_163447.log",
+              "size": 309
+            },
+            {
+              "name": "lean_verification_20260417_220120.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260417_220120.log",
+              "size": 414
+            },
+            {
+              "name": "lean_verification_20260419_132230.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260419_132230.log",
+              "size": 246
+            },
+            {
+              "name": "lean_verification_20260419_132846.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260419_132846.log",
+              "size": 166
+            },
+            {
+              "name": "lean_verification_20260508_131138.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_131138.log",
+              "size": 323
+            },
+            {
+              "name": "lean_verification_20260508_154146.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_154146.log",
+              "size": 271
+            },
+            {
+              "name": "lean_verification_20260508_160700.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_160700.log",
+              "size": 272
+            },
+            {
+              "name": "lean_verification_20260508_183028.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_183028.log",
+              "size": 271
+            },
+            {
+              "name": "lean_verification_20260508_191234.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_191234.log",
+              "size": 272
+            },
+            {
+              "name": "lean_verification_20260508_203244.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_203244.log",
+              "size": 269
+            },
+            {
+              "name": "lean_verification_20260508_210052.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260508_210052.log",
+              "size": 271
+            },
+            {
+              "name": "lean_verification_20260510_170323.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260510_170323.log",
+              "size": 269
+            },
+            {
+              "name": "lean_verification_20260513_092316.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_092316.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260513_111232.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_111232.log",
+              "size": 509
+            },
+            {
+              "name": "lean_verification_20260513_114807.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_114807.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260513_121746.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_121746.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260513_125025.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_125025.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260513_125252.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_125252.log",
+              "size": 509
+            },
+            {
+              "name": "lean_verification_20260513_144005.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_144005.log",
+              "size": 272
+            },
+            {
+              "name": "lean_verification_20260513_164259.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_164259.log",
+              "size": 282
+            },
+            {
+              "name": "lean_verification_20260513_173937.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260513_173937.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260514_203139.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260514_203139.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260514_220815.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260514_220815.log",
+              "size": 2050
+            },
+            {
+              "name": "lean_verification_20260515_120833.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260515_120833.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260515_180603.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260515_180603.log",
+              "size": 503
+            },
+            {
+              "name": "lean_verification_20260515_194037.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260515_194037.log",
+              "size": 2050
+            }
+          ]
+        },
+        {
+          "name": "rust_tools",
+          "type": "folder",
+          "children": [
+            {
+              "name": "creusot_verification_20260408_214122.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260408_214122.log",
+              "size": 3835
+            },
+            {
+              "name": "creusot_verification_20260408_220600.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260408_220600.log",
+              "size": 1036
+            },
+            {
+              "name": "creusot_verification_20260409_131844.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260409_131844.log",
+              "size": 2054
+            },
+            {
+              "name": "creusot_verification_20260409_133807.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260409_133807.log",
+              "size": 20472
+            },
+            {
+              "name": "creusot_verification_20260409_152602.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260409_152602.log",
+              "size": 34130
+            },
+            {
+              "name": "creusot_verification_20260411_161415.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260411_161415.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260411_165642.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260411_165642.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260412_131231.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260412_131231.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260417_165738.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260417_165738.log",
+              "size": 1337
+            },
+            {
+              "name": "creusot_verification_20260417_220830.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260417_220830.log",
+              "size": 1043
+            },
+            {
+              "name": "creusot_verification_20260419_114112.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_114112.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_121924.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_121924.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_125504.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_125504.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_131009.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_131009.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_131633.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_131633.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_132952.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_132952.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_135858.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_135858.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_143334.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_143334.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260419_144457.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260419_144457.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260420_171432.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260420_171432.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260420_174520.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260420_174520.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260508_143215.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260508_143215.log",
+              "size": 34131
+            },
+            {
+              "name": "creusot_verification_20260508_183133.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260508_183133.log",
+              "size": 1260
+            },
+            {
+              "name": "creusot_verification_20260508_203428.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/creusot_verification_20260508_203428.log",
+              "size": 3950
+            },
+            {
+              "name": "kani_verification_20260409_133823.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260409_133823.log",
+              "size": 18495
+            },
+            {
+              "name": "kani_verification_20260411_161451.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260411_161451.log",
+              "size": 410
+            },
+            {
+              "name": "kani_verification_20260411_165557.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260411_165557.log",
+              "size": 410
+            },
+            {
+              "name": "kani_verification_20260412_131247.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260412_131247.log",
+              "size": 410
+            },
+            {
+              "name": "kani_verification_20260412_132641.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260412_132641.log",
+              "size": 410
+            },
+            {
+              "name": "kani_verification_20260412_133304.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260412_133304.log",
+              "size": 6977
+            },
+            {
+              "name": "kani_verification_20260417_165433.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260417_165433.log",
+              "size": 7051
+            },
+            {
+              "name": "kani_verification_20260417_220856.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260417_220856.log",
+              "size": 7059
+            },
+            {
+              "name": "kani_verification_20260419_114153.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_114153.log",
+              "size": 7050
+            },
+            {
+              "name": "kani_verification_20260419_125509.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_125509.log",
+              "size": 7057
+            },
+            {
+              "name": "kani_verification_20260419_125519.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_125519.log",
+              "size": 7060
+            },
+            {
+              "name": "kani_verification_20260419_131020.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_131020.log",
+              "size": 7061
+            },
+            {
+              "name": "kani_verification_20260419_131640.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_131640.log",
+              "size": 7057
+            },
+            {
+              "name": "kani_verification_20260419_133009.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_133009.log",
+              "size": 7057
+            },
+            {
+              "name": "kani_verification_20260419_140025.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_140025.log",
+              "size": 7061
+            },
+            {
+              "name": "kani_verification_20260419_143351.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_143351.log",
+              "size": 7059
+            },
+            {
+              "name": "kani_verification_20260419_144517.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_144517.log",
+              "size": 7059
+            },
+            {
+              "name": "kani_verification_20260419_151411.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260419_151411.log",
+              "size": 7059
+            },
+            {
+              "name": "kani_verification_20260420_124657.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260420_124657.log",
+              "size": 7054
+            },
+            {
+              "name": "kani_verification_20260420_171513.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260420_171513.log",
+              "size": 7060
+            },
+            {
+              "name": "kani_verification_20260420_174540.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260420_174540.log",
+              "size": 7061
+            },
+            {
+              "name": "kani_verification_20260422_115604.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260422_115604.log",
+              "size": 7062
+            },
+            {
+              "name": "kani_verification_20260508_154203.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260508_154203.log",
+              "size": 7059
+            },
+            {
+              "name": "kani_verification_20260508_183032.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260508_183032.log",
+              "size": 7056
+            },
+            {
+              "name": "kani_verification_20260508_210058.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/kani_verification_20260508_210058.log",
+              "size": 7061
+            },
+            {
+              "name": "prusti_verification_20260417_165408.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260417_165408.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260417_220814.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260417_220814.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260419_125346.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260419_125346.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260419_130844.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260419_130844.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260419_131704.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260419_131704.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260419_132904.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260419_132904.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260420_171259.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260420_171259.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260422_115459.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260422_115459.log",
+              "size": 645
+            },
+            {
+              "name": "prusti_verification_20260508_154213.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260508_154213.log",
+              "size": 619
+            },
+            {
+              "name": "prusti_verification_20260508_183038.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/rust_tools/prusti_verification_20260508_183038.log",
+              "size": 619
+            }
+          ]
+        },
+        {
+          "name": "spin",
+          "type": "folder",
+          "children": [
+            {
+              "name": "pan",
+              "type": "file",
+              "icon": "file",
+              "path": "logs/spin/pan",
+              "size": 148392
+            },
+            {
+              "name": "spin_verification_20260409_143057.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260409_143057.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260409_145930.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260409_145930.log",
+              "size": 4141
+            },
+            {
+              "name": "spin_verification_20260409_151123.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260409_151123.log",
+              "size": 4141
+            },
+            {
+              "name": "spin_verification_20260409_152146.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260409_152146.log",
+              "size": 4155
+            },
+            {
+              "name": "spin_verification_20260409_153913.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260409_153913.log",
+              "size": 4141
+            },
+            {
+              "name": "spin_verification_20260411_161024.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260411_161024.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260411_165528.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260411_165528.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260412_130859.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_130859.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260412_132428.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_132428.log",
+              "size": 4163
+            },
+            {
+              "name": "spin_verification_20260412_132558.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_132558.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260412_133239.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_133239.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260412_144511.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_144511.log",
+              "size": 4141
+            },
+            {
+              "name": "spin_verification_20260412_162612.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_162612.log",
+              "size": 4141
+            },
+            {
+              "name": "spin_verification_20260412_163358.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260412_163358.log",
+              "size": 9420
+            },
+            {
+              "name": "spin_verification_20260417_164336.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260417_164336.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260417_165318.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260417_165318.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260417_220026.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260417_220026.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260417_220926.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260417_220926.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_113757.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_113757.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_121733.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_121733.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_125223.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_125223.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_130706.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_130706.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_131530.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_131530.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_132830.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_132830.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_135749.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_135749.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_143202.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_143202.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_144332.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_144332.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_151402.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_151402.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260419_154152.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_154152.log",
+              "size": 4158
+            },
+            {
+              "name": "spin_verification_20260419_164412.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_164412.log",
+              "size": 4227
+            },
+            {
+              "name": "spin_verification_20260419_170626.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260419_170626.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260420_124606.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_124606.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260420_171130.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_171130.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260420_174352.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_174352.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260420_175333.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_175333.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260420_180701.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_180701.log",
+              "size": 4141
+            },
+            {
+              "name": "spin_verification_20260420_190258.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_190258.log",
+              "size": 3268
+            },
+            {
+              "name": "spin_verification_20260420_201550.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_201550.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260420_203000.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260420_203000.log",
+              "size": 9420
+            },
+            {
+              "name": "spin_verification_20260422_115414.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_115414.log",
+              "size": 4157
+            },
+            {
+              "name": "spin_verification_20260422_122543.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_122543.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260422_135221.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_135221.log",
+              "size": 9432
+            },
+            {
+              "name": "spin_verification_20260422_182657.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_182657.log",
+              "size": 9437
+            },
+            {
+              "name": "spin_verification_20260422_195124.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_195124.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260422_200732.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_200732.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260422_210922.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_210922.log",
+              "size": 9435
+            },
+            {
+              "name": "spin_verification_20260422_215039.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260422_215039.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260424_162917.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260424_162917.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260424_172751.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260424_172751.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260424_182107.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260424_182107.log",
+              "size": 9432
+            },
+            {
+              "name": "spin_verification_20260424_182224.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260424_182224.log",
+              "size": 9432
+            },
+            {
+              "name": "spin_verification_20260424_195432.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260424_195432.log",
+              "size": 9440
+            },
+            {
+              "name": "spin_verification_20260427_120359.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260427_120359.log",
+              "size": 9426
+            },
+            {
+              "name": "spin_verification_20260427_120804.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260427_120804.log",
+              "size": 9435
+            },
+            {
+              "name": "spin_verification_20260427_223835.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260427_223835.log",
+              "size": 4158
+            },
+            {
+              "name": "spin_verification_20260427_225141.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260427_225141.log",
+              "size": 9440
+            },
+            {
+              "name": "spin_verification_20260427_230349.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260427_230349.log",
+              "size": 9432
+            },
+            {
+              "name": "spin_verification_20260501_190224.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260501_190224.log",
+              "size": 9434
+            },
+            {
+              "name": "spin_verification_20260504_191440.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260504_191440.log",
+              "size": 9681
+            },
+            {
+              "name": "spin_verification_20260504_195042.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260504_195042.log",
+              "size": 9670
+            },
+            {
+              "name": "spin_verification_20260504_202537.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260504_202537.log",
+              "size": 9678
+            },
+            {
+              "name": "spin_verification_20260504_205225.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260504_205225.log",
+              "size": 9672
+            },
+            {
+              "name": "spin_verification_20260505_111045.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260505_111045.log",
+              "size": 9678
+            },
+            {
+              "name": "spin_verification_20260506_124259.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_124259.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260506_130511.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_130511.log",
+              "size": 4328
+            },
+            {
+              "name": "spin_verification_20260506_130737.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_130737.log",
+              "size": 9678
+            },
+            {
+              "name": "spin_verification_20260506_142101.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_142101.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260506_144136.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_144136.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260506_183404.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_183404.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260506_213311.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_213311.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260506_223523.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260506_223523.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260507_163053.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_163053.log",
+              "size": 9672
+            },
+            {
+              "name": "spin_verification_20260507_165615.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_165615.log",
+              "size": 9670
+            },
+            {
+              "name": "spin_verification_20260507_171647.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_171647.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260507_193048.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_193048.log",
+              "size": 9675
+            },
+            {
+              "name": "spin_verification_20260507_195515.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_195515.log",
+              "size": 9670
+            },
+            {
+              "name": "spin_verification_20260507_215342.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_215342.log",
+              "size": 9678
+            },
+            {
+              "name": "spin_verification_20260507_222743.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260507_222743.log",
+              "size": 9664
+            },
+            {
+              "name": "spin_verification_20260508_102650.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_102650.log",
+              "size": 8262
+            },
+            {
+              "name": "spin_verification_20260508_130713.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_130713.log",
+              "size": 4327
+            },
+            {
+              "name": "spin_verification_20260508_142640.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_142640.log",
+              "size": 4328
+            },
+            {
+              "name": "spin_verification_20260508_154023.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_154023.log",
+              "size": 4327
+            },
+            {
+              "name": "spin_verification_20260508_160546.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_160546.log",
+              "size": 4328
+            },
+            {
+              "name": "spin_verification_20260508_183016.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_183016.log",
+              "size": 1155
+            },
+            {
+              "name": "spin_verification_20260508_191123.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_191123.log",
+              "size": 4328
+            },
+            {
+              "name": "spin_verification_20260508_194630.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_194630.log",
+              "size": 8259
+            },
+            {
+              "name": "spin_verification_20260508_200131.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_200131.log",
+              "size": 4327
+            },
+            {
+              "name": "spin_verification_20260508_203115.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_203115.log",
+              "size": 4325
+            },
+            {
+              "name": "spin_verification_20260508_205913.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260508_205913.log",
+              "size": 4327
+            },
+            {
+              "name": "spin_verification_20260510_162717.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260510_162717.log",
+              "size": 8259
+            },
+            {
+              "name": "spin_verification_20260510_170213.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260510_170213.log",
+              "size": 4325
+            },
+            {
+              "name": "spin_verification_20260511_103140.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260511_103140.log",
+              "size": 9674
+            },
+            {
+              "name": "spin_verification_20260511_114443.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260511_114443.log",
+              "size": 9674
+            },
+            {
+              "name": "spin_verification_20260511_171437.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260511_171437.log",
+              "size": 9677
+            },
+            {
+              "name": "spin_verification_20260512_194944.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260512_194944.log",
+              "size": 9668
+            },
+            {
+              "name": "spin_verification_20260513_092250.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_092250.log",
+              "size": 9668
+            },
+            {
+              "name": "spin_verification_20260513_111212.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_111212.log",
+              "size": 9674
+            },
+            {
+              "name": "spin_verification_20260513_114747.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_114747.log",
+              "size": 9668
+            },
+            {
+              "name": "spin_verification_20260513_121636.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_121636.log",
+              "size": 9671
+            },
+            {
+              "name": "spin_verification_20260513_125010.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_125010.log",
+              "size": 9671
+            },
+            {
+              "name": "spin_verification_20260513_125235.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_125235.log",
+              "size": 9674
+            },
+            {
+              "name": "spin_verification_20260513_143943.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_143943.log",
+              "size": 1156
+            },
+            {
+              "name": "spin_verification_20260513_164049.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_164049.log",
+              "size": 9674
+            },
+            {
+              "name": "spin_verification_20260513_164247.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_164247.log",
+              "size": 4338
+            },
+            {
+              "name": "spin_verification_20260513_173745.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260513_173745.log",
+              "size": 9668
+            },
+            {
+              "name": "spin_verification_20260514_203122.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260514_203122.log",
+              "size": 9738
+            },
+            {
+              "name": "spin_verification_20260514_220801.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260514_220801.log",
+              "size": 9734
+            },
+            {
+              "name": "spin_verification_20260515_120753.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260515_120753.log",
+              "size": 9738
+            },
+            {
+              "name": "spin_verification_20260515_180506.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260515_180506.log",
+              "size": 9738
+            },
+            {
+              "name": "spin_verification_20260515_193954.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260515_193954.log",
+              "size": 9734
+            },
+            {
+              "name": "spin_verification_20260516_121422.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260516_121422.log",
+              "size": 9738
+            },
+            {
+              "name": "translated_output.pml.trail",
+              "type": "file",
+              "icon": "file",
+              "path": "logs/spin/translated_output.pml.trail",
+              "size": 150
+            }
+          ]
+        },
+        {
+          "name": "portal_server.log",
+          "type": "file",
+          "icon": "log",
+          "path": "logs/portal_server.log",
+          "size": 1198
+        },
+        {
+          "name": "spin.log",
+          "type": "file",
+          "icon": "log",
+          "path": "logs/spin.log",
+          "size": 56
+        },
+        {
+          "name": "streamlit_server.log",
+          "type": "file",
+          "icon": "log",
+          "path": "logs/streamlit_server.log",
+          "size": 2418
+        }
+      ]
+    },
+    {
+      "name": "models",
+      "type": "folder",
+      "children": [
+        {
+          "name": "burn_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/burn_translated.pml",
+          "size": 2409
+        },
+        {
+          "name": "creusot_example_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/creusot_example_translated.pml",
+          "size": 1184
+        },
+        {
+          "name": "creusot_test_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/creusot_test_translated.pml",
+          "size": 1184
+        },
+        {
+          "name": "defi_vault_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/defi_vault_translated.pml",
+          "size": 1184
+        },
+        {
+          "name": "lib_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/lib_translated.pml",
+          "size": 1206
+        },
+        {
+          "name": "OffersLogic_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/OffersLogic_translated.pml",
+          "size": 3691
+        },
+        {
+          "name": "test_kani_working_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/test_kani_working_translated.pml",
+          "size": 1184
+        },
+        {
+          "name": "test_vault_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/test_vault_translated.pml",
+          "size": 2550
+        },
+        {
+          "name": "translated_output.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/translated_output.pml",
+          "size": 1184
+        },
+        {
+          "name": "translated_output_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/translated_output_translated.pml",
+          "size": 1184
+        },
+        {
+          "name": "user_lending_translated.pml",
+          "type": "file",
+          "icon": "promela",
+          "path": "models/user_lending_translated.pml",
+          "size": 1184
+        }
+      ]
+    },
+    {
+      "name": "outputs",
+      "type": "folder",
+      "children": [
+        {
+          "name": "_spin_nvr.tmp",
+          "type": "file",
+          "icon": "file",
+          "path": "outputs/_spin_nvr.tmp",
+          "size": 579
+        },
+        {
+          "name": "test.glob",
+          "type": "file",
+          "icon": "file",
+          "path": "outputs/test.glob",
+          "size": 162
+        },
+        {
+          "name": "test.vo",
+          "type": "file",
+          "icon": "file",
+          "path": "outputs/test.vo",
+          "size": 1039
+        },
+        {
+          "name": "test.vok",
+          "type": "file",
+          "icon": "file",
+          "path": "outputs/test.vok",
+          "size": 0
+        },
+        {
+          "name": "test.vos",
+          "type": "file",
+          "icon": "file",
+          "path": "outputs/test.vos",
+          "size": 0
+        },
+        {
+          "name": "translated_output.pml.trail",
+          "type": "file",
+          "icon": "file",
+          "path": "outputs/translated_output.pml.trail",
+          "size": 150
+        }
+      ]
+    },
+    {
+      "name": "reports",
+      "type": "folder",
+      "children": [
+        {
+          "name": "counterexamples",
+          "type": "folder",
+          "children": [
+            {
+              "name": "counterexample_20260506_124427.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260506_124427.log",
+              "size": 601
+            },
+            {
+              "name": "counterexample_20260506_130836.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260506_130836.log",
+              "size": 601
+            },
+            {
+              "name": "counterexample_20260506_132426.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260506_132426.log",
+              "size": 601
+            },
+            {
+              "name": "counterexample_20260507_215413.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260507_215413.log",
+              "size": 601
+            },
+            {
+              "name": "counterexample_20260508_102726.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260508_102726.log",
+              "size": 601
+            },
+            {
+              "name": "counterexample_20260508_102733.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260508_102733.log",
+              "size": 601
+            },
+            {
+              "name": "counterexample_20260508_131329.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260508_131329.log",
+              "size": 601
+            }
+          ]
+        },
+        {
+          "name": "sample_report.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "reports/sample_report.txt",
+          "size": 22
+        }
+      ]
+    },
+    {
+      "name": "scripts",
+      "type": "folder",
+      "children": [
+        {
+          "name": "vscode-extension",
+          "type": "folder",
+          "children": [
+            {
+              "name": "extension.js",
+              "type": "file",
+              "icon": "file",
+              "path": "scripts/vscode-extension/extension.js",
+              "size": 10633
+            },
+            {
+              "name": "package.json",
+              "type": "file",
+              "icon": "json",
+              "path": "scripts/vscode-extension/package.json",
+              "size": 2008
+            }
+          ]
+        },
+        {
+          "name": "check_reentrancy.py",
+          "type": "file",
+          "icon": "python",
+          "path": "scripts/check_reentrancy.py",
+          "size": 2204
+        },
+        {
+          "name": "install_system_deps.sh",
+          "type": "file",
+          "icon": "file",
+          "path": "scripts/install_system_deps.sh",
+          "size": 488
+        },
+        {
+          "name": "pre_commit_verify.py",
+          "type": "file",
+          "icon": "python",
+          "path": "scripts/pre_commit_verify.py",
+          "size": 1935
+        }
+      ]
+    },
+    {
+      "name": "tests",
+      "type": "folder",
+      "children": [
+        {
+          "name": "test_parsers.py",
+          "type": "file",
+          "icon": "python",
+          "path": "tests/test_parsers.py",
+          "size": 10890
+        }
+      ]
+    },
+    {
+      "name": "trace_parsers",
+      "type": "folder",
+      "children": [
+        {
+          "name": "__init__.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/__init__.py",
+          "size": 2654
+        },
+        {
+          "name": "certora_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/certora_parser.py",
+          "size": 3656
+        },
+        {
+          "name": "coq_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/coq_parser.py",
+          "size": 5980
+        },
+        {
+          "name": "lean_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/lean_parser.py",
+          "size": 4170
+        },
+        {
+          "name": "rust_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/rust_parser.py",
+          "size": 18709
+        },
+        {
+          "name": "spin_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/spin_parser.py",
+          "size": 12101
+        },
+        {
+          "name": "verus_parser.py",
+          "type": "file",
+          "icon": "python",
+          "path": "trace_parsers/verus_parser.py",
+          "size": 3850
+        }
+      ]
+    },
+    {
+      "name": "web_portal",
+      "type": "folder",
+      "children": [
+        {
+          "name": "scripts",
+          "type": "folder",
+          "children": [
+            {
+              "name": "add_trace_data_column.py",
+              "type": "file",
+              "icon": "python",
+              "path": "web_portal/scripts/add_trace_data_column.py",
+              "size": 856
+            },
+            {
+              "name": "backfill_trace_data.py",
+              "type": "file",
+              "icon": "python",
+              "path": "web_portal/scripts/backfill_trace_data.py",
+              "size": 1683
+            }
+          ]
+        },
+        {
+          "name": "static",
+          "type": "folder",
+          "children": [
+            {
+              "name": "css",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "components.css",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/css/components.css",
+                  "size": 10545
+                },
+                {
+                  "name": "style.css",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/css/style.css",
+                  "size": 48024
+                }
+              ]
+            },
+            {
+              "name": "img",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "architecture.png",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/img/architecture.png",
+                  "size": 199791
+                }
+              ]
+            },
+            {
+              "name": "js",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "counterexample.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/counterexample.js",
+                  "size": 23689
+                },
+                {
+                  "name": "dashboard.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/dashboard.js",
+                  "size": 10351
+                },
+                {
+                  "name": "main.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/main.js",
+                  "size": 2068
+                },
+                {
+                  "name": "socket.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/socket.js",
+                  "size": 7420
+                },
+                {
+                  "name": "theme.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/theme.js",
+                  "size": 4477
+                },
+                {
+                  "name": "tools.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/tools.js",
+                  "size": 10646
+                },
+                {
+                  "name": "trace.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/trace.js",
+                  "size": 13112
+                },
+                {
+                  "name": "websocket-client.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/static/js/websocket-client.js",
+                  "size": 1055
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "templates",
+          "type": "folder",
+          "children": [
+            {
+              "name": "404.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/404.html",
+              "size": 1041
+            },
+            {
+              "name": "about.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/about.html",
+              "size": 7263
+            },
+            {
+              "name": "active.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/active.html",
+              "size": 17253
+            },
+            {
+              "name": "artifacts.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/artifacts.html",
+              "size": 4191
+            },
+            {
+              "name": "base.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/base.html",
+              "size": 15379
+            },
+            {
+              "name": "benchmarks.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/benchmarks.html",
+              "size": 11313
+            },
+            {
+              "name": "contact.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/contact.html",
+              "size": 6949
+            },
+            {
+              "name": "counterexample.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/counterexample.html",
+              "size": 20650
+            },
+            {
+              "name": "dashboard.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/dashboard.html",
+              "size": 25133
+            },
+            {
+              "name": "desktop_app.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/desktop_app.html",
+              "size": 17617
+            },
+            {
+              "name": "index.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/index.html",
+              "size": 8868
+            },
+            {
+              "name": "login.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/login.html",
+              "size": 3245
+            },
+            {
+              "name": "logs.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/logs.html",
+              "size": 13850
+            },
+            {
+              "name": "new_run.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/new_run.html",
+              "size": 31660
+            },
+            {
+              "name": "register.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/register.html",
+              "size": 5112
+            },
+            {
+              "name": "services.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/services.html",
+              "size": 8156
+            },
+            {
+              "name": "settings.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/settings.html",
+              "size": 14358
+            },
+            {
+              "name": "specifications.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/specifications.html",
+              "size": 19732
+            },
+            {
+              "name": "streamlit.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/streamlit.html",
+              "size": 9431
+            },
+            {
+              "name": "terms.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/terms.html",
+              "size": 2045
+            },
+            {
+              "name": "tools.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/tools.html",
+              "size": 1946
+            },
+            {
+              "name": "trace.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/trace.html",
+              "size": 3972
+            },
+            {
+              "name": "visualization.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/visualization.html",
+              "size": 56207
+            }
+          ]
+        },
+        {
+          "name": "uploads",
+          "type": "folder",
+          "children": [
+            {
+              "name": "job-125",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-125/contract.pml",
+                  "size": 56
+                }
+              ]
+            },
+            {
+              "name": "job-126",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-126/contract.pml",
+                  "size": 41
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-126/pan.h",
+                  "size": 15957
+                }
+              ]
+            },
+            {
+              "name": "job-127",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-127/contract.pml",
+                  "size": 41
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-127/pan.h",
+                  "size": 15957
+                }
+              ]
+            },
+            {
+              "name": "job-128",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-128/contract.pml",
+                  "size": 41
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-128/pan.h",
+                  "size": 15957
+                }
+              ]
+            },
+            {
+              "name": "job-129",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-129/contract.pml",
+                  "size": 56
+                }
+              ]
+            },
+            {
+              "name": "IERC3156FlashBorrower.sol",
+              "type": "file",
+              "icon": "solidity",
+              "path": "web_portal/uploads/IERC3156FlashBorrower.sol",
+              "size": 900
+            }
+          ]
+        },
+        {
+          "name": "verification_results",
+          "type": "folder",
+          "children": [
+            {
+              "name": "3252ac6c",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/verification_results/3252ac6c/contract.pml",
+                  "size": 56
+                },
+                {
+                  "name": "contract_input",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/3252ac6c/contract_input",
+                  "size": 56
+                }
+              ]
+            },
+            {
+              "name": "873a2deb",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/verification_results/873a2deb/contract.pml",
+                  "size": 38
+                },
+                {
+                  "name": "contract_input",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/873a2deb/contract_input",
+                  "size": 38
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/873a2deb/pan.h",
+                  "size": 15962
+                }
+              ]
+            },
+            {
+              "name": "875e70f6",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/875e70f6/_spin_nvr.tmp",
+                  "size": 139
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/verification_results/875e70f6/contract.pml",
+                  "size": 93
+                },
+                {
+                  "name": "contract_input",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/875e70f6/contract_input",
+                  "size": 35
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/875e70f6/pan.h",
+                  "size": 16454
+                },
+                {
+                  "name": "spec.txt",
+                  "type": "file",
+                  "icon": "text",
+                  "path": "web_portal/verification_results/875e70f6/spec.txt",
+                  "size": 18
+                }
+              ]
+            },
+            {
+              "name": "caefc344",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/verification_results/caefc344/contract.pml",
+                  "size": 38
+                },
+                {
+                  "name": "contract_input",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/caefc344/contract_input",
+                  "size": 38
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/verification_results/caefc344/pan.h",
+                  "size": 15962
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "__init__.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/__init__.py",
+          "size": 0
+        },
+        {
+          "name": "api_v1.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/api_v1.py",
+          "size": 35062
+        },
+        {
+          "name": "app.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/app.py",
+          "size": 26550
+        },
+        {
+          "name": "app.py.bak",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/app.py.bak",
+          "size": 19212
+        },
+        {
+          "name": "audit_db.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/audit_db.py",
+          "size": 16073
+        },
+        {
+          "name": "config.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/config.py",
+          "size": 1996
+        },
+        {
+          "name": "defi_guardian.db",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/defi_guardian.db",
+          "size": 618496
+        },
+        {
+          "name": "defi_guardian.db-shm",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/defi_guardian.db-shm",
+          "size": 32768
+        },
+        {
+          "name": "defi_guardian.db.migrated",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/defi_guardian.db.migrated",
+          "size": 327680
+        },
+        {
+          "name": "llm_spec.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/llm_spec.py",
+          "size": 5641
+        },
+        {
+          "name": "queue_manager.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/queue_manager.py",
+          "size": 1976
+        },
+        {
+          "name": "tasks.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/tasks.py",
+          "size": 5171
+        },
+        {
+          "name": "trace_parsers.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/trace_parsers.py",
+          "size": 36609
+        },
+        {
+          "name": "utils.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/utils.py",
+          "size": 7493
+        },
+        {
+          "name": "verification_queue.db",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/verification_queue.db",
+          "size": 16384
+        },
+        {
+          "name": "verification_server.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/verification_server.py",
+          "size": 20968
+        },
+        {
+          "name": "verification_simulator.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/verification_simulator.py",
+          "size": 30170
+        }
+      ]
+    },
+    {
+      "name": "aeneas_integration.py",
+      "type": "file",
+      "icon": "python",
+      "path": "aeneas_integration.py",
+      "size": 2150
+    },
+    {
+      "name": "annotated_output.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "annotated_output.rs",
+      "size": 996
+    },
+    {
+      "name": "app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "app.py",
+      "size": 146442
+    },
+    {
+      "name": "check_app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "check_app.py",
+      "size": 430
+    },
+    {
+      "name": "check_tools.py",
+      "type": "file",
+      "icon": "python",
+      "path": "check_tools.py",
+      "size": 7607
+    },
+    {
+      "name": "check_tools.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "check_tools.sh",
+      "size": 0
+    },
+    {
+      "name": "cookies.txt",
+      "type": "file",
+      "icon": "text",
+      "path": "cookies.txt",
+      "size": 233
+    },
+    {
+      "name": "coq_verifier.py",
+      "type": "file",
+      "icon": "python",
+      "path": "coq_verifier.py",
+      "size": 31480
+    },
+    {
+      "name": "counterexample_analyzer.py",
+      "type": "file",
+      "icon": "python",
+      "path": "counterexample_analyzer.py",
+      "size": 10598
+    },
+    {
+      "name": "create_custom_icon.py",
+      "type": "file",
+      "icon": "python",
+      "path": "create_custom_icon.py",
+      "size": 14210
+    },
+    {
+      "name": "create_defi_icon.py",
+      "type": "file",
+      "icon": "python",
+      "path": "create_defi_icon.py",
+      "size": 1471
+    },
+    {
+      "name": "deepseek_python_20260506_b2360f.py",
+      "type": "file",
+      "icon": "python",
+      "path": "deepseek_python_20260506_b2360f.py",
+      "size": 47886
+    },
+    {
+      "name": "DeFi Guardian final report draft 1.docx",
+      "type": "file",
+      "icon": "file",
+      "path": "DeFi Guardian final report draft 1.docx",
+      "size": 3631094
+    },
+    {
+      "name": "defi-guardian.desktop",
+      "type": "file",
+      "icon": "file",
+      "path": "defi-guardian.desktop",
+      "size": 606
+    },
+    {
+      "name": "defi_vault.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "defi_vault.rs",
+      "size": 15649
+    },
+    {
+      "name": "DeFiGuardian.desktop",
+      "type": "file",
+      "icon": "file",
+      "path": "DeFiGuardian.desktop",
+      "size": 1888
+    },
+    {
+      "name": "desktop_app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "desktop_app.py",
+      "size": 267680
+    },
+    {
+      "name": "desktop_bridge.py",
+      "type": "file",
+      "icon": "python",
+      "path": "desktop_bridge.py",
+      "size": 2937
+    },
+    {
+      "name": "desktop_console.log",
+      "type": "file",
+      "icon": "log",
+      "path": "desktop_console.log",
+      "size": 58
+    },
+    {
+      "name": "docker-entrypoint.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "docker-entrypoint.sh",
+      "size": 588
+    },
+    {
+      "name": "Dockerfile",
+      "type": "file",
+      "icon": "file",
+      "path": "Dockerfile",
+      "size": 1017
+    },
+    {
+      "name": "dump.rdb",
+      "type": "file",
+      "icon": "file",
+      "path": "dump.rdb",
+      "size": 771
+    },
+    {
+      "name": "events.py",
+      "type": "file",
+      "icon": "python",
+      "path": "events.py",
+      "size": 6724
+    },
+    {
+      "name": "file_tree.json",
+      "type": "file",
+      "icon": "json",
+      "path": "file_tree.json",
+      "size": 164646
+    },
+    {
+      "name": "FIXES.md",
+      "type": "file",
+      "icon": "file",
+      "path": "FIXES.md",
+      "size": 3489
+    },
+    {
+      "name": "formal-verification.yml",
+      "type": "file",
+      "icon": "file",
+      "path": "formal-verification.yml",
+      "size": 10445
+    },
+    {
+      "name": "install.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "install.sh",
+      "size": 15678
+    },
+    {
+      "name": "install_icons.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "install_icons.sh",
+      "size": 1561
+    },
+    {
+      "name": "launch.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "launch.sh",
+      "size": 270
+    },
+    {
+      "name": "launch_desktop_app.desktop",
+      "type": "file",
+      "icon": "file",
+      "path": "launch_desktop_app.desktop",
+      "size": 319
+    },
+    {
+      "name": "launch_desktop_app.py",
+      "type": "file",
+      "icon": "python",
+      "path": "launch_desktop_app.py",
+      "size": 1409
+    },
+    {
+      "name": "launch_portal.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "launch_portal.sh",
+      "size": 1658
+    },
+    {
+      "name": "launcher.py",
+      "type": "file",
+      "icon": "python",
+      "path": "launcher.py",
+      "size": 20863
+    },
+    {
+      "name": "lean_verifier.py",
+      "type": "file",
+      "icon": "python",
+      "path": "lean_verifier.py",
+      "size": 5818
+    },
+    {
+      "name": "llm_spec_generator.py",
+      "type": "file",
+      "icon": "python",
+      "path": "llm_spec_generator.py",
+      "size": 9404
+    },
+    {
+      "name": "metrics.py",
+      "type": "file",
+      "icon": "python",
+      "path": "metrics.py",
+      "size": 5277
+    },
+    {
+      "name": "migrate_sqlite_to_postgres.py",
+      "type": "file",
+      "icon": "python",
+      "path": "migrate_sqlite_to_postgres.py",
+      "size": 6170
+    },
+    {
+      "name": "my_contract.verify.yaml",
+      "type": "file",
+      "icon": "file",
+      "path": "my_contract.verify.yaml",
+      "size": 699
+    },
+    {
+      "name": "pan.b",
+      "type": "file",
+      "icon": "file",
+      "path": "pan.b",
+      "size": 341
+    },
+    {
+      "name": "pan.c",
+      "type": "file",
+      "icon": "file",
+      "path": "pan.c",
+      "size": 329785
+    },
+    {
+      "name": "pan.h",
+      "type": "file",
+      "icon": "file",
+      "path": "pan.h",
+      "size": 16320
+    },
+    {
+      "name": "pan.m",
+      "type": "file",
+      "icon": "file",
+      "path": "pan.m",
+      "size": 1216
+    },
+    {
+      "name": "pan.p",
+      "type": "file",
+      "icon": "file",
+      "path": "pan.p",
+      "size": 56174
+    },
+    {
+      "name": "pan.t",
+      "type": "file",
+      "icon": "file",
+      "path": "pan.t",
+      "size": 18074
+    },
+    {
+      "name": "PROJECT_STRUCTURE.md",
+      "type": "file",
+      "icon": "file",
+      "path": "PROJECT_STRUCTURE.md",
+      "size": 5250
+    },
+    {
+      "name": "property_inference.py",
+      "type": "file",
+      "icon": "python",
+      "path": "property_inference.py",
+      "size": 1397
+    },
+    {
+      "name": "README.md",
+      "type": "file",
+      "icon": "file",
+      "path": "README.md",
+      "size": 1286
+    },
+    {
+      "name": "repro_prusti.py",
+      "type": "file",
+      "icon": "python",
+      "path": "repro_prusti.py",
+      "size": 579
+    },
+    {
+      "name": "requirements.txt",
+      "type": "file",
+      "icon": "text",
+      "path": "requirements.txt",
+      "size": 1616
+    },
+    {
+      "name": "run_defi_guardian.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "run_defi_guardian.sh",
+      "size": 378
+    },
+    {
+      "name": "run_verification_server.py",
+      "type": "file",
+      "icon": "python",
+      "path": "run_verification_server.py",
+      "size": 1395
+    },
+    {
+      "name": "run_worker.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "run_worker.sh",
+      "size": 516
+    },
+    {
+      "name": "rust_verifiers.py",
+      "type": "file",
+      "icon": "python",
+      "path": "rust_verifiers.py",
+      "size": 36702
+    },
+    {
+      "name": "SimpleLending.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "SimpleLending.sol",
+      "size": 4115
+    },
+    {
+      "name": "spec_generator.py",
+      "type": "file",
+      "icon": "python",
+      "path": "spec_generator.py",
+      "size": 11324
+    },
+    {
+      "name": "test.v",
+      "type": "file",
+      "icon": "file",
+      "path": "test.v",
+      "size": 62
+    },
+    {
+      "name": "test_contract.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "test_contract.rs",
+      "size": 1487
+    },
+    {
+      "name": "test_import.py",
+      "type": "file",
+      "icon": "python",
+      "path": "test_import.py",
+      "size": 575
+    },
+    {
+      "name": "test_report.py",
+      "type": "file",
+      "icon": "python",
+      "path": "test_report.py",
+      "size": 748
+    },
+    {
+      "name": "theme_config.json",
+      "type": "file",
+      "icon": "json",
+      "path": "theme_config.json",
+      "size": 27
+    },
+    {
+      "name": "themes.py",
+      "type": "file",
+      "icon": "python",
+      "path": "themes.py",
+      "size": 2997
+    },
+    {
+      "name": "TOOL_INTEGRATION_GUIDE.md",
+      "type": "file",
+      "icon": "file",
+      "path": "TOOL_INTEGRATION_GUIDE.md",
+      "size": 3921
+    },
+    {
+      "name": "TRACE_SCHEMA.md",
+      "type": "file",
+      "icon": "file",
+      "path": "TRACE_SCHEMA.md",
+      "size": 1579
+    },
+    {
+      "name": "translated_output.pml.trail",
+      "type": "file",
+      "icon": "file",
+      "path": "translated_output.pml.trail",
+      "size": 150
+    },
+    {
+      "name": "translator.py",
+      "type": "file",
+      "icon": "python",
+      "path": "translator.py",
+      "size": 30193
+    },
+    {
+      "name": "triangulation.py",
+      "type": "file",
+      "icon": "python",
+      "path": "triangulation.py",
+      "size": 12891
+    },
+    {
+      "name": "user_lending.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "user_lending.rs",
+      "size": 941
+    },
+    {
+      "name": "verification_cache.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verification_cache.py",
+      "size": 1397
+    },
+    {
+      "name": "verification_service.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verification_service.py",
+      "size": 14258
+    },
+    {
+      "name": "verification_state.json",
+      "type": "file",
+      "icon": "json",
+      "path": "verification_state.json",
+      "size": 23109
+    },
+    {
+      "name": "verification_worker.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verification_worker.py",
+      "size": 9962
+    },
+    {
+      "name": "verifier_plugins.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verifier_plugins.py",
+      "size": 4092
+    },
+    {
+      "name": "verify_db.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verify_db.py",
+      "size": 1121
+    },
+    {
+      "name": "verify_installation.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verify_installation.py",
+      "size": 2092
+    },
+    {
+      "name": "verify_routes.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verify_routes.py",
+      "size": 769
+    },
+    {
+      "name": "verify_rust.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verify_rust.py",
+      "size": 785
+    },
+    {
+      "name": "verus_integration.py",
+      "type": "file",
+      "icon": "python",
+      "path": "verus_integration.py",
+      "size": 2307
+    },
+    {
+      "name": "websocket_server.py",
+      "type": "file",
+      "icon": "python",
+      "path": "websocket_server.py",
+      "size": 1012
+    },
+    {
+      "name": "wsgi.py",
+      "type": "file",
+      "icon": "python",
+      "path": "wsgi.py",
+      "size": 407
+    }
+  ]
+}

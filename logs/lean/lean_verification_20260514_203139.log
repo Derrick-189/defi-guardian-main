@@ -1,0 +1,19 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-05-14T20:31:39.815545
+file: /home/slade/Downloads/ALL/Account.sol
+
+--- STDOUT ---
+/tmp/tmprrn8dtbm.lean:39:34: error: Application type mismatch: The argument
+  lock
+has type
+  Nat
+but is expected to have type
+  Prop
+in the application
+  And lock
+/tmp/tmprrn8dtbm.lean:49:40: error: unexpected token '<'; expected term
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---

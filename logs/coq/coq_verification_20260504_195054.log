@@ -1,0 +1,11 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-04T19:50:54.592274
+file: /home/slade/Downloads/VestingWallet.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmphe4shir4.v", line 28, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+

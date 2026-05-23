@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block title %}Settings — DeFi Guardian{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">
+      <i class="fa-solid fa-gear"></i> Settings
+    </h1>
+    <p class="page-subtitle">Manage your account, appearance, and API keys.</p>
+  </div>
+</div>
+
+<div class="settings-layout">
+
+  <!-- ── Profile Card ──────────────────────────────────────────────────── -->
+  <div class="card" id="card-profile">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fa-solid fa-circle-user"></i> Profile</h2>
+    </div>
+    <div class="card-body">
+      <div class="profile-info-row">
+        <div class="profile-avatar">
+          <i class="fa-solid fa-circle-user" style="font-size: 3rem; color: var(--accent);"></i>
+        </div>
+        <div class="profile-details">
+          <div class="profile-username">{{ current_user.username }}</div>
+          <div class="profile-email text-muted">{{ current_user.email if current_user.email else 'No email set' }}</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <h3 class="settings-section-title">Change Password</h3>
+      <form id="change-password-form" novalidate>
+        <div class="form-group">
+          <label for="current-password" class="form-label">Current Password</label>
+          <input type="password" id="current-password" name="current_password"
+                 class="input" autocomplete="current-password" required />
+        </div>
+        <div class="form-group">
+          <label for="new-password" class="form-label">New Password</label>
+          <input type="password" id="new-password" name="new_password"
+                 class="input" autocomplete="new-password" required minlength="8" />
+          <span class="form-hint">Minimum 8 characters.</span>
+        </div>
+        <div class="form-group">
+          <label for="confirm-password" class="form-label">Confirm New Password</label>
+          <input type="password" id="confirm-password" name="confirm_password"
+                 class="input" autocomplete="new-password" required />
+        </div>
+        <div id="password-msg" class="alert" hidden></div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-key"></i> Update Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Appearance Card ───────────────────────────────────────────────── -->
+  <div class="card" id="card-appearance">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fa-solid fa-palette"></i> Appearance</h2>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Theme</label>
+        <div class="theme-picker">
+          <label class="theme-option {% if theme == 'dark' %}active{% endif %}" id="theme-opt-dark">
+            <input type="radio" name="theme-pick" value="dark" {% if theme == 'dark' %}checked{% endif %} />
+            <div class="theme-preview theme-preview-dark">
+              <div class="tp-navbar"></div>
+              <div class="tp-sidebar"></div>
+              <div class="tp-content"></div>
+            </div>
+            <span class="theme-option-label"><i class="fa-solid fa-moon"></i> Dark</span>
+          </label>
+          <label class="theme-option {% if theme == 'light' %}active{% endif %}" id="theme-opt-light">
+            <input type="radio" name="theme-pick" value="light" {% if theme == 'light' %}checked{% endif %} />
+            <div class="theme-preview theme-preview-light">
+              <div class="tp-navbar"></div>
+              <div class="tp-sidebar"></div>
+              <div class="tp-content"></div>
+            </div>
+            <span class="theme-option-label"><i class="fa-solid fa-sun"></i> Light</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── API Keys Card ─────────────────────────────────────────────────── -->
+  <div class="card" id="card-api-keys">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fa-solid fa-key"></i> API Keys</h2>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info" style="margin-bottom: 1rem;">
+        <i class="fa-solid fa-circle-info"></i>
+        Keys are stored in your session only and are never persisted to disk.
+      </div>
+      <form id="api-keys-form" novalidate>
+        <div class="form-group">
+          <label for="anthropic-key" class="form-label">
+            <i class="fa-solid fa-robot"></i> ANTHROPIC_API_KEY
+          </label>
+          <div class="input-group">
+            <input type="password" id="anthropic-key" name="anthropic_api_key"
+                   class="input font-mono" placeholder="sk-ant-…"
+                   autocomplete="off"
+                   value="{{ '•' * 20 if session_keys is defined and session_keys.anthropic else '' }}" />
+            <button type="button" class="btn btn-icon btn-ghost input-group-btn" data-toggle-pw="anthropic-key" aria-label="Show/hide key">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="openai-key" class="form-label">
+            <i class="fa-solid fa-brain"></i> OPENAI_API_KEY
+          </label>
+          <div class="input-group">
+            <input type="password" id="openai-key" name="openai_api_key"
+                   class="input font-mono" placeholder="sk-…"
+                   autocomplete="off"
+                   value="{{ '•' * 20 if session_keys is defined and session_keys.openai else '' }}" />
+            <button type="button" class="btn btn-icon btn-ghost input-group-btn" data-toggle-pw="openai-key" aria-label="Show/hide key">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div id="api-keys-msg" class="alert" hidden></div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Save Keys
+          </button>
+          <button type="button" class="btn btn-ghost" id="btn-clear-keys">
+            <i class="fa-solid fa-trash"></i> Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── About Card ────────────────────────────────────────────────────── -->
+  <div class="card" id="card-about">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fa-solid fa-circle-info"></i> About</h2>
+    </div>
+    <div class="card-body">
+      <table class="table table-compact">
+        <tbody>
+          <tr>
+            <td class="text-muted">Version</td>
+            <td class="font-mono">{{ app_version if app_version else '1.0.0' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Python</td>
+            <td class="font-mono" id="about-python">—</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Flask</td>
+            <td class="font-mono" id="about-flask">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="settings-section-title" style="margin-top: 1rem;">Tool Availability</h3>
+      <div id="tool-availability-grid" class="tool-availability-grid">
+        {% set tools = [('SPIN', 'spin'), ('Coq', 'coqc'), ('Lean 4', 'lean'), ('Certora', 'certoraRun'), ('Kani', 'cargo-kani'), ('Prusti', 'prusti-rustc'), ('Creusot', 'cargo-creusot'), ('Verus', 'verus')] %}
+        {% for name, cmd in tools %}
+        <div class="tool-avail-item">
+          <span class="tool-avail-name">{{ name }}</span>
+          <span class="badge badge-neutral tool-avail-badge" data-tool-cmd="{{ cmd }}">checking…</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.settings-layout -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  // ── Theme picker ───────────────────────────────────────────────────────
+  document.querySelectorAll('input[name="theme-pick"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      var theme = this.value;
+      document.documentElement.setAttribute('data-theme', theme);
+      document.body.setAttribute('data-theme', theme);
+      document.querySelectorAll('.theme-option').forEach(function (opt) {
+        opt.classList.remove('active');
+      });
+      this.closest('.theme-option').classList.add('active');
+      // Persist via API
+      fetch('/api/v1/set-theme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ theme: theme })
+      });
+    });
+  });
+
+  // ── Password toggle ────────────────────────────────────────────────────
+  document.querySelectorAll('[data-toggle-pw]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = document.getElementById(this.dataset.togglePw);
+      if (!input) return;
+      var isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      this.querySelector('i').className = isHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+  });
+
+  // ── Change password form ───────────────────────────────────────────────
+  var pwForm = document.getElementById('change-password-form');
+  var pwMsg  = document.getElementById('password-msg');
+
+  function showMsg(el, type, text) {
+    el.className = 'alert alert-' + type;
+    el.textContent = text;
+    el.hidden = false;
+  }
+
+  if (pwForm) {
+    pwForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var cur  = document.getElementById('current-password').value;
+      var nw   = document.getElementById('new-password').value;
+      var conf = document.getElementById('confirm-password').value;
+      if (nw !== conf) { showMsg(pwMsg, 'danger', 'Passwords do not match.'); return; }
+      if (nw.length < 8) { showMsg(pwMsg, 'danger', 'Password must be at least 8 characters.'); return; }
+
+      fetch('/api/v1/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ current_password: cur, new_password: nw })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          showMsg(pwMsg, 'success', 'Password updated successfully.');
+          pwForm.reset();
+        } else {
+          showMsg(pwMsg, 'danger', data.error || 'Failed to update password.');
+        }
+      })
+      .catch(function () { showMsg(pwMsg, 'danger', 'Network error.'); });
+    });
+  }
+
+  // ── API Keys form ──────────────────────────────────────────────────────
+  var apiForm = document.getElementById('api-keys-form');
+  var apiMsg  = document.getElementById('api-keys-msg');
+
+  if (apiForm) {
+    apiForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var anthropic = document.getElementById('anthropic-key').value;
+      var openai    = document.getElementById('openai-key').value;
+
+      fetch('/api/v1/save-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ anthropic_api_key: anthropic, openai_api_key: openai })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        showMsg(apiMsg, data.success ? 'success' : 'danger',
+          data.success ? 'Keys saved to session.' : (data.error || 'Failed to save keys.'));
+      })
+      .catch(function () { showMsg(apiMsg, 'danger', 'Network error.'); });
+    });
+  }
+
+  var clearBtn = document.getElementById('btn-clear-keys');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      fetch('/api/v1/clear-keys', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function () {
+          document.getElementById('anthropic-key').value = '';
+          document.getElementById('openai-key').value = '';
+          showMsg(apiMsg, 'success', 'Keys cleared from session.');
+        });
+    });
+  }
+
+  // ── Tool availability ──────────────────────────────────────────────────
+  fetch('/api/v1/tool-status', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function (data) {
+      document.querySelectorAll('[data-tool-cmd]').forEach(function (badge) {
+        var cmd    = badge.dataset.toolCmd;
+        var status = data[cmd] || data[badge.closest('.tool-avail-item').querySelector('.tool-avail-name').textContent.trim()];
+        if (status === true || status === 'available') {
+          badge.className = 'badge badge-success tool-avail-badge';
+          badge.textContent = 'Available';
+        } else if (status === 'simulated') {
+          badge.className = 'badge badge-warning tool-avail-badge';
+          badge.textContent = 'Simulated';
+        } else {
+          badge.className = 'badge badge-neutral tool-avail-badge';
+          badge.textContent = 'Not found';
+        }
+      });
+    })
+    .catch(function () {
+      document.querySelectorAll('[data-tool-cmd]').forEach(function (badge) {
+        badge.textContent = 'Unknown';
+      });
+    });
+
+})();
+</script>
+{% endblock %}

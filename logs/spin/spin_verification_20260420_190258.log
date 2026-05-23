@@ -1,0 +1,105 @@
+=== SPIN VERIFICATION LOG ===
+timestamp: 2026-04-20T19:02:58.911972
+file: /home/slade/defi_guardian/SimpleLending.sol
+
+--- STDOUT ---
+
+--- LTL safety_no_overflow ---
+pan: ltl formula safety_no_overflow
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (safety_no_overflow)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	translated_output.pml:31, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim safety_no_overflow
+	_spin_nvr.tmp:8, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL safety_reentrancy ---
+pan: error: cannot find claim 'safety_reentrancy'
+
+--- LTL liveness_progress ---
+pan: ltl formula liveness_progress
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (liveness_progress)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 2, errors: 0
+        2 states, stored (4 visited)
+        0 states, matched
+        4 transitions (= visited+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	translated_output.pml:31, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	translated_output.pml:33, state 11, "printf('Insufficient balance\n')"
+	translated_output.pml:29, state 12, "((balance>=10))"
+	translated_output.pml:29, state 12, "else"
+	translated_output.pml:38, state 16, "state = 2"
+	translated_output.pml:24, state 18, "printf('Executing program logic...\n')"
+	translated_output.pml:42, state 22, "printf('Program terminated.\n')"
+	translated_output.pml:46, state 26, "-end-"
+	(7 of 26 states)
+unreached in claim liveness_progress
+	_spin_nvr.tmp:15, state 6, "-end-"
+	(1 of 6 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL invariant_collateral ---
+pan: error: cannot find claim 'invariant_collateral'
+
+--- LTL response_price_drop ---
+pan: error: cannot find claim 'response_price_drop'
+
+--- LTL stability ---
+pan: error: cannot find claim 'stability'
+
+--- LTL fairness ---
+pan: error: cannot find claim 'fairness'
+
+--- LTL reachability_liquidation ---
+pan: error: cannot find claim 'reachability_liquidation'
+
+
+--- STDERR ---

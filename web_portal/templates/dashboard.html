@@ -1,0 +1,675 @@
+{% extends "base.html" %} {% block title %}Dashboard — DeFi Guardian{% endblock
+%} {% block extra_css %}
+<style>
+    /* ── Dashboard-specific overrides ── */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 1.25rem;
+        align-items: start;
+        margin-top: 1.25rem;
+    }
+    .dashboard-col-main {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    .dashboard-col-side {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    /* Tool status — single column list inside the narrow right panel */
+    .tool-status-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .tool-status-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        background: var(--bg3);
+        border-radius: 6px;
+        font-size: 0.82rem;
+        gap: 0.5rem;
+    }
+    .tool-status-name {
+        font-weight: 600;
+        min-width: 70px;
+    }
+    .tool-status-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.15rem;
+    }
+    .tool-avail-dot {
+        font-size: 0.65rem;
+    }
+    .tool-avail-dot.avail {
+        color: var(--success);
+    }
+    .tool-avail-dot.sim {
+        color: var(--text2);
+    }
+    .tool-last-run-time {
+        font-size: 0.7rem;
+        color: var(--text2);
+    }
+
+    /* Runs table sort headers */
+    th.sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+    th.sortable:hover {
+        color: var(--accent);
+    }
+    th.sortable .sort-icon {
+        margin-left: 0.3rem;
+        opacity: 0.4;
+        font-size: 0.7rem;
+    }
+    th.sortable.asc .sort-icon::after {
+        content: "▲";
+        opacity: 1;
+    }
+    th.sortable.desc .sort-icon::after {
+        content: "▼";
+        opacity: 1;
+    }
+    th.sortable:not(.asc):not(.desc) .sort-icon::after {
+        content: "⇅";
+    }
+
+    /* Filter bar */
+    .runs-filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+    .runs-filter-bar select,
+    .runs-filter-bar input {
+        width: auto;
+        min-width: 120px;
+    }
+    .runs-filter-bar input {
+        flex: 1;
+        min-width: 160px;
+    }
+
+    /* Action buttons */
+    .action-group {
+        display: flex;
+        gap: 0.25rem;
+    }
+    .btn-xs {
+        padding: 0.2rem 0.45rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+
+    /* Live feed */
+    .live-feed {
+        display: flex;
+        flex-direction: column;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+    .feed-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.45rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.82rem;
+    }
+    .feed-item:last-child {
+        border-bottom: none;
+    }
+    .feed-time {
+        color: var(--text2);
+        font-size: 0.72rem;
+        min-width: 72px;
+        font-family: "JetBrains Mono", monospace;
+    }
+    .feed-tool {
+        font-weight: 600;
+        min-width: 55px;
+    }
+    .feed-file {
+        color: var(--text2);
+        font-size: 0.78rem;
+        font-family: "JetBrains Mono", monospace;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
+<!-- Header -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1 class="page-title">
+            Dashboard <span class="live-dot" title="Live updates active"></span>
+        </h1>
+        <p class="page-subtitle" id="dashboard-datetime"></p>
+    </div>
+    <div class="page-header-right"></div>
+</div>
+
+<!-- Desktop sync status -->
+<div class="sync-status-bar" id="sync-status-bar">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span id="sync-status-text">Checking desktop app sync…</span>
+    <span style="margin-left: auto">
+        <button
+            class="btn btn-ghost btn-sm"
+            id="btn-sync-audit"
+            style="padding: 0.15rem 0.5rem; font-size: 0.75rem"
+        >
+            <i class="fa-solid fa-rotate"></i> Sync now
+        </button>
+    </span>
+</div>
+
+<!-- KPI Grid -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">States Explored</div>
+        <div class="kpi-value" id="kpi-states">—</div>
+        <div class="kpi-sub"><i class="fa-solid fa-circle-nodes"></i></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Transitions</div>
+        <div class="kpi-value" id="kpi-transitions">—</div>
+        <div class="kpi-sub">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Max Depth</div>
+        <div class="kpi-value" id="kpi-depth">—</div>
+        <div class="kpi-sub"><i class="fa-solid fa-layer-group"></i></div>
+    </div>
+    <div class="kpi-card kpi-card-success">
+        <div class="kpi-label">LTL Passed</div>
+        <div class="kpi-value text-success" id="kpi-ltl-pass">—</div>
+        <div class="kpi-sub"><i class="fa-solid fa-circle-check"></i></div>
+    </div>
+    <div class="kpi-card kpi-card-danger">
+        <div class="kpi-label">LTL Failed</div>
+        <div class="kpi-value text-danger" id="kpi-ltl-fail">—</div>
+        <div class="kpi-sub"><i class="fa-solid fa-circle-xmark"></i></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Tools Available</div>
+        <div class="kpi-value" id="kpi-tools">—</div>
+        <div class="kpi-sub">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Main grid -->
+<div class="dashboard-grid">
+    <!-- ── Left column ── -->
+    <div class="dashboard-col-main">
+        <!-- Recent Verification Runs -->
+        <div class="card" style="padding: 0">
+            <div
+                class="card-header"
+                style="padding: 0.85rem 1.25rem; margin-bottom: 0"
+            >
+                <h2 class="card-title">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Recent
+                    Verification Runs
+                </h2>
+                <div class="card-header-actions">
+                    <span class="text-muted text-sm" id="runs-count"></span>
+                </div>
+            </div>
+
+            <!-- Filter bar -->
+            <div class="runs-filter-bar">
+                <select
+                    id="filter-tool"
+                    class="input select input-sm"
+                    aria-label="Filter by tool"
+                >
+                    <option value="">All Tools</option>
+                    <option>SPIN</option>
+                    <option>COQ</option>
+                    <option>LEAN</option>
+                    <option>CERTORA</option>
+                    <option>KANI</option>
+                    <option>PRUSTI</option>
+                    <option>CREUSOT</option>
+                    <option>VERUS</option>
+                </select>
+                <select
+                    id="filter-status"
+                    class="input select input-sm"
+                    aria-label="Filter by status"
+                >
+                    <option value="">All Status</option>
+                    <option value="PASS">Pass</option>
+                    <option value="FAIL">Fail</option>
+                </select>
+                <input
+                    type="search"
+                    id="filter-file"
+                    class="input input-sm"
+                    placeholder="Search filename…"
+                    aria-label="Search filename"
+                />
+            </div>
+
+            {% if audits %}
+            <div class="table-responsive">
+                <table class="table" id="runs-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-col="filename">
+                                File <span class="sort-icon"></span>
+                            </th>
+                            <th class="sortable" data-col="tool_used">
+                                Tool <span class="sort-icon"></span>
+                            </th>
+                            <th class="sortable" data-col="status">
+                                Status <span class="sort-icon"></span>
+                            </th>
+                            <th class="sortable" data-col="states_explored">
+                                States <span class="sort-icon"></span>
+                            </th>
+                            <th class="sortable" data-col="depth_reached">
+                                Depth <span class="sort-icon"></span>
+                            </th>
+                            <th class="sortable" data-col="audit_date">
+                                Date <span class="sort-icon"></span>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="runs-tbody">
+                        {% for a in audits %}
+                        <tr
+                            class="run-row"
+                            data-tool="{{ a.tool_used | upper if a.tool_used else '' }}"
+                            data-status="{{ a.status | upper if a.status else '' }}"
+                            data-file="{{ a.filename | lower if a.filename else '' }}"
+                        >
+                            <td class="font-mono text-sm">
+                                {{ a.filename | truncate(28) if a.filename else
+                                '—' }}
+                            </td>
+                            <td>
+                                {% if a.tool_used %}
+                                <span class="badge badge-tool"
+                                    >{{ a.tool_used }}</span
+                                >
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>
+                                {% set s = (a.status or '') | upper %} {% if s
+                                == 'PASS' %}
+                                <span class="badge badge-pass">PASS</span>
+                                {% elif s == 'FAIL' %}
+                                <span class="badge badge-fail">FAIL</span>
+                                {% else %}
+                                <span class="badge badge-tool"
+                                    >{{ s or '?' }}</span
+                                >
+                                {% endif %}
+                            </td>
+                            <td class="font-mono">
+                                {{ a.states_explored if a.states_explored else
+                                '—' }}
+                            </td>
+                            <td class="font-mono">
+                                {{ a.depth_reached if a.depth_reached else '—'
+                                }}
+                            </td>
+                            <td class="text-muted text-sm">
+                                {{ a.audit_date | string | truncate(16,
+                                killwords=True, end='') if a.audit_date else '—'
+                                }}
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a
+                                        href="{{ url_for('counterexample_analysis', audit_id=a.id) }}"
+                                        class="btn btn-xs btn-secondary"
+                                        title="Counterexample"
+                                    >
+                                        <i
+                                            class="fa-solid fa-magnifying-glass"
+                                        ></i>
+                                    </a>
+                                    <a
+                                        href="{{ url_for('trace_viewer', audit_id=a.id) }}"
+                                        class="btn btn-xs btn-secondary"
+                                        title="Trace"
+                                    >
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state" style="padding: 2.5rem 1rem">
+                <span class="empty-state-icon"
+                    ><i class="fa-solid fa-inbox"></i
+                ></span>
+                <p class="empty-state-title">No verification runs yet</p>
+                <p class="empty-state-sub">
+                    Run a verification from the desktop app or click New Run.
+                </p>
+                <div class="empty-state-actions">
+                    <a href="{{ url_for('new_run') }}" class="btn btn-primary"
+                        ><i class="fa-solid fa-play"></i> New Run</a
+                    >
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Live Feed -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="live-dot"></span> Live Feed
+                </h2>
+                <span class="text-muted text-sm"
+                    >Real-time verification events</span
+                >
+            </div>
+            <div class="card-body" style="padding-top: 0.5rem">
+                <div id="live-feed" class="live-feed" aria-live="polite">
+                    <p class="text-muted text-sm" style="padding: 0.5rem 0">
+                        Waiting for events…
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LTL Properties (full width in left column) -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-list-check"></i> LTL Properties — Last
+                    Run
+                </h2>
+                <a
+                    href="{{ url_for('counterexample_latest') }}"
+                    class="btn btn-sm btn-secondary"
+                >
+                    <i class="fa-solid fa-magnifying-glass"></i> Analyse
+                </a>
+            </div>
+            <div class="card-body" style="padding: 0">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Formula</th>
+                            <th>Status</th>
+                            <th>Errors</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ltl-table">
+                        <tr>
+                            <td
+                                colspan="4"
+                                class="text-muted text-sm"
+                                style="text-align: center; padding: 1.5rem"
+                            >
+                                Loading…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /.dashboard-col-main -->
+
+    <!-- ── Right column ── -->
+    <div class="dashboard-col-side">
+        <!-- Tool Status — single-column list, no overflow -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> Tool Status
+                </h2>
+                <a
+                    href="{{ url_for('tools') }}"
+                    class="btn btn-sm btn-ghost text-sm"
+                    >All →</a
+                >
+            </div>
+            <div class="card-body" style="padding-top: 0.5rem">
+                <div id="tools-status-list" class="tool-status-list">
+                    <p class="text-muted text-sm">Loading…</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick stats from state -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-chart-simple"></i> Last SPIN Run
+                </h2>
+            </div>
+            <div class="card-body" style="padding-top: 0.5rem">
+                <div id="spin-stats" class="tool-status-list">
+                    <p class="text-muted text-sm">Loading…</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.dashboard-col-side -->
+</div>
+{% endblock %} {% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    (function () {
+        "use strict";
+
+        // ── Live clock ─────────────────────────────────────────────────────
+        var dtEl = document.getElementById("dashboard-datetime");
+        function tick() {
+            if (dtEl)
+                dtEl.textContent = new Date().toLocaleString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                });
+        }
+        tick();
+        setInterval(tick, 1000);
+
+        // ── Sync button + status bar ──────────────────────────────────────────────────
+        var syncBtn = document.getElementById("btn-sync-audit");
+        var syncDot = document.getElementById("sync-dot");
+        var syncText = document.getElementById("sync-status-text");
+
+        function updateSyncStatus() {
+            fetch("/api/v1/desktop-runs", { credentials: "same-origin" })
+                .then(function (r) {
+                    return r.ok ? r.json() : [];
+                })
+                .then(function (runs) {
+                    if (!runs || !runs.length) {
+                        if (syncDot) syncDot.className = "sync-dot stale";
+                        if (syncText)
+                            syncText.textContent =
+                                "No desktop runs found — run a verification in the desktop app";
+                        return;
+                    }
+                    var latest = runs[0];
+                    var ts = latest.timestamp || "";
+                    if (syncDot) syncDot.className = "sync-dot";
+                    if (syncText)
+                        syncText.textContent =
+                            "Desktop app synced · " +
+                            runs.length +
+                            " run" +
+                            (runs.length !== 1 ? "s" : "") +
+                            (ts ? " · Last: " + ts.slice(0, 16) : "");
+                })
+                .catch(function () {
+                    if (syncDot) syncDot.className = "sync-dot error";
+                    if (syncText)
+                        syncText.textContent = "Could not reach sync API";
+                });
+        }
+
+        if (syncBtn) {
+            syncBtn.addEventListener("click", function () {
+                syncBtn.disabled = true;
+                syncBtn.innerHTML =
+                    '<i class="fa-solid fa-rotate fa-spin"></i>';
+                fetch("/api/v1/sync-audit", {
+                    method: "POST",
+                    credentials: "same-origin",
+                })
+                    .then(function (r) {
+                        return r.json();
+                    })
+                    .then(function (d) {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML =
+                            '<i class="fa-solid fa-rotate"></i> Sync now';
+                        if (syncText)
+                            syncText.textContent =
+                                "Synced · " +
+                                (d.new_records || 0) +
+                                " new records";
+                        location.reload();
+                    })
+                    .catch(function () {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML =
+                            '<i class="fa-solid fa-rotate"></i> Sync now';
+                    });
+            });
+        }
+
+        updateSyncStatus();
+
+        // ── Runs table: filter ────────────────────────────────────────────────────────
+        var rows = Array.from(document.querySelectorAll(".run-row"));
+        var runsCount = document.getElementById("runs-count");
+
+        function applyFilters() {
+            var tool = (
+                document.getElementById("filter-tool").value || ""
+            ).toUpperCase();
+            var status = (
+                document.getElementById("filter-status").value || ""
+            ).toUpperCase();
+            var file = (document.getElementById("filter-file").value || "")
+                .toLowerCase()
+                .trim();
+            var visible = 0;
+            rows.forEach(function (row) {
+                var match =
+                    (!tool || row.dataset.tool === tool) &&
+                    (!status || row.dataset.status === status) &&
+                    (!file || row.dataset.file.includes(file));
+                row.style.display = match ? "" : "none";
+                if (match) visible++;
+            });
+            if (runsCount)
+                runsCount.textContent =
+                    visible + " run" + (visible !== 1 ? "s" : "");
+        }
+
+        ["filter-tool", "filter-status", "filter-file"].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el)
+                el.addEventListener(
+                    el.tagName === "SELECT" ? "change" : "input",
+                    applyFilters,
+                );
+        });
+        applyFilters(); // set initial count
+
+        // ── Runs table: sort ───────────────────────────────────────────────────
+        var sortState = { col: "audit_date", dir: "desc" };
+        var tbody = document.getElementById("runs-tbody");
+
+        document.querySelectorAll("th.sortable").forEach(function (th) {
+            th.addEventListener("click", function () {
+                var col = th.dataset.col;
+                if (sortState.col === col) {
+                    sortState.dir = sortState.dir === "asc" ? "desc" : "asc";
+                } else {
+                    sortState.col = col;
+                    sortState.dir = "asc";
+                }
+                document.querySelectorAll("th.sortable").forEach(function (h) {
+                    h.classList.remove("asc", "desc");
+                });
+                th.classList.add(sortState.dir);
+                sortRows();
+            });
+        });
+
+        // Mark default sort column
+        var defaultTh = document.querySelector('th[data-col="audit_date"]');
+        if (defaultTh) defaultTh.classList.add("desc");
+
+        function sortRows() {
+            if (!tbody) return;
+            var allRows = Array.from(tbody.querySelectorAll("tr.run-row"));
+            var colIndex = {
+                filename: 0,
+                tool_used: 1,
+                status: 2,
+                states_explored: 3,
+                depth_reached: 4,
+                audit_date: 5,
+            };
+            var idx =
+                colIndex[sortState.col] !== undefined
+                    ? colIndex[sortState.col]
+                    : 5;
+            allRows.sort(function (a, b) {
+                var av = a.cells[idx] ? a.cells[idx].textContent.trim() : "";
+                var bv = b.cells[idx] ? b.cells[idx].textContent.trim() : "";
+                var an = parseFloat(av),
+                    bn = parseFloat(bv);
+                var cmp =
+                    !isNaN(an) && !isNaN(bn) ? an - bn : av.localeCompare(bv);
+                return sortState.dir === "asc" ? cmp : -cmp;
+            });
+            allRows.forEach(function (r) {
+                tbody.appendChild(r);
+            });
+        }
+    })();
+</script>
+{% endblock %}

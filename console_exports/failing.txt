@@ -1,0 +1,169 @@
+
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                         🛡️ DEFI GUARDIAN FORMAL VERIFICATION SUITE                    ║
+║                    Powered by SPIN Model Checker | LTL Properties                     ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+SUPPORTED FORMATS:
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │ • .pml  - Promela models (direct Spin verification with LTL properties)        │
+   │ • .sol  - Solidity contracts (auto-translated to Promela with LTL)             │
+   │ • .rs   - Rust programs (experimental translation with verification)           │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+FORMAL VERIFICATION FEATURES:
+   • LTL Properties (Linear Temporal Logic) - Safety, Liveness, Fairness
+   • Invariants and Safety Properties
+   • State Space Exploration and Counterexample Analysis
+   • Proof Obligations Generation
+   • Coq and Lean Theorem Prover Integration
+
+HOW TO USE:
+   1. Click "OPEN SOURCE FILE" to select a model (.pml, .sol, .rs)
+   2. Click "RUN SPIN VERIFICATION" to verify with LTL properties
+   3. View detailed results in this console (with auto-scroll)
+   4. Click "OPEN VISUAL DASHBOARD" for state diagrams and analytics
+   5. Use Coq/Lean buttons for theorem proving
+
+TIPS:
+   • Solidity contracts are automatically translated to Promela with LTL properties
+   • Verification results are saved to verification_state.json for the dashboard
+   • The dashboard shows state diagrams, LTL verification, and risk analytics
+   • Use "Verbose output" for detailed SPIN verification logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ready for verification!
+   File tree saved to: /home/slade/defi_guardian/file_tree.json
+
+LOADED FILE: user_lending.rs
+TYPE: .RS
+PATH: /home/slade/defi_guardian/user_lending.rs
+────────────────────────────────────────────────────────────
+
+
+RUNNING SPIN VERIFICATION
+Model: user_lending.rs
+Time: 2026-05-08 18:30:13
+────────────────────────────────────────────────────────────
+
+[1/5] Translating Rust to Promela...
+   Translation complete
+
+   Translated output saved to: /home/slade/defi_guardian/generated/models/translated_output.pml
+
+   Backup saved to: /home/slade/defi_guardian/generated/models/user_lending_translated.pml
+
+   Applied custom specifications from Specification tab
+[2/5] Generating SPIN verifier...
+
+[3/5] Compiling verifier...
+[4/5] 🔍 Running verification with LTL model checking...
+
+────────────────────────────────────────────────────────────
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	- (none specified)
+	assertion violations	+
+	acceptance   cycles 	- (not selected)
+	invalid end states	+
+
+State-vector 20 byte, depth reached 6, errors: 0
+        5 states, stored
+        0 states, matched
+        5 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.290	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/generated/models/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+
+pan: elapsed time 0 seconds
+
+warning: no accept labels are defined, so option -a has no effect (ignored)
+
+────────────────────────────────────────────────────────────
+
+VERIFICATION SUCCESSFUL!
+   All LTL properties satisfied
+   No counterexamples found
+   Invariants hold in all states
+────────────────────────────────────────────────────────────
+
+States explored: 5
+Depth reached: 6
+Transitions: 5
+
+[5/5] Verification results saved to verification_state.json
+   📊 State graph with 3 nodes and 1 edges saved
+
+📊 State graph exported for dashboard visualization
+
+COQ VERIFICATION
+────────────────────────────────────────────────────────────
+Coq verification successful!
+
+⚡ LEAN VERIFICATION
+────────────────────────────────────────────────────────────
+Running Lean on: tmpjyircnqh.lean
+Lean verification successful!
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+🦀 KANI VERIFICATION
+────────────────────────────────────────────────────────────
+✅ Kani verification successful!
+   Checking harness kani_verification::verify_u64_increment_non_wrapping...
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   VERIFICATION:- SUCCESSFUL
+   Checking harness kani_verification::verify_no_arithmetic_overflow...
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   	 - Status: SUCCESS
+   VERIFICATION:- SUCCESSFUL
+   Complete - 2 successfully verified harnesses, 0 failures, 2 total.
+📄 Full Kani log: /home/slade/defi_guardian/logs/rust_tools/kani_verification_20260508_183032.log
+
+PRUSTI VERIFICATION
+────────────────────────────────────────────────────────────
+Analyzing Rust code and generating verification annotations...
+Annotations generated. Running robust Prusti verification...
+
+Annotated code saved to: /home/slade/defi_guardian/annotated_output.rs
+
+Robust strategy used: kani_fallback
+Prusti verification failed:
+   Compiling kani_verify v0.1.0 (/tmp/tmpmxt4yb9p)
+error: could not compile `kani_verify` (lib) due to 1 previous error
+
+Prusti verification failed
+
+Tips:
+   - Check the annotated_output.rs file
+   - Review function preconditions
+Full Prusti log: /home/slade/defi_guardian/logs/rust_tools/prusti_verification_20260508_183038.log
+
+============================================================
+CREUSOT VERIFICATION
+============================================================
+

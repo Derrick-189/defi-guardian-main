@@ -1,0 +1,18 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-11T10:31:45.013917
+file: /home/slade/defi_guardian/SimpleLending.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpe43j4t80.v", line 19, characters 0-42:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmpe43j4t80.v", line 89, characters 56-57:
+Error:
+In environment
+s : ContractState
+The term "1" has type "nat" while it is expected to have type
+ "ContractState -> bool".
+

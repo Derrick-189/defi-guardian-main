@@ -1,0 +1,11 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-14T22:08:13.499710
+file: /home/slade/Downloads/Kabvote.sol
+
+--- STDOUT ---
+
+attribute/flag 'solc': Cannot run solc8.17
+
+
+
+--- STDERR ---

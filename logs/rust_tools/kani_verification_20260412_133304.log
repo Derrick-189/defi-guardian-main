@@ -1,0 +1,166 @@
+=== KANI VERIFICATION LOG ===
+timestamp: 2026-04-12T13:33:04.543430
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+Kani Rust Verifier 0.67.0 (cargo plugin)
+warning: unused import: `super::*`
+  --> src/lib.rs:32:9
+   |
+32 |     use super::*;
+   |         ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: comparison is useless due to type limits
+  --> src/lib.rs:47:17
+   |
+47 |         assert!(balance >= 0);
+   |                 ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_comparisons)]` on by default
+
+Checking harness kani_verification::verify_balance_invariant...
+CBMC 6.8.0 (cbmc-6.8.0)
+CBMC version 6.8.0 (cbmc-6.8.0) 64-bit x86_64 linux
+Reading GOTO program from file /tmp/tmpg6sx1wo3/target/kani/x86_64-unknown-linux-gnu/debug/deps/kani_verify-246ab16df0d35867__RNvNtCshAN2AuFOzKJ_11kani_verify17kani_verification24verify_balance_invariant.out
+Generating GOTO Program
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Generic Property Instrumentation
+Running with 16 object bits, 48 offset bits (user-specified)
+Starting Bounded Model Checking
+Runtime Symex: 0.0240829s
+size of program expression: 106 steps
+slicing removed 58 assignments
+Generated 2 VCC(s), 1 remaining after simplification
+Runtime Postprocess Equation: 0.000117031s
+Passing problem to propositional reduction
+converting SSA
+Runtime Convert SSA: 8.7597e-05s
+Running propositional reduction
+Post-processing
+Runtime Post-process: 1.118e-05s
+Solving with CaDiCaL 2.0.0
+1 variables, 0 clauses
+SAT checker: instance is SATISFIABLE
+Runtime Solver: 0.000279075s
+Runtime decision procedure: 0.000419904s
+
+RESULTS:
+Check 1: kani_verification::verify_balance_invariant.assertion.1
+	 - Status: SUCCESS
+	 - Description: "assertion failed: balance >= 0"
+	 - Location: src/lib.rs:47:9 in function kani_verification::verify_balance_invariant
+
+
+SUMMARY:
+ ** 0 of 1 failed
+
+VERIFICATION:- SUCCESSFUL
+Verification Time: 0.33612671s
+
+Checking harness kani_verification::verify_no_arithmetic_overflow...
+CBMC 6.8.0 (cbmc-6.8.0)
+CBMC version 6.8.0 (cbmc-6.8.0) 64-bit x86_64 linux
+Reading GOTO program from file /tmp/tmpg6sx1wo3/target/kani/x86_64-unknown-linux-gnu/debug/deps/kani_verify-246ab16df0d35867__RNvNtCshAN2AuFOzKJ_11kani_verify17kani_verification29verify_no_arithmetic_overflow.out
+Generating GOTO Program
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Generic Property Instrumentation
+Running with 16 object bits, 48 offset bits (user-specified)
+Starting Bounded Model Checking
+Runtime Symex: 0.00731773s
+size of program expression: 243 steps
+slicing removed 136 assignments
+Generated 12 VCC(s), 4 remaining after simplification
+Runtime Postprocess Equation: 8.5846e-05s
+Passing problem to propositional reduction
+converting SSA
+Runtime Convert SSA: 0.00181101s
+Running propositional reduction
+Post-processing
+Runtime Post-process: 7.687e-06s
+Solving with CaDiCaL 2.0.0
+470 variables, 1374 clauses
+SAT checker: instance is SATISFIABLE
+Runtime Solver: 0.000124998s
+Runtime decision procedure: 0.00202366s
+Running propositional reduction
+Solving with CaDiCaL 2.0.0
+471 variables, 1375 clauses
+SAT checker: instance is SATISFIABLE
+Runtime Solver: 0.000348724s
+Runtime decision procedure: 0.000411801s
+Running propositional reduction
+Solving with CaDiCaL 2.0.0
+472 variables, 1376 clauses
+SAT checker: instance is UNSATISFIABLE
+Runtime Solver: 3.0511e-05s
+Runtime decision procedure: 6.4765e-05s
+
+RESULTS:
+Check 1: core::num::<impl u64>::checked_add.arithmetic_overflow.1
+	 - Status: SUCCESS
+	 - Description: "attempt to compute `unchecked_add` which would overflow"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/uint_macros.rs:658:31 in function core::num::<impl u64>::checked_add
+
+Check 2: kani_verification::verify_no_arithmetic_overflow.assertion.1
+	 - Status: SUCCESS
+	 - Description: "attempt to divide by zero"
+	 - Location: src/lib.rs:39:31 in function kani_verification::verify_no_arithmetic_overflow
+
+Check 3: kani_verification::verify_no_arithmetic_overflow.arithmetic_overflow.1
+	 - Status: SUCCESS
+	 - Description: "attempt to divide by zero"
+	 - Location: src/lib.rs:39:31 in function kani_verification::verify_no_arithmetic_overflow
+
+Check 4: kani_verification::verify_no_arithmetic_overflow.assertion.2
+	 - Status: SUCCESS
+	 - Description: "assertion failed: result.is_some()"
+	 - Location: src/lib.rs:41:9 in function kani_verification::verify_no_arithmetic_overflow
+
+Check 5: std::option::Option::<u64>::is_some.pointer_dereference.1
+	 - Status: SUCCESS
+	 - Description: "dereference failure: pointer NULL"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:636:18 in function std::option::Option::<u64>::is_some
+
+Check 6: std::option::Option::<u64>::is_some.pointer_dereference.2
+	 - Status: SUCCESS
+	 - Description: "dereference failure: pointer invalid"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:636:18 in function std::option::Option::<u64>::is_some
+
+Check 7: std::option::Option::<u64>::is_some.pointer_dereference.3
+	 - Status: SUCCESS
+	 - Description: "dereference failure: deallocated dynamic object"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:636:18 in function std::option::Option::<u64>::is_some
+
+Check 8: std::option::Option::<u64>::is_some.pointer_dereference.4
+	 - Status: SUCCESS
+	 - Description: "dereference failure: dead object"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:636:18 in function std::option::Option::<u64>::is_some
+
+Check 9: std::option::Option::<u64>::is_some.pointer_dereference.5
+	 - Status: SUCCESS
+	 - Description: "dereference failure: pointer outside object bounds"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:636:18 in function std::option::Option::<u64>::is_some
+
+Check 10: std::option::Option::<u64>::is_some.pointer_dereference.6
+	 - Status: SUCCESS
+	 - Description: "dereference failure: invalid integer address"
+	 - Location: ../../home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:636:18 in function std::option::Option::<u64>::is_some
+
+
+SUMMARY:
+ ** 0 of 10 failed
+
+VERIFICATION:- SUCCESSFUL
+Verification Time: 0.03758368s
+
+Manual Harness Summary:
+Complete - 2 successfully verified harnesses, 0 failures, 2 total.
+
+
+--- STDERR ---
+   Compiling kani_verify v0.1.0 (/tmp/tmpg6sx1wo3)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.75s

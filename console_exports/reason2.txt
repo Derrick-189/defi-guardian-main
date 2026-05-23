@@ -1,0 +1,86 @@
+
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                         🛡️ DEFI GUARDIAN FORMAL VERIFICATION SUITE                    ║
+║                    Powered by SPIN Model Checker | LTL Properties                     ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+📋 SUPPORTED FORMATS:
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │ • .pml  - Promela models (direct Spin verification with LTL properties)        │
+   │ • .sol  - Solidity contracts (auto-translated to Promela with LTL)             │
+   │ • .rs   - Rust programs (experimental translation with verification)           │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+🎯 FORMAL VERIFICATION FEATURES:
+   • LTL Properties (Linear Temporal Logic) - Safety, Liveness, Fairness
+   • Invariants and Safety Properties
+   • State Space Exploration and Counterexample Analysis
+   • Proof Obligations Generation
+   • Coq and Lean Theorem Prover Integration
+
+🚀 HOW TO USE:
+   1. Click "OPEN SOURCE FILE" to select a model (.pml, .sol, .rs)
+   2. Click "RUN SPIN VERIFICATION" to verify with LTL properties
+   3. View detailed results in this console (with auto-scroll)
+   4. Click "OPEN VISUAL DASHBOARD" for state diagrams and analytics
+   5. Use Coq/Lean buttons for theorem proving
+
+💡 TIPS:
+   • Solidity contracts are automatically translated to Promela with LTL properties
+   • Verification results are saved to verification_state.json for the dashboard
+   • The dashboard shows state diagrams, LTL verification, and risk analytics
+   • Use "Verbose output" for detailed SPIN verification logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Ready for verification!
+   File tree saved to: /home/slade/defi_guardian/file_tree.json
+
+📂 LOADED FILE: SimpleLending.sol
+📁 TYPE: .SOL
+📂 PATH: /home/slade/defi_guardian/SimpleLending.sol
+────────────────────────────────────────────────────────────
+
+
+🚀 RUNNING SPIN VERIFICATION
+📁 Model: SimpleLending.sol
+⏰ Time: 2026-04-27 10:18:48
+────────────────────────────────────────────────────────────
+
+[1/5] 🔄 Translating Solidity to Promela...
+   ✅ Translation complete with semantic preservation checks
+   📜 Proof Obligation: ∀s: State • source_invariant(s) ⇒ pml_invariant(translate(s))
+   📜 Proof Obligation: ∀s, s': State • source_transition(s, s') ⇒ pml_transition(translate(s), translate(s'))
+
+   📄 Translated output saved to: /home/slade/defi_guardian/translated_output.pml
+
+   📄 Backup saved to: /home/slade/defi_guardian/SimpleLending_translated.pml
+
+   ✓ Detected 8 LTL property(ies) in model
+
+[2/5] 🔧 Generating SPIN verifier...
+spin: /home/slade/defi_guardian/translated_output.pml:44, Error: undeclared variable: paused	saw '')' = 41'
+
+[3/5] ⚙️ Compiling verifier...
+cc1: fatal error: pan.c: No such file or directory
+compilation terminated.
+[4/5] 🔍 Running verification with LTL model checking...
+
+────────────────────────────────────────────────────────────
+   Verifying LTL: safety_no_overflow...
+
+❌ Error: [Errno 2] No such file or directory: './pan'
+
+🌐 Opening dashboard in browser...
+⏳ Starting Streamlit… (first run can take 30–90s while Python loads)
+✅ Dashboard ready at http://localhost:8501
+
+✅ Console exported to: /home/slade/defi_guardian/console_exports/reason.txt
+
+📜 COQ VERIFICATION
+────────────────────────────────────────────────────────────
+❌ Coq failed: File "/tmp/tmpsi2urcz3.v", line 28, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+
+
+

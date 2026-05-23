@@ -1,0 +1,117 @@
+=== CREUSOT VERIFICATION LOG ===
+timestamp: 2026-04-08T21:41:22.354176
+file: /home/slade/HIDING/lib.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+    Updating crates.io index
+   Compiling autocfg v1.5.0
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.24
+   Compiling libc v0.2.184
+   Compiling quote v1.0.45
+   Compiling getrandom v0.4.2
+   Compiling cfg-if v1.0.4
+   Compiling num-traits v0.2.19
+   Compiling syn v2.0.117
+    Checking num-integer v0.1.46
+    Checking num-bigint v0.4.6
+   Compiling uuid v1.23.0
+    Checking num-rational v0.4.2
+   Compiling pearlite-syn v0.11.0-dev (/home/slade/creusot/pearlite-syn)
+   Compiling creusot-std-proc v0.11.0-dev (/home/slade/creusot/creusot-std-proc)
+    Checking creusot-std v0.11.0-dev (/home/slade/creusot/creusot-std)
+    Checking creusot_verify v0.1.0 (/tmp/tmp92ltvwlb)
+error[E0433]: cannot find module or crate `anchor_lang` in this scope
+ --> src/lib.rs:3:5
+  |
+3 | use anchor_lang::prelude::*;
+  |     ^^^^^^^^^^^ use of unresolved module or unlinked crate `anchor_lang`
+  |
+  = help: if you wanted to use a crate named `anchor_lang`, use `cargo add anchor_lang` to add it to your `Cargo.toml`
+
+error: cannot find attribute `account` in this scope
+  --> src/lib.rs:23:3
+   |
+23 | #[account]
+   |   ^^^^^^^
+
+error: cannot find attribute `program` in this scope
+ --> src/lib.rs:7:3
+  |
+7 | #[program]
+  |   ^^^^^^^
+
+error: cannot find macro `err` in this scope
+  --> src/lib.rs:15:20
+   |
+15 |             return err!(ErrorCode::InsufficientFunds);
+   |                    ^^^
+
+error: cannot find macro `declare_id` in this scope
+ --> src/lib.rs:5:1
+  |
+5 | declare_id!("Fg6PaFpoS8Gdxv8L2XQV7BscHAbT3dX7W61tXm991QHi");
+  | ^^^^^^^^^^
+
+error[E0425]: cannot find type `Context` in this scope
+  --> src/lib.rs:11:26
+   |
+11 |     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+   |                          ^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 9 +     use std::task::Context;
+   |
+
+error[E0425]: cannot find type `Withdraw` in this scope
+  --> src/lib.rs:11:34
+   |
+11 |     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+   |                                  ^^^^^^^^ not found in this scope
+   |
+help: you might be missing a type parameter
+   |
+11 |     pub fn withdraw<Withdraw>(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+   |                    ++++++++++
+
+error[E0425]: cannot find type `Pubkey` in this scope
+  --> src/lib.rs:26:16
+   |
+26 |     pub owner: Pubkey,
+   |                ^^^^^^ not found in this scope
+
+warning: unused import: `creusot_std::prelude::*`
+ --> src/lib.rs:1:5
+  |
+1 | use creusot_std::prelude::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `super::*`
+ --> src/lib.rs:9:9
+  |
+9 |     use super::*;
+  |         ^^^^^^^^
+
+error[E0107]: enum takes 2 generic arguments but 1 generic argument was supplied
+  --> src/lib.rs:11:61
+   |
+11 |     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+   |                                                             ^^^^^^ -- supplied 1 generic argument
+   |                                                             |
+   |                                                             expected 2 generic arguments
+   |
+help: add missing generic argument
+   |
+11 |     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<(), E> {
+   |                                                                      +++
+
+Some errors have detailed explanations: E0107, E0425, E0433.
+For more information about an error, try `rustc --explain E0107`.
+warning: `creusot_verify` (lib) generated 2 warnings
+error: could not compile `creusot_verify` (lib) due to 9 previous errors; 2 warnings emitted

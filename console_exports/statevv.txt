@@ -1,0 +1,381 @@
+
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                         🛡️ DEFI GUARDIAN FORMAL VERIFICATION SUITE                    ║
+║                    Powered by SPIN Model Checker | LTL Properties                     ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+SUPPORTED FORMATS:
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │ • .pml  - Promela models (direct Spin verification with LTL properties)        │
+   │ • .sol  - Solidity contracts (auto-translated to Promela with LTL)             │
+   │ • .rs   - Rust programs (experimental translation with verification)           │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+FORMAL VERIFICATION FEATURES:
+   • LTL Properties (Linear Temporal Logic) - Safety, Liveness, Fairness
+   • Invariants and Safety Properties
+   • State Space Exploration and Counterexample Analysis
+   • Proof Obligations Generation
+   • Coq and Lean Theorem Prover Integration
+
+HOW TO USE:
+   1. Click "OPEN SOURCE FILE" to select a model (.pml, .sol, .rs)
+   2. Click "RUN SPIN VERIFICATION" to verify with LTL properties
+   3. View detailed results in this console (with auto-scroll)
+   4. Click "OPEN VISUAL DASHBOARD" for state diagrams and analytics
+   5. Use Coq/Lean buttons for theorem proving
+
+TIPS:
+   • Solidity contracts are automatically translated to Promela with LTL properties
+   • Verification results are saved to verification_state.json for the dashboard
+   • The dashboard shows state diagrams, LTL verification, and risk analytics
+   • Use "Verbose output" for detailed SPIN verification logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ready for verification!
+   File tree saved to: /home/slade/defi_guardian/file_tree.json
+
+LOADED FILE: SimpleLending.sol
+TYPE: .SOL
+PATH: /home/slade/defi_guardian/SimpleLending.sol
+────────────────────────────────────────────────────────────
+
+
+RUNNING SPIN VERIFICATION
+Model: SimpleLending.sol
+Time: 2026-05-10 16:27:06
+────────────────────────────────────────────────────────────
+
+[1/5] Translating Solidity to Promela...
+   Translation complete with semantic preservation checks
+   Proof Obligation: ∀s: State • source_invariant(s) ⇒ pml_invariant(translate(s))
+   Proof Obligation: ∀s, s': State • source_transition(s, s') ⇒ pml_transition(translate(s), translate(s'))
+
+   Translated output saved to: /home/slade/defi_guardian/generated/models/translated_output.pml
+
+   Backup saved to: /home/slade/defi_guardian/generated/models/SimpleLending_translated.pml
+
+   Applied custom specifications from Specification tab
+   Detected 8 LTL property(ies) in model
+
+[2/5] Generating SPIN verifier...
+
+[3/5] Compiling verifier...
+[4/5] 🔍 Running verification with LTL model checking...
+
+────────────────────────────────────────────────────────────
+   Verifying LTL: safety_no_overflow...
+   Verifying LTL: safety_reentrancy...
+   Verifying LTL: liveness_progress...
+   Verifying LTL: invariant_collateral...
+   Verifying LTL: response_price_drop...
+   Verifying LTL: stability...
+   Verifying LTL: fairness...
+   Verifying LTL: reachability_liquidation...
+
+--- LTL safety_no_overflow ---
+pan: ltl formula safety_no_overflow
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (safety_no_overflow)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL safety_reentrancy ---
+pan: ltl formula safety_reentrancy
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (safety_reentrancy)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL liveness_progress ---
+pan: ltl formula liveness_progress
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (liveness_progress)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL invariant_collateral ---
+pan: ltl formula invariant_collateral
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (invariant_collateral)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL response_price_drop ---
+pan: ltl formula response_price_drop
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (response_price_drop)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL stability ---
+pan: ltl formula stability
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (stability)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL fairness ---
+pan: ltl formula fairness
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (fairness)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+--- LTL reachability_liquidation ---
+pan: ltl formula reachability_liquidation
+pan:1: assertion violated (totalSupply>=(totalBorrowed+amount)) (at depth 5)
+pan: wrote translated_output.pml.trail
+
+(Spin Version 6.5.2 -- 6 December 2019)
+WARNING: Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (reachability_liquidation)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 60 byte, depth reached 5, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.279	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+
+────────────────────────────────────────────────────────────
+   Counterexample trail preserved: /home/slade/defi_guardian/logs/spin/translated_output.pml.trail
+
+VERIFICATION FAILED!
+   Counterexample found
+   Review the model and LTL properties
+────────────────────────────────────────────────────────────
+
+
+[5/5] Verification results saved to verification_state.json
+   📊 State graph with 11 nodes and 1 edges saved
+
+📊 State graph exported for dashboard visualization
+
+COQ VERIFICATION
+────────────────────────────────────────────────────────────
+Coq failed: File "/tmp/tmpub1m60bo.v", line 57, characters 0-111:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmpub1m60bo.v", line 78, characters 17-23:
+Error: Illegal application (Non-functional construction): 
+The expression "true" of type "bool"
+cannot be applied to the term
+ "s" : "ContractState"
+
+
+
+CERTORA FORMAL VERIFICATION
+────────────────────────────────────────────────────────────
+Verifying: SimpleLending.sol
+Contract copied to: /home/slade/defi_guardian/certora/contracts/SimpleLending.sol
+
+Running Certora Prover (cloud)...
+   This may take 2-10 minutes...
+
+Certora found violations:
+Log saved: /home/slade/defi_guardian/logs/certora/certora_verification_20260510_162730.log
+
+🌐 Opening dashboard at http://localhost:5005/dashboard
+

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block title %}DeFi Guardian — Formal Verification Suite{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Public page — no sidebar offset */
+  .main-content { margin-left: 0 !important; width: 100% !important; }
+  .page-content { padding: 0 !important; max-width: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════════════════ HERO -->
+<section class="hero-section">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="badge-accent">⛨ Formal Verification Suite</span>
+    </div>
+    <h1 class="hero-title">
+      Mathematically Prove<br>
+      Your <span class="hero-highlight">Smart Contracts</span>
+    </h1>
+    <p class="hero-subtitle">
+      DeFi Guardian integrates 8 industry-leading formal verification engines —
+      SPIN, Coq, Lean, Certora, Kani, Prusti, Creusot, and Verus — into one
+      unified interface. Prove correctness before deployment, not after.
+    </p>
+    <div class="hero-cta">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+        <i class="fa-solid fa-rocket"></i> Get Started Free
+      </a>
+      <a href="{{ url_for('about') }}" class="btn btn-ghost btn-lg">
+        <i class="fa-solid fa-book-open"></i> Learn More
+      </a>
+    </div>
+  </div>
+  <div class="hero-graphic" aria-hidden="true">
+    <div class="hero-shield">⛨</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ STATS -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">8</div>
+      <div class="stat-label">Verification Tools</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">∀</div>
+      <div class="stat-label">All-path Coverage</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">LTL</div>
+      <div class="stat-label">Temporal Logic</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">OSS</div>
+      <div class="stat-label">Open Source</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ FEATURES -->
+<section class="features-section">
+  <div class="section-header">
+    <h2 class="section-title">Verification Engines</h2>
+    <p class="section-subtitle">Every tool purpose-built for a different class of correctness proof.</p>
+  </div>
+
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <span class="feature-icon" style="color:#58a6ff;">🔄</span>
+      <h3 class="feature-title">SPIN Model Checking</h3>
+      <p class="feature-desc">
+        Exhaustive state-space exploration using Promela. Verifies LTL properties,
+        detects deadlocks, race conditions, and assertion violations across all reachable states.
+      </p>
+      <div class="feature-tags">
+        <span class="badge-neutral">LTL</span>
+        <span class="badge-neutral">Promela</span>
+        <span class="badge-neutral">State-space</span>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon" style="color:#bc8cff;">📐</span>
+      <h3 class="feature-title">Coq Theorem Proving</h3>
+      <p class="feature-desc">
+        Interactive proof assistant for machine-checked mathematical proofs of
+        contract invariants, functional correctness, and safety properties.
+      </p>
+      <div class="feature-tags">
+        <span class="badge-neutral">Gallina</span>
+        <span class="badge-neutral">Tactics</span>
+        <span class="badge-neutral">Qed</span>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon" style="color:#3fb950;">🧮</span>
+      <h3 class="feature-title">Lean 4 Proofs</h3>
+      <p class="feature-desc">
+        Modern proof assistant with dependent types. Expressive enough to verify
+        complex DeFi protocol invariants with concise, readable proofs.
+      </p>
+      <div class="feature-tags">
+        <span class="badge-neutral">Lean 4</span>
+        <span class="badge-neutral">Mathlib</span>
+        <span class="badge-neutral">Types</span>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon" style="color:#f78166;">📋</span>
+      <h3 class="feature-title">Certora CVL</h3>
+      <p class="feature-desc">
+        Industry-standard formal verification for Solidity. Write CVL specifications
+        and let the Certora Prover check them against your EVM bytecode via SMT solving.
+      </p>
+      <div class="feature-tags">
+        <span class="badge-neutral">CVL</span>
+        <span class="badge-neutral">Solidity</span>
+        <span class="badge-neutral">SMT</span>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon" style="color:#d29922;">🦀</span>
+      <h3 class="feature-title">Rust Verification</h3>
+      <p class="feature-desc">
+        Kani, Prusti, Creusot, and Verus bring bounded model checking and
+        deductive verification to Rust-based smart contracts and off-chain code.
+      </p>
+      <div class="feature-tags">
+        <span class="badge-neutral">Kani</span>
+        <span class="badge-neutral">Prusti</span>
+        <span class="badge-neutral">Creusot</span>
+        <span class="badge-neutral">Verus</span>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon" style="color:#58a6ff;">📊</span>
+      <h3 class="feature-title">Real-time Dashboard</h3>
+      <p class="feature-desc">
+        Live WebSocket feed, interactive state-space visualisation, Certora-style
+        counterexample explorer, and trace playback — all in one unified interface.
+      </p>
+      <div class="feature-tags">
+        <span class="badge-neutral">WebSocket</span>
+        <span class="badge-neutral">D3.js</span>
+        <span class="badge-neutral">Live</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ RECENT AUDITS -->
+{% if recent_audits %}
+<section class="recent-audits-section">
+  <div class="section-header">
+    <h2 class="section-title" style="font-size:1.4rem;">Recent Verifications</h2>
+    <a href="{{ url_for('login') }}" class="btn btn-ghost btn-sm">View all →</a>
+  </div>
+  <div class="card" style="max-width:860px;margin:0 auto;">
+    <div style="padding:0;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Tool</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in recent_audits %}
+          <tr>
+            <td class="font-mono text-sm">{{ a.filename | truncate(40) if a.filename else '—' }}</td>
+            <td>
+              {% if a.tool_used %}<span class="badge badge-tool">{{ a.tool_used }}</span>
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% set s = (a.status or '') | upper %}
+              {% if s == 'PASS' %}<span class="badge badge-pass">PASS</span>
+              {% elif s == 'FAIL' %}<span class="badge badge-fail">FAIL</span>
+              {% else %}<span class="badge badge-tool">{{ s or '?' }}</span>{% endif %}
+            </td>
+            <td class="text-muted text-sm">{{ a.audit_date | string | truncate(16, killwords=True, end='') if a.audit_date else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════ CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2 class="cta-title">Ready to verify?</h2>
+    <p class="cta-subtitle">
+      Create a free account and start proving your contracts correct in minutes.
+      No configuration required — demo data included.
+    </p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+        <i class="fa-solid fa-user-plus"></i> Register for Free
+      </a>
+      <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

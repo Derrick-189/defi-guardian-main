@@ -1,0 +1,11 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-13T11:48:03.302356
+file: /home/slade/Downloads/ALL/Account.sol
+
+--- STDOUT ---
+
+attribute/flag 'solc': Cannot run solc8.17
+
+
+
+--- STDERR ---

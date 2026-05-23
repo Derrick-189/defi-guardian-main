@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% block title %}Active Verification — DeFi Guardian{% endblock %}
+
+{% block extra_css %}
+<style>
+  .active-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .active-col-main { display: flex; flex-direction: column; gap: 1.25rem; }
+  .active-col-side  { display: flex; flex-direction: column; gap: 1.25rem;
+                      position: sticky; top: calc(56px + 1.75rem); }
+
+  /* Tool progress cards */
+  .tool-progress-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+  .tool-prog-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem;
+    transition: border-color 0.2s;
+  }
+  .tool-prog-card.running { border-color: var(--accent); animation: pulse-border 1.5s infinite; }
+  .tool-prog-card.pass    { border-color: var(--success); }
+  .tool-prog-card.fail    { border-color: var(--danger); }
+  @keyframes pulse-border {
+    0%,100% { box-shadow: 0 0 0 0 rgba(88,166,255,0); }
+    50%      { box-shadow: 0 0 0 3px rgba(88,166,255,0.2); }
+  }
+  .tool-prog-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.4rem; }
+  .tool-prog-status { font-size: 0.75rem; color: var(--text2); }
+  .tool-prog-bar { height: 4px; background: var(--bg2); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+  .tool-prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+  .tool-prog-fill.running { background: var(--accent); animation: shimmer-bar 1.5s infinite; }
+  .tool-prog-fill.pass    { background: var(--success); }
+  .tool-prog-fill.fail    { background: var(--danger); }
+  @keyframes shimmer-bar {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  /* Live output terminal */
+  .live-terminal {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.65;
+    color: #e6edf3;
+    height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  [data-theme="light"] .live-terminal { background: #f6f8fa; color: #1f2328; }
+  .terminal-line { margin: 0; }
+  .terminal-line.error { color: #f85149; }
+  .terminal-line.pass  { color: #3fb950; }
+  .terminal-line.info  { color: #58a6ff; }
+
+  /* LTL live table */
+  .ltl-live-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.85rem;
+                  border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .ltl-live-row:last-child { border-bottom: none; }
+  .ltl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ltl-dot.checking { background: var(--warning); animation: pulse 1s infinite; }
+  .ltl-dot.pass     { background: var(--success); }
+  .ltl-dot.fail     { background: var(--danger); }
+  .ltl-dot.pending  { background: var(--border); }
+  .ltl-name  { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; flex: 1; }
+  .ltl-formula { color: var(--text2); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
+
+  @media (max-width: 900px) {
+    .active-grid { grid-template-columns: 1fr; }
+    .tool-progress-grid { grid-template-columns: repeat(2, 1fr); }
+    .active-col-side { position: static; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">
+      <span class="live-dot"></span> Active Verification
+    </h1>
+    <p class="page-subtitle" id="active-subtitle">Monitoring verification state in real-time</p>
+  </div>
+  <div class="page-header-right">
+    <a href="{{ url_for('counterexample_latest') }}" class="btn btn-secondary btn-sm">
+      <i class="fa-solid fa-magnifying-glass"></i> View Results
+    </a>
+    <a href="{{ url_for('new_run') }}" class="btn btn-primary btn-sm">
+      <i class="fa-solid fa-play"></i> New Run
+    </a>
+  </div>
+</div>
+
+<!-- Tool progress grid -->
+<div class="tool-progress-grid" id="tool-progress-grid" style="margin-bottom:1.25rem;">
+  {% for tool in ['SPIN','COQ','LEAN','CERTORA','KANI','PRUSTI','CREUSOT','VERUS'] %}
+  <div class="tool-prog-card" id="prog-{{ tool }}">
+    <div class="tool-prog-name">{{ tool }}</div>
+    <div class="tool-prog-status" id="prog-status-{{ tool }}">Not run</div>
+    <div class="tool-prog-bar">
+      <div class="tool-prog-fill" id="prog-fill-{{ tool }}" style="width:0%"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="active-grid">
+
+  <!-- ── Left: terminal + LTL ── -->
+  <div class="active-col-main">
+
+    <!-- Live terminal output -->
+    <div class="card" style="padding:0;">
+      <div class="card-header" style="padding:0.75rem 1rem;margin-bottom:0;">
+        <h2 class="card-title">
+          <span class="live-dot"></span> Live Output
+        </h2>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-ghost btn-sm" id="btn-clear-terminal">
+            <i class="fa-solid fa-trash"></i> Clear
+          </button>
+          <button class="btn btn-ghost btn-sm" id="btn-scroll-bottom">
+            <i class="fa-solid fa-arrow-down"></i> Bottom
+          </button>
+        </div>
+      </div>
+      <div class="live-terminal" id="live-terminal">
+        <p class="terminal-line info">DeFi Guardian — Waiting for verification events…</p>
+        <p class="terminal-line info">Run a verification from the desktop app or click New Run.</p>
+      </div>
+    </div>
+
+    <!-- LTL properties live -->
+    <div class="card" style="padding:0;">
+      <div class="card-header" style="padding:0.75rem 1rem;margin-bottom:0;">
+        <h2 class="card-title"><i class="fa-solid fa-list-check"></i> LTL Properties</h2>
+        <span class="text-muted text-sm" id="ltl-summary"></span>
+      </div>
+      <div id="ltl-live-list">
+        <p class="text-muted text-sm" style="padding:1.5rem;text-align:center;">
+          No LTL data — run SPIN verification first
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Right: stats + recent ── -->
+  <div class="active-col-side">
+
+    <!-- Current run stats -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-chart-simple"></i> Current Run</h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        {% set stats = [
+          ('file',        'Contract',    'fa-file-code'),
+          ('tool',        'Tool',        'fa-wrench'),
+          ('status',      'Status',      'fa-circle-check'),
+          ('states',      'States',      'fa-circle-nodes'),
+          ('transitions', 'Transitions', 'fa-arrow-right-arrow-left'),
+          ('depth',       'Depth',       'fa-layer-group'),
+          ('datetime',    'Last Run',    'fa-clock'),
+        ] %}
+        {% for key, label, icon in stats %}
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    padding:0.45rem 0.75rem;background:var(--bg3);border-radius:5px;">
+          <span style="font-size:0.78rem;color:var(--text2);display:flex;align-items:center;gap:0.4rem;">
+            <i class="fa-solid {{ icon }}" style="width:14px;text-align:center;"></i> {{ label }}
+          </span>
+          <span class="font-mono" style="font-size:0.78rem;" id="stat-{{ key }}">—</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Recent runs -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Runs</h2>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-ghost btn-sm text-sm">All →</a>
+      </div>
+      <div id="recent-runs-list" style="display:flex;flex-direction:column;gap:0;">
+        <p class="text-muted text-sm" style="padding:1rem;text-align:center;">Loading…</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  var terminal = document.getElementById('live-terminal');
+  var TOOL_COLORS = {
+    SPIN:'#58a6ff', COQ:'#bc8cff', LEAN:'#3fb950', CERTORA:'#f78166',
+    KANI:'#d29922', PRUSTI:'#79c0ff', CREUSOT:'#56d364', VERUS:'#ff7b72'
+  };
+
+  // ── Terminal helpers ───────────────────────────────────────────────────
+  function termLine(text, cls) {
+    if (!terminal) return;
+    var p = document.createElement('p');
+    p.className = 'terminal-line' + (cls ? ' ' + cls : '');
+    p.textContent = '[' + new Date().toLocaleTimeString() + '] ' + text;
+    terminal.appendChild(p);
+    // Cap at 500 lines
+    while (terminal.children.length > 500) terminal.removeChild(terminal.firstChild);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  document.getElementById('btn-clear-terminal').addEventListener('click', function () {
+    if (terminal) terminal.innerHTML = '';
+  });
+  document.getElementById('btn-scroll-bottom').addEventListener('click', function () {
+    if (terminal) terminal.scrollTop = terminal.scrollHeight;
+  });
+
+  // ── Tool progress cards ────────────────────────────────────────────────
+  function setToolStatus(tool, status, pct) {
+    var card   = document.getElementById('prog-' + tool);
+    var fill   = document.getElementById('prog-fill-' + tool);
+    var label  = document.getElementById('prog-status-' + tool);
+    if (!card) return;
+
+    var s = (status || '').toUpperCase();
+    card.className = 'tool-prog-card ' +
+      (s === 'RUNNING' ? 'running' : s === 'PASS' ? 'pass' : s === 'FAIL' ? 'fail' : '');
+
+    if (label) label.textContent = s || 'Not run';
+    if (fill) {
+      fill.style.width = (pct || 0) + '%';
+      fill.className = 'tool-prog-fill ' +
+        (s === 'RUNNING' ? 'running' : s === 'PASS' ? 'pass' : s === 'FAIL' ? 'fail' : '');
+    }
+  }
+
+  // ── Stats panel ────────────────────────────────────────────────────────
+  function updateStats(data) {
+    function set(id, v) {
+      var el = document.getElementById('stat-' + id);
+      if (el) el.textContent = (v !== undefined && v !== null && v !== '') ? String(v) : '—';
+    }
+    var spin = data.spin || {};
+    // Prefer per-user latest audit fields; fall back to global state fields
+    set('file',        data.model_name || '—');
+    set('tool',        data.active_tool || (spin.status ? 'SPIN' : '—'));
+    set('status',      data.active_status || spin.status || (data.success ? 'PASS' : data.success === false ? 'FAIL' : '—'));
+    set('states',      data.states_stored || data.states || '—');
+    set('transitions', data.transitions || '—');
+    set('depth',       data.depth || '—');
+    set('datetime',    data.datetime || '—');
+
+    var subtitle = document.getElementById('active-subtitle');
+    if (subtitle && data.model_name) {
+      subtitle.textContent = 'Monitoring: ' + data.model_name;
+    }
+  }
+
+  // ── LTL properties ─────────────────────────────────────────────────────
+  function renderLTL(ltl) {
+    var list = document.getElementById('ltl-live-list');
+    var summary = document.getElementById('ltl-summary');
+    if (!list) return;
+
+    if (!ltl || !ltl.length) {
+      list.innerHTML = '<p class="text-muted text-sm" style="padding:1rem;text-align:center;">No LTL data</p>';
+      return;
+    }
+
+    var pass = ltl.filter(function (r) { return r.success; }).length;
+    var fail = ltl.length - pass;
+    if (summary) summary.innerHTML =
+      '<span class="text-success">' + pass + ' verified</span>' +
+      (fail ? ' · <span class="text-danger">' + fail + ' violated</span>' : '');
+
+    list.innerHTML = ltl.map(function (r) {
+      var dotCls = r.success ? 'pass' : 'fail';
+      return '<div class="ltl-live-row">' +
+        '<span class="ltl-dot ' + dotCls + '"></span>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="ltl-name truncate">' + escHtml(r.name || '?') + '</div>' +
+          (r.formula ? '<div class="ltl-formula truncate">' + escHtml(r.formula) + '</div>' : '') +
+        '</div>' +
+        '<span class="badge ' + (r.success ? 'badge-pass' : 'badge-fail') + '" style="font-size:0.65rem;">' +
+          (r.success ? 'VERIFIED' : 'VIOLATED') +
+        '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Recent runs ────────────────────────────────────────────────────────
+  function loadRecentRuns() {
+    fetch('/api/v1/runs/recent?limit=15', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (runs) {
+        var list = document.getElementById('recent-runs-list');
+        if (!list) return;
+        if (!runs || !runs.length) {
+          list.innerHTML = '<p class="text-muted text-sm" style="padding:1rem;text-align:center;">No runs yet</p>';
+          return;
+        }
+        list.innerHTML = runs.slice(0, 8).map(function (r) {
+          var s = (r.status || '').toUpperCase();
+          var color = TOOL_COLORS[r.tool] || '#8b949e';
+          return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.85rem;' +
+            'border-bottom:1px solid var(--border);font-size:0.8rem;">' +
+            '<span style="width:8px;height:8px;border-radius:50%;background:' + color + ';flex-shrink:0;"></span>' +
+            '<span class="font-mono truncate" style="flex:1;font-size:0.75rem;">' + escHtml(r.file || r.filename || '?') + '</span>' +
+            '<span class="badge ' + (s === 'PASS' || s === 'SUCCESS' ? 'badge-pass' : 'badge-fail') +
+              '" style="font-size:0.62rem;">' + escHtml(r.tool || '?') + '</span>' +
+            '<span style="font-size:0.6rem;margin-left:4px;color:' + (r.source==="web_portal"?"var(--accent)":"var(--text2)") + ';">' + (r.source==="web_portal"?"WEB":"DSK") + '</span>' +
+          '</div>';
+        }).join('');
+      })
+      .catch(function () {});
+  }
+
+  // ── Load current state ─────────────────────────────────────────────────
+  function loadState() {
+    // Use /active/current which merges the user's latest DB audit with global
+    // tool-card state, so the page always shows the correct contract name
+    fetch('/api/v1/active/current', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        updateStats(data);
+
+        // Update tool cards from state
+        ['spin','coq','lean','certora','kani','prusti','creusot','verus'].forEach(function (t) {
+          var ts = data[t];
+          if (ts) setToolStatus(t.toUpperCase(), ts.status, ts.status === 'PASS' ? 100 : ts.status === 'FAIL' ? 100 : 0);
+        });
+
+        // LTL
+        var ltl = data.ltl_results || (data.spin && data.spin.ltl_results) || [];
+        renderLTL(ltl);
+
+        // Populate terminal on initial load
+        var term = document.getElementById('live-terminal');
+        if (term && term.innerHTML.indexOf('LTL') === -1) {
+          ltl.forEach(function (r) {
+            termLine('LTL ' + (r.name || '?') + ': ' + (r.success ? 'VERIFIED' : 'VIOLATED'),
+                     r.success ? 'pass' : 'error');
+          });
+        }
+      })
+      .catch(function () {});
+  }
+
+  // ── Real-time events ───────────────────────────────────────────────────
+  document.addEventListener('dg:verification_complete', function (e) {
+    var d = e.detail || {};
+    var tool   = d.tool   || 'Unknown';
+    var status = (d.status || '').toUpperCase();
+    var file   = d.filename || '';
+
+    termLine(tool + ' — ' + status + (file ? ' — ' + file : ''),
+             status === 'PASS' ? 'pass' : status === 'FAIL' ? 'error' : 'info');
+
+    setToolStatus(tool, status, 100);
+    loadState();
+    loadRecentRuns();
+  });
+
+  document.addEventListener('dg:state_update', function (e) {
+    if (e.detail) {
+      updateStats(e.detail);
+      var ltl = e.detail.ltl_results || [];
+      if (ltl.length) renderLTL(ltl);
+      
+      // Log LTL results to terminal if not already there
+      var term = document.getElementById('active-terminal');
+      ltl.forEach(function (r) {
+        var msg = 'LTL ' + (r.name || '?') + ': ' + (r.success ? 'VERIFIED' : 'VIOLATED');
+        if (term && term.innerHTML.indexOf(msg) === -1) {
+          termLine(msg, r.success ? 'pass' : 'error');
+        }
+      });
+    }
+  });
+
+  // ── Init ───────────────────────────────────────────────────────────────
+  loadState();
+  loadRecentRuns();
+  setInterval(function () { loadState(); loadRecentRuns(); }, 5000);
+
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+# example: my_contract.verify.yaml
+contract: lending_pool
+properties:
+  invariants:
+    - name: "collateral_coverage"
+      formula: "collateral * price >= debt"
+      severity: "critical"
+    - name: "balance_consistency"
+      formula: "total_assets == total_liabilities"
+      
+  function_specs:
+    - function: "borrow"
+      requires:
+        - "amount > 0"
+        - "self.collateral_value() >= self.debt + amount"
+      ensures:
+        - "self.debt == old(self.debt) + amount"
+        - "self.collateral == old(self.collateral)"
+    
+    - function: "liquidate"
+      requires:
+        - "self.health_factor() < 100"
+      ensures:
+        - "self.debt == 0"
+        - "self.collateral == 0"

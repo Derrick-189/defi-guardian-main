@@ -1,0 +1,9 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-23T14:21:32.919192
+file: /home/slade/Downloads/ALL/VestingWallet.sol
+
+--- STDOUT ---
+[Errno 21] Is a directory: '.certora_internal/latest'
+
+
+--- STDERR ---

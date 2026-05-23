@@ -1,0 +1,9 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-08T16:06:49.352626
+file: /home/slade/defi_guardian/test_contract.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+Timeout

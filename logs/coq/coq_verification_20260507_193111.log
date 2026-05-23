@@ -1,0 +1,17 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-07T19:31:11.793354
+file: /home/slade/Downloads/VestingWalletCliff.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpcb5gcijv.v", line 44, characters 0-111:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmpcb5gcijv.v", line 65, characters 17-23:
+Error: Illegal application (Non-functional construction): 
+The expression "true" of type "bool"
+cannot be applied to the term
+ "s" : "ContractState"
+

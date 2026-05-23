@@ -1,0 +1,16 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-08T19:12:22.419332
+file: /home/slade/defi_guardian/test_contract.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpky_az0op.v", line 37, characters 0-113:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmpky_az0op.v", line 79, characters 0-4:
+Error:
+ (in proof ltl_liveness_progress_holds): Attempt to save an incomplete proof
+(there are remaining open goals).
+

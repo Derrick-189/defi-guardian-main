@@ -1,0 +1,283 @@
+
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                         🛡️ DEFI GUARDIAN FORMAL VERIFICATION SUITE                    ║
+║                    Powered by SPIN Model Checker | LTL Properties                     ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+📋 SUPPORTED FORMATS:
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │ • .pml  - Promela models (direct Spin verification with LTL properties)        │
+   │ • .sol  - Solidity contracts (auto-translated to Promela with LTL)             │
+   │ • .rs   - Rust programs (experimental translation with verification)           │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+🎯 FORMAL VERIFICATION FEATURES:
+   • LTL Properties (Linear Temporal Logic) - Safety, Liveness, Fairness
+   • Invariants and Safety Properties
+   • State Space Exploration and Counterexample Analysis
+   • Proof Obligations Generation
+   • Coq and Lean Theorem Prover Integration
+
+🚀 HOW TO USE:
+   1. Click "OPEN SOURCE FILE" to select a model (.pml, .sol, .rs)
+   2. Click "RUN SPIN VERIFICATION" to verify with LTL properties
+   3. View detailed results in this console (with auto-scroll)
+   4. Click "OPEN VISUAL DASHBOARD" for state diagrams and analytics
+   5. Use Coq/Lean buttons for theorem proving
+
+💡 TIPS:
+   • Solidity contracts are automatically translated to Promela with LTL properties
+   • Verification results are saved to verification_state.json for the dashboard
+   • The dashboard shows state diagrams, LTL verification, and risk analytics
+   • Use "Verbose output" for detailed SPIN verification logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Ready for verification!
+
+================================================================================
+📂 LOADED FILE: user_lending.rs
+📁 TYPE: Rust Program
+📂 PATH: /home/slade/defi_guardian/user_lending.rs
+================================================================================
+
+📄 MODEL PREVIEW (first 30 lines):
+------------------------------------------------------------
+  1 | // user_lending.rs
+  2 | pub struct DynamicLendingPool {
+  3 |     pub total_deposits: u64,
+  4 |     pub total_borrows: u64,
+  5 |     pub base_rate: u64,        // 5% base rate
+  6 |     pub slope1: u64,           // 10% slope for low utilization
+  7 |     pub slope2: u64,           // 30% slope for high utilization
+  8 |     pub optimal_utilization: u64, // 80% target
+  9 | }
+ 11 | impl DynamicLendingPool {
+ 12 |     pub fn calculate_borrow_rate(&self) -> u64 {
+ 13 |         let utilization = if self.total_deposits == 0 {
+ 14 |             0
+ 15 |         } else {
+ 16 |             (self.total_borrows * 10000) / self.total_deposits  // basis points
+ 17 |         };
+ 19 |         if utilization <= self.optimal_utilization {
+ 20 |             self.base_rate + (self.slope1 * utilization) / 10000
+ 21 |         } else {
+ 22 |             let excess = utilization - self.optimal_utilization;
+ 23 |             self.base_rate + (self.slope1 * self.optimal_utilization) / 10000
+ 24 |                 + (self.slope2 * excess) / 10000
+ 25 |         }
+ 26 |     }
+ 27 | }
+------------------------------------------------------------
+
+
+================================================================================
+🚀 RUNNING SPIN VERIFICATION
+📁 Model: user_lending.rs
+⏰ Time: 2026-04-12 13:25:54
+================================================================================
+
+[1/5] 🔄 Translating Rust to Promela...
+   ✅ Translation complete
+
+   📄 Translated output saved to: /home/slade/defi_guardian/translated_output.pml
+
+   📄 Backup saved to: /home/slade/defi_guardian/user_lending_translated.pml
+
+   ✓ Detected 3 LTL property(ies) in model
+
+[2/5] 🔧 Generating SPIN verifier...
+ltl safety_no_overflow: [] (((balance>=0)) && ((balance<=1000000)))
+ltl liveness_progress: <> ((state==1))
+ltl invariant_balance: [] ((balance>=0))
+  the model contains 3 never claims: invariant_balance, liveness_progress, safety_no_overflow
+  only one claim is used in a verification run
+  choose which one with ./pan -a -N name (defaults to -N safety_no_overflow)
+  or use e.g.: spin -search -ltl safety_no_overflow /home/slade/defi_guardian/translated_output.pml
+
+[3/5] ⚙️ Compiling verifier...
+[4/5] 🔍 Running verification with LTL model checking...
+
+────────────────────────────────────────────────────────────
+   Verifying LTL: safety_no_overflow...
+   Verifying LTL: liveness_progress...
+   Verifying LTL: invariant_balance...
+
+--- LTL safety_no_overflow ---
+pan: ltl formula safety_no_overflow
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (safety_no_overflow)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim safety_no_overflow
+	_spin_nvr.tmp:8, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL liveness_progress ---
+pan: ltl formula liveness_progress
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (liveness_progress)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 2, errors: 0
+        2 states, stored (4 visited)
+        0 states, matched
+        4 transitions (= visited+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	/home/slade/defi_guardian/translated_output.pml:32, state 11, "printf('Insufficient balance\n')"
+	/home/slade/defi_guardian/translated_output.pml:28, state 12, "((balance>=10))"
+	/home/slade/defi_guardian/translated_output.pml:28, state 12, "else"
+	/home/slade/defi_guardian/translated_output.pml:37, state 16, "state = 2"
+	/home/slade/defi_guardian/translated_output.pml:23, state 18, "printf('Executing program logic...\n')"
+	/home/slade/defi_guardian/translated_output.pml:41, state 22, "printf('Program terminated.\n')"
+	/home/slade/defi_guardian/translated_output.pml:45, state 26, "-end-"
+	(7 of 26 states)
+unreached in claim liveness_progress
+	_spin_nvr.tmp:15, state 6, "-end-"
+	(1 of 6 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL invariant_balance ---
+pan: ltl formula invariant_balance
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (invariant_balance)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim invariant_balance
+	_spin_nvr.tmp:24, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+
+────────────────────────────────────────────────────────────
+
+================================================================================
+✅ VERIFICATION SUCCESSFUL!
+   ✓ All LTL properties satisfied
+   ✓ No counterexamples found
+   ✓ Invariants hold in all states
+================================================================================
+
+📊 States explored: 5
+📊 Depth reached: 11
+📊 Transitions: 6
+
+[5/5] 💾 Verification results saved to verification_state.json
+
+============================================================
+⚡ LEAN VERIFICATION RESULTS
+============================================================
+✅ Lean verification successful!
+collateral_sufficient : collateral * price ≥ debt
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+============================================================
+🔧 PRUSTI VERIFICATION
+============================================================
+📝 Analyzing Rust code and generating verification annotations...
+✅ Annotations generated. Running Prusti...
+
+📄 Annotated code saved to: /home/slade/defi_guardian/annotated_output.rs
+
+❌ Prusti verification failed:
+  __          __        __  ___             
+ |__)  _\/_  |__) |  | /__`  |   ____\/_  | 
+ |      /\   |  \ \__/ .__/  |       /\   | 
+
+Prusti version: 0.2.2, commit a0681ee 2023-08-22 15:08:33 UTC, built on 2023-08-22 15:17:40 UTC
+error[E0636]: the feature `register_tool` has already been declared
+ --> <crate attribute>:1:9
+  |
+1 | feature(register_tool)
+  |         ^^^^^^^^^^^^^
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0636`.
+
+ℹ️ Prusti verification failed
+
+💡 Tips:
+   - Check the annotated_output.rs file
+   - Review function preconditions
+📄 Full Prusti log: /home/slade/defi_guardian/prusti_verification_20260412_132606.log
+
+============================================================
+🦀 KANI VERIFICATION
+============================================================
+✅ Kani verification successful!
+   No proof harnesses (functions with #[kani::proof]) were found to verify.
+📄 Full Kani log: /home/slade/defi_guardian/kani_verification_20260412_132641.log
+

@@ -1,0 +1,11 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-04T20:25:51.300740
+file: /home/slade/Downloads/IERC3156FlashBorrower.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpejtb_3rf.v", line 26, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+

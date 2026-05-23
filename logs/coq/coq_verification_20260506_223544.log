@@ -1,0 +1,17 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-06T22:35:44.218859
+file: /home/slade/Downloads/Account.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmp8ljymf49.v", line 44, characters 0-111:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmp8ljymf49.v", line 65, characters 17-23:
+Error: Illegal application (Non-functional construction): 
+The expression "true" of type "bool"
+cannot be applied to the term
+ "s" : "ContractState"
+

@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block title %}Logs & Reports — DeFi Guardian{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title"><i class="fa-solid fa-scroll"></i> Logs &amp; Reports</h1>
+    <p class="page-subtitle">Verification logs, console exports, and generated reports — sorted newest first.</p>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="card card-compact" style="margin-bottom:1rem;">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label class="form-label">Tool</label>
+      <select id="tool-filter" class="input select input-sm">
+        <option value="">ALL</option>
+        <option value="SPIN">SPIN</option>
+        <option value="COQ">COQ</option>
+        <option value="LEAN">LEAN</option>
+        <option value="CERTORA">CERTORA</option>
+        <option value="KANI">KANI</option>
+        <option value="PRUSTI">PRUSTI</option>
+        <option value="CREUSOT">CREUSOT</option>
+        <option value="VERUS">VERUS</option>
+        <option value="RUST">RUST</option>
+        <option value="CONSOLE">Console Exports</option>
+        <option value="REPORT">Reports</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="form-label">Category</label>
+      <select id="cat-filter" class="input select input-sm">
+        <option value="">All</option>
+        <option value="verification">Verification</option>
+        <option value="export">Console Exports</option>
+        <option value="report">Reports</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="form-label">Contract</label>
+      <select id="contract-filter" class="input select input-sm" style="min-width:160px;">
+        <option value="">All Contracts</option>
+        {% for c in contracts %}
+        <option value="{{ c | lower }}">{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group filter-group-search">
+      <label class="form-label">Search filename</label>
+      <div class="input-group input-group-sm">
+        <span class="input-group-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <input type="search" id="log-search" class="input input-sm" placeholder="Search filename…">
+      </div>
+    </div>
+    <div class="filter-group" style="margin-left:auto;align-self:flex-end;">
+      <span class="text-muted text-sm" id="log-count">{{ log_entries|length }} entries</span>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card" style="padding:0;">
+  {% if log_entries %}
+  <div class="table-responsive">
+    <table class="table" id="logs-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-col="0" style="cursor:pointer;user-select:none;">Tool <span class="sort-icon" style="opacity:0.5;font-size:0.7rem;">⇅</span></th>
+          <th class="sortable" data-col="1" style="cursor:pointer;user-select:none;">Category <span class="sort-icon" style="opacity:0.5;font-size:0.7rem;">⇅</span></th>
+          <th class="sortable" data-col="2" style="cursor:pointer;user-select:none;">Contract <span class="sort-icon" style="opacity:0.5;font-size:0.7rem;">⇅</span></th>
+          <th class="sortable" data-col="3" style="cursor:pointer;user-select:none;">Filename <span class="sort-icon" style="opacity:0.5;font-size:0.7rem;">⇅</span></th>
+          <th class="sortable" data-col="4" style="cursor:pointer;user-select:none;">Size <span class="sort-icon" style="opacity:0.5;font-size:0.7rem;">⇅</span></th>
+          <th class="sortable" data-col="5" style="cursor:pointer;user-select:none;">Modified <span class="sort-icon" style="opacity:0.5;font-size:0.7rem;"> ▼</span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="logs-tbody">
+        {% for entry in log_entries %}
+        {% set tc = {'SPIN':'#58a6ff','COQ':'#bc8cff','LEAN':'#3fb950','CERTORA':'#f78166','KANI':'#d29922','PRUSTI':'#79c0ff','CREUSOT':'#56d364','VERUS':'#ff7b72','CONSOLE':'#8b949e','REPORT':'#8b949e','RUST':'#d29922'} %}
+        <tr class="log-row"
+            data-tool="{{ entry.tool | upper }}"
+            data-cat="{{ entry.category }}"
+            data-filename="{{ entry.filename | lower }}"
+            data-contract="{{ (entry.contract or '') | lower }}">
+          <td>
+            <span class="badge badge-tool" style="border-color:{{ tc.get(entry.tool,'#30363d') }}44;color:{{ tc.get(entry.tool,'#8b949e') }};">{{ entry.tool }}</span>
+          </td>
+          <td class="text-muted text-sm">{{ entry.category | capitalize }}</td>
+          <td class="font-mono text-sm" style="color:var(--accent);">
+            {% if entry.contract %}{{ entry.contract }}{% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+          <td class="font-mono text-sm">{{ entry.filename }}</td>
+          <td class="text-muted text-sm">{{ entry.size }}</td>
+          <td class="text-muted text-sm">{{ entry.modified }}</td>
+          <td>
+            <button class="btn btn-sm btn-secondary btn-view-log"
+                    data-log-path="{{ entry.path }}"
+                    data-log-name="{{ entry.filename }}">
+              <i class="fa-solid fa-eye"></i> View
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-state-icon"><i class="fa-solid fa-folder-open"></i></span>
+    <p class="empty-state-title">No logs found</p>
+    <p class="empty-state-sub">Run a verification to generate log files.</p>
+    <a href="{{ url_for('new_run') }}" class="btn btn-primary"><i class="fa-solid fa-play"></i> New Run</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Log viewer modal -->
+<div class="modal-overlay" id="log-modal" hidden>
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 class="modal-title" style="display:flex;align-items:center;gap:0.5rem;">
+        <i class="fa-solid fa-file-lines"></i>
+        <span id="log-modal-filename" class="font-mono" style="font-size:0.9rem;">Log Viewer</span>
+      </h3>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <a href="#" class="btn btn-secondary btn-sm" id="log-download-btn" download>
+          <i class="fa-solid fa-download"></i> Download
+        </a>
+        <button class="btn btn-icon btn-ghost" id="log-modal-close" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0.5rem 0 0;">
+      <div id="log-modal-loading" class="text-center text-muted" style="padding:3rem;">
+        <span class="spinner"></span><br><span style="margin-top:0.5rem;display:block;">Loading…</span>
+      </div>
+      <pre id="log-content" class="log-content-pre" hidden></pre>
+    </div>
+    <div class="modal-footer" style="flex-shrink:0;">
+      <button class="btn btn-ghost" id="log-modal-close-btn">Close</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  var toolFilter      = document.getElementById('tool-filter');
+  var catFilter       = document.getElementById('cat-filter');
+  var contractFilter  = document.getElementById('contract-filter');
+  var searchInput     = document.getElementById('log-search');
+  var countEl         = document.getElementById('log-count');
+  var tbody           = document.getElementById('logs-tbody');
+
+  // ── Filter + sort ──────────────────────────────────────────────────────
+  // col indices: 0=Tool, 1=Category, 2=Contract, 3=Filename, 4=Size, 5=Modified
+  var sortState = { col: 5, dir: 'desc' };
+
+  function applyFilters() {
+    var tool     = (toolFilter     ? toolFilter.value.toUpperCase()     : '');
+    var cat      = (catFilter      ? catFilter.value.toLowerCase()      : '');
+    var contract = (contractFilter ? contractFilter.value.toLowerCase() : '');
+    var search   = (searchInput    ? searchInput.value.toLowerCase().trim() : '');
+    var visible  = 0;
+    Array.from(document.querySelectorAll('.log-row')).forEach(function (row) {
+      var show =
+        (!tool     || row.dataset.tool     === tool)     &&
+        (!cat      || row.dataset.cat      === cat)      &&
+        (!contract || row.dataset.contract === contract) &&
+        (!search   || (row.dataset.filename || '').includes(search));
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (countEl) countEl.textContent = visible + ' entries';
+  }
+
+  function sortTable() {
+    if (!tbody) return;
+    var allRows = Array.from(tbody.querySelectorAll('tr.log-row'));
+    allRows.sort(function (a, b) {
+      var av = a.cells[sortState.col] ? a.cells[sortState.col].textContent.trim() : '';
+      var bv = b.cells[sortState.col] ? b.cells[sortState.col].textContent.trim() : '';
+      // Parse size values like "4.3 kB", "148.6 kB", "193 B"
+      if (sortState.col === 4) {
+        function toBytes(s) {
+          var m = s.match(/([\d.]+)\s*(B|kB|MB|GB)?/i);
+          if (!m) return 0;
+          var n = parseFloat(m[1]);
+          var u = (m[2] || 'B').toUpperCase();
+          return u === 'GB' ? n*1e9 : u === 'MB' ? n*1e6 : u === 'KB' ? n*1e3 : n;
+        }
+        return sortState.dir === 'asc' ? toBytes(av) - toBytes(bv) : toBytes(bv) - toBytes(av);
+      }
+      var cmp = av.localeCompare(bv);
+      return sortState.dir === 'asc' ? cmp : -cmp;
+    });
+    allRows.forEach(function (r) { tbody.appendChild(r); });
+    applyFilters();
+  }
+
+  // ── Sort header clicks ─────────────────────────────────────────────────
+  document.querySelectorAll('th.sortable').forEach(function (th) {
+    th.addEventListener('click', function () {
+      var col = parseInt(th.getAttribute('data-col'), 10);
+      sortState.dir = (sortState.col === col && sortState.dir === 'asc') ? 'desc' : 'asc';
+      sortState.col = col;
+      document.querySelectorAll('th.sortable .sort-icon').forEach(function (ic) {
+        ic.textContent = ' ⇅'; ic.style.opacity = '0.4';
+      });
+      var icon = th.querySelector('.sort-icon');
+      if (icon) { icon.textContent = sortState.dir === 'asc' ? ' ▲' : ' ▼'; icon.style.opacity = '1'; }
+      sortTable();
+    });
+  });
+
+  // ── Filter listeners ───────────────────────────────────────────────────
+  if (toolFilter)     toolFilter.addEventListener('change',     applyFilters);
+  if (catFilter)      catFilter.addEventListener('change',      applyFilters);
+  if (contractFilter) contractFilter.addEventListener('change', applyFilters);
+  if (searchInput)    searchInput.addEventListener('input',     applyFilters);
+
+  // ── Initial sort by Modified desc ──────────────────────────────────────
+  (function () {
+    var modTh = document.querySelector('th.sortable[data-col="5"]');
+    if (modTh) {
+      var icon = modTh.querySelector('.sort-icon');
+      if (icon) { icon.textContent = ' ▼'; icon.style.opacity = '1'; }
+    }
+    sortTable();
+  })();
+
+  // ── Modal ──────────────────────────────────────────────────────────────
+  var modal       = document.getElementById('log-modal');
+  var modalTitle  = document.getElementById('log-modal-filename');
+  var logContent  = document.getElementById('log-content');
+  var loadingEl   = document.getElementById('log-modal-loading');
+  var downloadBtn = document.getElementById('log-download-btn');
+
+  function openModal(path, name) {
+    modalTitle.textContent = name;
+    logContent.hidden = true;
+    loadingEl.style.display = '';
+    // Use CSS class system (not hidden attribute) so the transition works
+    modal.removeAttribute('hidden');
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    fetch('/api/v1/log-content?path=' + encodeURIComponent(path), { credentials:'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
+      .then(function (d) {
+        logContent.textContent = d.content || '(empty)';
+        logContent.hidden = false;
+        loadingEl.style.display = 'none';
+        if (downloadBtn) {
+          downloadBtn.href = '/api/v1/log-content?path=' + encodeURIComponent(path);
+          downloadBtn.download = name;
+        }
+      })
+      .catch(function (err) {
+        logContent.textContent = 'Error loading file: ' + err;
+        logContent.hidden = false;
+        loadingEl.style.display = 'none';
+      });
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    // Re-add hidden after transition so it's removed from tab order
+    setTimeout(function () {
+      if (!modal.classList.contains('open')) modal.setAttribute('hidden', '');
+    }, 220);
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-view-log');
+    if (btn) openModal(btn.dataset.logPath, btn.dataset.logName);
+  });
+
+  ['log-modal-close','log-modal-close-btn'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', closeModal);
+  });
+
+  if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+})();
+</script>
+{% endblock %}

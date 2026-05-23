@@ -1,0 +1,12 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-01T19:02:53.676890
+file: /home/slade/Downloads/IERC1363Spender.sol
+
+--- STDOUT ---
+
+Error when reading /home/slade/defi_guardian/certora/confs/IERC1363Spender.conf: cloud appears in the conf 
+file but is not a known attribute. 
+
+
+
+--- STDERR ---

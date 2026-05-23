@@ -1,0 +1,8 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-04-19T13:15:55.046662
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+✅ Coq verification successful!
+
+--- STDERR ---

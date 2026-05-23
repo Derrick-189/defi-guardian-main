@@ -1,0 +1,39 @@
+=== SPIN VERIFICATION LOG ===
+timestamp: 2026-05-13T14:39:43.292068
+file: /home/slade/emergent-main/test_contract.rs
+
+--- STDOUT ---
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	- (none specified)
+	assertion violations	+
+	acceptance   cycles 	- (not selected)
+	invalid end states	+
+
+State-vector 20 byte, depth reached 6, errors: 0
+        5 states, stored
+        0 states, matched
+        5 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.290	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/emergent-main/generated/models/translated_output.pml:31, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+
+pan: elapsed time 0 seconds
+
+
+--- STDERR ---
+warning: no accept labels are defined, so option -a has no effect (ignored)

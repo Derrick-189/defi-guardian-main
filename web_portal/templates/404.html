@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}404 — DeFi Guardian{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div class="error-page-inner">
+    <div class="error-code" aria-hidden="true">404</div>
+    <div class="error-icon" aria-hidden="true">
+      <i class="fa-solid fa-circle-question"></i>
+    </div>
+    <h1 class="error-title">Page not found</h1>
+    <p class="error-subtitle">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+    <div class="error-actions">
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+        <i class="fa-solid fa-gauge-high"></i> Back to Dashboard
+      </a>
+      {% else %}
+      <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="fa-solid fa-house"></i> Back to Home
+      </a>
+      {% endif %}
+      <button class="btn btn-ghost" onclick="history.back()">
+        <i class="fa-solid fa-arrow-left"></i> Go Back
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

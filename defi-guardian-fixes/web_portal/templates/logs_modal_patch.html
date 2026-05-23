@@ -1,0 +1,248 @@
+{#
+  LOGS PAGE — Modal Log Viewer patch
+  
+  HOW TO APPLY:
+  In web_portal/templates/logs.html, find the line that says:
+      {% endblock %}
+  at the very end, and INSERT the entire content below BEFORE that line.
+  
+  Also update each View button to use: class="... log-view-btn" data-audit-id="{{ e.id or 'db://'+e.id|string }}" data-path="{{ e.path }}"
+  
+  For the Jinja table, the "View" button should look like:
+  
+    <button class="btn btn-sm btn-secondary log-view-btn"
+            data-audit-id="{{ loop.index }}"
+            data-path="{{ e.path }}"
+            data-id="{{ e.filename.replace('DB_LOG_','') if e.filename.startswith('DB_LOG_') else '' }}">
+      <i class="fa-solid fa-eye"></i> View
+    </button>
+  
+  For DB_LOG_* entries the path is "db://<id>" and the audit_id is the numeric ID.
+#}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     LOG VIEW MODAL — powered by /api/v1/log-view/<audit_id>
+     Shows full stored log content for both disk files and DB records.
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="log-modal" tabindex="-1"
+     style="display:none;position:fixed;inset:0;z-index:9999;
+            background:rgba(0,0,0,0.65);align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+              width:min(900px,96vw);max-height:88vh;display:flex;flex-direction:column;
+              overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,0.6);">
+
+    <!-- Modal header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                padding:0.75rem 1rem;border-bottom:1px solid var(--border);background:var(--bg3);
+                flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+        <span id="lm-tool"   class="badge badge-tool" style="font-size:0.75rem;"></span>
+        <span id="lm-file"   style="font-family:'JetBrains Mono',monospace;font-size:0.83rem;"></span>
+        <span id="lm-status" class="badge" style="font-size:0.72rem;"></span>
+        <span id="lm-source" style="font-size:0.63rem;padding:0.15rem 0.4rem;border-radius:3px;
+                                    background:var(--bg);color:var(--text2);"></span>
+      </div>
+      <button id="log-modal-close"
+              style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.3rem;
+                     line-height:1;padding:0 0.25rem;"
+              aria-label="Close">&times;</button>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:flex;gap:1rem;padding:0.45rem 1rem;border-bottom:1px solid var(--border);
+                font-size:0.78rem;color:var(--text2);flex-shrink:0;">
+      <span>States: <b id="lm-states" style="color:var(--text);">—</b></span>
+      <span>Depth:  <b id="lm-depth"  style="color:var(--text);">—</b></span>
+      <span id="lm-date"></span>
+    </div>
+
+    <!-- LTL properties badges -->
+    <div id="lm-ltl" style="display:none;padding:0.45rem 1rem;border-bottom:1px solid var(--border);
+                              flex-wrap:wrap;gap:0.3rem;flex-shrink:0;"></div>
+
+    <!-- Toolbar -->
+    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;
+                border-bottom:1px solid var(--border);background:var(--bg3);flex-shrink:0;">
+      <input type="search" id="lm-search" class="input input-sm"
+             style="flex:1;max-width:300px;" placeholder="Search log…">
+      <button id="lm-wrap-toggle" class="btn btn-ghost btn-sm" title="Toggle word wrap">
+        <i class="fa-solid fa-text-width"></i> Wrap
+      </button>
+      <button id="lm-copy" class="btn btn-ghost btn-sm" title="Copy to clipboard">
+        <i class="fa-solid fa-copy"></i> Copy
+      </button>
+    </div>
+
+    <!-- Log content -->
+    <pre id="lm-content"
+         style="flex:1;overflow:auto;margin:0;padding:1rem;
+                font-size:0.77rem;line-height:1.65;
+                font-family:'JetBrains Mono',monospace;
+                color:var(--text2);
+                white-space:pre-wrap;word-break:break-all;
+                background:var(--bg);"></pre>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var modal   = document.getElementById('log-modal');
+  var content = document.getElementById('lm-content');
+  var searchEl = document.getElementById('lm-search');
+  var _rawContent = '';
+
+  // ── Open ────────────────────────────────────────────────────────────────
+  function openModal(auditId, filePath) {
+    modal.style.display = 'flex';
+    content.textContent = 'Loading…';
+    document.getElementById('lm-ltl').style.display = 'none';
+    document.getElementById('lm-tool').textContent   = '';
+    document.getElementById('lm-file').textContent   = '';
+    document.getElementById('lm-status').textContent  = '';
+    document.getElementById('lm-source').textContent  = '';
+    document.getElementById('lm-states').textContent  = '—';
+    document.getElementById('lm-depth').textContent   = '—';
+    document.getElementById('lm-date').textContent    = '';
+
+    // For DB_LOG_* records the auditId is the numeric row ID
+    var url = auditId
+      ? '/api/v1/log-view/' + encodeURIComponent(auditId)
+      : '/api/v1/log-content?path=' + encodeURIComponent(filePath || '');
+
+    fetch(url, { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || d.error) {
+          // Fallback to raw path if log-view not available
+          if (filePath) {
+            return fetch('/api/v1/log-content?path=' + encodeURIComponent(filePath),
+                         { credentials: 'same-origin' })
+              .then(function (r) { return r.ok ? r.json() : null; })
+              .then(function (c) {
+                _rawContent = (c && c.content) ? c.content : '(no content available)';
+                content.textContent = _rawContent;
+              });
+          }
+          content.textContent = '(could not load log content)';
+          return;
+        }
+
+        // Populate header
+        document.getElementById('lm-tool').textContent = d.tool || '';
+
+        var fileEl = document.getElementById('lm-file');
+        fileEl.textContent = d.filename || '';
+
+        var sEl = document.getElementById('lm-status');
+        sEl.textContent = d.status || '';
+        sEl.className = 'badge ' + (
+          d.status === 'PASS' ? 'badge-pass' :
+          d.status === 'FAIL' ? 'badge-fail' : 'badge-tool'
+        );
+
+        var srcEl = document.getElementById('lm-source');
+        srcEl.textContent = d.source === 'web_portal' ? '🌐 Web Portal' : '🖥️ Desktop';
+        srcEl.style.color = d.source === 'web_portal' ? 'var(--accent)' : 'var(--text2)';
+
+        document.getElementById('lm-states').textContent = d.states || '—';
+        document.getElementById('lm-depth').textContent  = d.depth  || '—';
+        document.getElementById('lm-date').textContent   = d.date   || '';
+
+        // LTL badges
+        var ltlEl = document.getElementById('lm-ltl');
+        if (d.ltl && d.ltl.length) {
+          ltlEl.style.display = 'flex';
+          ltlEl.innerHTML = d.ltl.map(function (p) {
+            var ok = p.success === true || p.status === 'VERIFIED';
+            var unk = p.status === 'UNKNOWN';
+            return '<span class="badge ' + (ok ? 'badge-pass' : unk ? 'badge-tool' : 'badge-fail') +
+              '" style="font-size:0.62rem;cursor:default;" title="' +
+              (p.formula || p.name || '') + '">' +
+              (ok ? '✓ ' : unk ? '? ' : '✗ ') + (p.name || '?') +
+              '</span>';
+          }).join('');
+        } else {
+          ltlEl.style.display = 'none';
+        }
+
+        _rawContent = d.content || '(no content)';
+        content.textContent = _rawContent;
+        highlightSearch();
+      })
+      .catch(function (err) {
+        content.textContent = 'Error loading log: ' + err;
+      });
+  }
+
+  // ── Close ────────────────────────────────────────────────────────────────
+  document.getElementById('log-modal-close').addEventListener('click', function () {
+    modal.style.display = 'none';
+  });
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) modal.style.display = 'none';
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.style.display !== 'none') {
+      modal.style.display = 'none';
+    }
+  });
+
+  // ── Search ────────────────────────────────────────────────────────────────
+  function highlightSearch() {
+    var q = (searchEl.value || '').trim();
+    if (!q) { content.textContent = _rawContent; return; }
+    // Simple highlight using innerHTML
+    var escaped = _rawContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    content.innerHTML = escaped.replace(re,
+      '<mark style="background:var(--warning);color:#000;border-radius:2px;">$1</mark>');
+  }
+  searchEl.addEventListener('input', highlightSearch);
+
+  // ── Word wrap toggle ──────────────────────────────────────────────────────
+  var _wrapOn = true;
+  document.getElementById('lm-wrap-toggle').addEventListener('click', function () {
+    _wrapOn = !_wrapOn;
+    content.style.whiteSpace = _wrapOn ? 'pre-wrap' : 'pre';
+    content.style.wordBreak  = _wrapOn ? 'break-all' : 'normal';
+    this.style.color = _wrapOn ? '' : 'var(--accent)';
+  });
+
+  // ── Copy ─────────────────────────────────────────────────────────────────
+  document.getElementById('lm-copy').addEventListener('click', function () {
+    navigator.clipboard.writeText(_rawContent).then(function () {
+      var btn = document.getElementById('lm-copy');
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+      setTimeout(function () {
+        btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+      }, 1500);
+    }).catch(function () {});
+  });
+
+  // ── Wire all View buttons ─────────────────────────────────────────────────
+  function attachButtons() {
+    document.querySelectorAll('.log-view-btn:not([data-lm-attached])').forEach(function (btn) {
+      btn.dataset.lmAttached = '1';
+      btn.addEventListener('click', function () {
+        var auditId = btn.dataset.auditId || btn.dataset.id || '';
+        var path    = btn.dataset.path || '';
+
+        // DB_LOG_* rows store the numeric DB id in data-id
+        if (!auditId && path && path.startsWith('db://')) {
+          auditId = path.replace('db://', '');
+        }
+        openModal(auditId || null, path);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', attachButtons);
+  // Also run immediately in case DOM already loaded
+  if (document.readyState !== 'loading') attachButtons();
+
+  // Expose for external calls
+  window._openLogModal = openModal;
+})();
+</script>

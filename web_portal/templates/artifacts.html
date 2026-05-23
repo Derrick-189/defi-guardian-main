@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Verification Artifacts — {{ job_id }} — DeFi Guardian{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title"><i class="fa-solid fa-folder-open"></i> Verification Artifacts</h1>
+    <p class="page-subtitle">Job <code>{{ job_id }}</code> — {{ job.get('tool', '') }}</p>
+  </div>
+  <div class="page-header-right">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-ghost btn-sm">
+      <i class="fa-solid fa-arrow-left"></i> Dashboard
+    </a>
+    {% if job.get('result') %}
+    <a href="{{ url_for('counterexample_latest') }}" class="btn btn-primary btn-sm">
+      <i class="fa-solid fa-bug"></i> View Counterexample
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Job Status Card -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-circle-info"></i> Job Summary</h2>
+    {% set s = job.get('status', 'unknown') %}
+    <span class="badge badge-{{ 'success' if s == 'completed' else ('danger' if s == 'failed' else ('warning' if s in ('pending','running') else 'secondary')) }}">
+      {{ s | upper }}
+    </span>
+  </div>
+  <div class="card-body">
+    <dl class="definition-list" style="display:grid;grid-template-columns:auto 1fr;gap:.5rem 1.5rem;">
+      <dt>Job ID</dt><dd><code>{{ job_id }}</code></dd>
+      <dt>Tool</dt><dd>{{ job.get('tool', '—') }}</dd>
+      {% set r = job.get('result', {}) %}
+      {% if r %}
+      <dt>Counterexample</dt>
+      <dd>
+        {% if r.get('counterexample_found') %}
+          <span style="color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i> Found</span>
+        {% else %}
+          <span style="color:var(--success)"><i class="fa-solid fa-check-circle"></i> None</span>
+        {% endif %}
+      </dd>
+      <dt>Return Code</dt><dd>{{ r.get('return_code', '—') }}</dd>
+      {% endif %}
+    </dl>
+  </div>
+</div>
+
+{% set r = job.get('result', {}) %}
+{% if r.get('stdout') %}
+<!-- Verifier stdout -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-terminal"></i> Verifier Output</h2>
+  </div>
+  <pre class="code-block" style="max-height:400px;overflow-y:auto;font-size:.8rem;padding:1rem;margin:0;">{{ r.stdout }}</pre>
+</div>
+{% endif %}
+
+{% if r.get('stderr') %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-circle-exclamation"></i> Verifier Stderr</h2>
+  </div>
+  <pre class="code-block" style="max-height:300px;overflow-y:auto;font-size:.8rem;padding:1rem;margin:0;color:var(--warning);">{{ r.stderr }}</pre>
+</div>
+{% endif %}
+
+<!-- Artifact Files -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-files"></i> Artifact Files</h2>
+  </div>
+  {% if files %}
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Size</th>
+          <th>Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in files %}
+        <tr>
+          <td><i class="fa-solid fa-file-lines" style="opacity:.5;margin-right:.4rem;"></i>{{ f.name }}</td>
+          <td>{{ f.size }}</td>
+          <td><span class="badge badge-secondary">{{ f.ext }}</span></td>
+          <td>
+            <a href="/api/v1/artifact/{{ job_id }}/{{ f.name }}" class="btn btn-ghost btn-xs" download>
+              <i class="fa-solid fa-download"></i> Download
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state" style="padding:2rem;text-align:center;">
+    {% if job.get('status') in ('pending', 'running') %}
+    <p><i class="fa-solid fa-spinner fa-spin"></i> Verification in progress — artifacts will appear here when complete.</p>
+    {% else %}
+    <p>No artifact files found for this job.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+{% if job.get('status') in ('pending', 'running') %}
+<script>
+// Auto-refresh while job is running
+setTimeout(function() { location.reload(); }, 3000);
+</script>
+{% endif %}
+{% endblock %}

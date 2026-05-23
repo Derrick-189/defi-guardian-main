@@ -1,0 +1,36 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-05-14T22:08:15.875707
+file: /home/slade/Downloads/Kabvote.sol
+
+--- STDOUT ---
+/tmp/tmpfp44jg0i.lean:14:4: error: `id` has already been declared
+/tmp/tmpfp44jg0i.lean:33:4: error: typeclass instance problem is stuck
+  HMul ?m.8 ?m.9 ?m.13
+
+Note: Lean will not try to resolve this typeclass instance problem because the first and second type arguments to `HMul` are metavariables. These arguments must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+/tmp/tmpfp44jg0i.lean:39:2: error: Expected type must not contain free variables
+  amount ≥ 0 ∧ amount ≤ 1000000
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+/tmp/tmpfp44jg0i.lean:43:34: error: Application type mismatch: The argument
+  lock
+has type
+  Nat
+but is expected to have type
+  Prop
+in the application
+  And lock
+/tmp/tmpfp44jg0i.lean:48:36: error: typeclass instance problem is stuck
+  LE ?m.5
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `LE` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+/tmp/tmpfp44jg0i.lean:53:40: error: unexpected token '<'; expected term
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---

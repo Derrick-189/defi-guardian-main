@@ -1,0 +1,11 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-04-12T13:24:54.012010
+file: /home/slade/defi_guardian/translated_output.pml
+
+--- STDOUT ---
+collateral_sufficient : collateral * price ≥ debt
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---

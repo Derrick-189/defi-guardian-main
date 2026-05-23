@@ -1,0 +1,5 @@
+DIGEST 8523d07a689f705f00e6eca9b70db3ed
+Ftest
+prf 8:11 <> test
+R20:22 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R16:18 Coq.Init.Peano <> ::nat_scope:x_'+'_x not

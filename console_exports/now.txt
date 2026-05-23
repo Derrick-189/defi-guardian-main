@@ -1,0 +1,91 @@
+
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                         🛡️ DEFI GUARDIAN FORMAL VERIFICATION SUITE                    ║
+║                    Powered by SPIN Model Checker | LTL Properties                     ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+📋 SUPPORTED FORMATS:
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │ • .pml  - Promela models (direct Spin verification with LTL properties)        │
+   │ • .sol  - Solidity contracts (auto-translated to Promela with LTL)             │
+   │ • .rs   - Rust programs (experimental translation with verification)           │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+🎯 FORMAL VERIFICATION FEATURES:
+   • LTL Properties (Linear Temporal Logic) - Safety, Liveness, Fairness
+   • Invariants and Safety Properties
+   • State Space Exploration and Counterexample Analysis
+   • Proof Obligations Generation
+   • Coq and Lean Theorem Prover Integration
+
+🚀 HOW TO USE:
+   1. Click "OPEN SOURCE FILE" to select a model (.pml, .sol, .rs)
+   2. Click "RUN SPIN VERIFICATION" to verify with LTL properties
+   3. View detailed results in this console (with auto-scroll)
+   4. Click "OPEN VISUAL DASHBOARD" for state diagrams and analytics
+   5. Use Coq/Lean buttons for theorem proving
+
+💡 TIPS:
+   • Solidity contracts are automatically translated to Promela with LTL properties
+   • Verification results are saved to verification_state.json for the dashboard
+   • The dashboard shows state diagrams, LTL verification, and risk analytics
+   • Use "Verbose output" for detailed SPIN verification logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Ready for verification!
+
+📂 LOADED FILE: IERC3156FlashBorrower.sol
+📁 TYPE: .SOL
+📂 PATH: /home/slade/Downloads/IERC3156FlashBorrower.sol
+────────────────────────────────────────────────────────────
+
+
+🚀 RUNNING SPIN VERIFICATION
+📁 Model: IERC3156FlashBorrower.sol
+⏰ Time: 2026-04-27 22:44:28
+────────────────────────────────────────────────────────────
+
+[1/5] 🔄 Translating Solidity to Promela...
+   ✅ Translation complete with semantic preservation checks
+   📜 Proof Obligation: ∀s: State • source_invariant(s) ⇒ pml_invariant(translate(s))
+   📜 Proof Obligation: ∀s, s': State • source_transition(s, s') ⇒ pml_transition(translate(s), translate(s'))
+
+   📄 Translated output saved to: /home/slade/defi_guardian/translated_output.pml
+
+   📄 Backup saved to: /home/slade/defi_guardian/IERC3156FlashBorrower_translated.pml
+
+   ✓ Detected 8 LTL property(ies) in model
+
+[2/5] 🔧 Generating SPIN verifier...
+spin: /home/slade/defi_guardian/translated_output.pml:44, Error: syntax error	saw 'operator: ?'
+spin: /home/slade/defi_guardian/translated_output.pml:55, Error: syntax error	saw 'function-name: printf' near 'printf'
+ltl safety_no_overflow: [] (((amount>=0)) && ((amount<=1000000)))
+ltl safety_reentrancy: [] (! ((lock) && ((amount>100))))
+ltl liveness_progress: <> ((state==2))
+ltl invariant_collateral: [] ((user_collateral>=user_debt))
+ltl response_price_drop: [] ((! ((price_eth<50))) || (<> ((health_factor<150))))
+ltl stability: [] ((! ((lock==0))) || (<> (((amount>0)) && ((health_factor>200)))))
+ltl fairness: [] (<> ((lock==0)))
+ltl reachability_liquidation: [] ((! ((health_factor<100))) || (<> ((liquidation_executed==1))))
+spin: /home/slade/defi_guardian/translated_output.pml:78, Error: aborting (ana_stmnt)
+
+[3/5] ⚙️ Compiling verifier...
+cc1: fatal error: pan.c: No such file or directory
+compilation terminated.
+[4/5] 🔍 Running verification with LTL model checking...
+
+────────────────────────────────────────────────────────────
+   Verifying LTL: safety_no_overflow...
+
+❌ Error: [Errno 2] No such file or directory: './pan'
+
+📜 COQ VERIFICATION
+────────────────────────────────────────────────────────────
+❌ Coq failed: File "/tmp/tmp_hjk099x.v", line 26, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+
+
+❌ CERTORAKEY environment variable not set
+   Get API key: https://prover.certora.com/
+

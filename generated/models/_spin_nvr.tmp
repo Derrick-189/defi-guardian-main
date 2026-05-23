@@ -1,0 +1,78 @@
+never safety_no_overflow {    /* !([] (((amount>=0)) && ((amount<=1000000)))) */
+T0_init:
+	do
+	:: atomic { (! ((((amount>=0)) && ((amount<=1000000))))) -> assert(!(! ((((amount>=0)) && ((amount<=1000000)))))) }
+	:: (1) -> goto T0_init
+	od;
+accept_all:
+	skip
+}
+never safety_reentrancy {    /* !([] (! ((lock) && ((amount>100))))) */
+T0_init:
+	do
+	:: atomic { (! ((! ((lock) && ((amount>100)))))) -> assert(!(! ((! ((lock) && ((amount>100))))))) }
+	:: (1) -> goto T0_init
+	od;
+accept_all:
+	skip
+}
+never liveness_progress {    /* !(<> ((state==2))) */
+accept_init:
+T0_init:
+	do
+	:: (! (((state==2)))) -> goto T0_init
+	od;
+}
+never invariant_collateral {    /* !([] ((user_collateral>=user_debt))) */
+T0_init:
+	do
+	:: atomic { (! (((user_collateral>=user_debt)))) -> assert(!(! (((user_collateral>=user_debt))))) }
+	:: (1) -> goto T0_init
+	od;
+accept_all:
+	skip
+}
+never response_price_drop {    /* !([] ((! ((price_eth<50))) || (<> ((health_factor<150))))) */
+T0_init:
+	do
+	:: (! ((! ((price_eth<50)))) && ! (((health_factor<150)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((health_factor<150)))) -> goto accept_S4
+	od;
+}
+never stability {    /* !([] ((! ((lock==0))) || (<> (((amount>0)) && ((health_factor>200)))))) */
+T0_init:
+	do
+	:: (! ((! ((lock==0)))) && ! ((((amount>0)) && ((health_factor>200))))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! ((((amount>0)) && ((health_factor>200))))) -> goto accept_S4
+	od;
+}
+never fairness {    /* !([] (<> ((lock==0)))) */
+T0_init:
+	do
+	:: (! (((lock==0)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((lock==0)))) -> goto accept_S4
+	od;
+}
+never reachability_liquidation {    /* !([] ((! ((health_factor<100))) || (<> ((liquidation_executed==1))))) */
+T0_init:
+	do
+	:: (! ((! ((health_factor<100)))) && ! (((liquidation_executed==1)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((liquidation_executed==1)))) -> goto accept_S4
+	od;
+}

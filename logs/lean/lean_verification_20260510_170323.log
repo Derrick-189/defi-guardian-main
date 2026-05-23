@@ -1,0 +1,10 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-05-10T17:03:23.610039
+file: /home/slade/defi_guardian/defi_vault.rs
+
+--- STDOUT ---
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---

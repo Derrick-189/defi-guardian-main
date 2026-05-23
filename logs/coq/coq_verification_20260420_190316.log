@@ -1,0 +1,8 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-04-20T19:03:16.864598
+file: /home/slade/defi_guardian/SimpleLending.sol
+
+--- STDOUT ---
+✅ Coq verification successful!
+
+--- STDERR ---

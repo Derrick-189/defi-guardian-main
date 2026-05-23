@@ -1,0 +1,11 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-12T19:49:52.631830
+file: /home/slade/Downloads/ALL/Account.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpuf5aqgv0.v", line 19, characters 0-42:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]

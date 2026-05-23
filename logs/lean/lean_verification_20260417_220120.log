@@ -1,0 +1,12 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-04-17T22:01:20.973398
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+collateral_sufficient : collateral * price ≥ debt
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---
+warning: failed to query latest release, using existing version 'leanprover/lean4:v4.29.0'

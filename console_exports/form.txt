@@ -1,0 +1,232 @@
+
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                         🛡️ DEFI GUARDIAN FORMAL VERIFICATION SUITE                    ║
+║                    Powered by SPIN Model Checker | LTL Properties                     ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+📋 SUPPORTED FORMATS:
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │ • .pml  - Promela models (direct Spin verification with LTL properties)        │
+   │ • .sol  - Solidity contracts (auto-translated to Promela with LTL)             │
+   │ • .rs   - Rust programs (experimental translation with verification)           │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+🎯 FORMAL VERIFICATION FEATURES:
+   • LTL Properties (Linear Temporal Logic) - Safety, Liveness, Fairness
+   • Invariants and Safety Properties
+   • State Space Exploration and Counterexample Analysis
+   • Proof Obligations Generation
+   • Coq and Lean Theorem Prover Integration
+
+🚀 HOW TO USE:
+   1. Click "OPEN SOURCE FILE" to select a model (.pml, .sol, .rs)
+   2. Click "RUN SPIN VERIFICATION" to verify with LTL properties
+   3. View detailed results in this console (with auto-scroll)
+   4. Click "OPEN VISUAL DASHBOARD" for state diagrams and analytics
+   5. Use Coq/Lean buttons for theorem proving
+
+💡 TIPS:
+   • Solidity contracts are automatically translated to Promela with LTL properties
+   • Verification results are saved to verification_state.json for the dashboard
+   • The dashboard shows state diagrams, LTL verification, and risk analytics
+   • Use "Verbose output" for detailed SPIN verification logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Ready for verification!
+   File tree saved to: /home/slade/defi_guardian/file_tree.json
+
+📂 LOADED FILE: test_contract.rs
+📁 TYPE: .RS
+📂 PATH: /home/slade/defi_guardian/test_contract.rs
+────────────────────────────────────────────────────────────
+
+
+🚀 RUNNING SPIN VERIFICATION
+📁 Model: test_contract.rs
+⏰ Time: 2026-04-27 22:38:29
+────────────────────────────────────────────────────────────
+
+[1/5] 🔄 Translating Rust to Promela...
+   ✅ Translation complete
+
+   📄 Translated output saved to: /home/slade/defi_guardian/translated_output.pml
+
+   📄 Backup saved to: /home/slade/defi_guardian/test_contract_translated.pml
+
+   ✓ Detected 3 LTL property(ies) in model
+
+[2/5] 🔧 Generating SPIN verifier...
+ltl safety_no_overflow: [] (((balance>=0)) && ((balance<=1000000)))
+ltl liveness_progress: <> ((state==1))
+ltl invariant_balance: [] ((balance>=0))
+  the model contains 3 never claims: invariant_balance, liveness_progress, safety_no_overflow
+  only one claim is used in a verification run
+  choose which one with ./pan -a -N name (defaults to -N safety_no_overflow)
+  or use e.g.: spin -search -ltl safety_no_overflow /home/slade/defi_guardian/translated_output.pml
+
+[3/5] ⚙️ Compiling verifier...
+[4/5] 🔍 Running verification with LTL model checking...
+
+────────────────────────────────────────────────────────────
+   Verifying LTL: safety_no_overflow...
+   Verifying LTL: liveness_progress...
+   Verifying LTL: invariant_balance...
+
+--- LTL safety_no_overflow ---
+pan: ltl formula safety_no_overflow
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (safety_no_overflow)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:31, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim safety_no_overflow
+	_spin_nvr.tmp:8, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL liveness_progress ---
+pan: ltl formula liveness_progress
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (liveness_progress)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 2, errors: 0
+        2 states, stored (4 visited)
+        0 states, matched
+        4 transitions (= visited+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:31, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	/home/slade/defi_guardian/translated_output.pml:33, state 11, "printf('Insufficient balance\n')"
+	/home/slade/defi_guardian/translated_output.pml:29, state 12, "((balance>=10))"
+	/home/slade/defi_guardian/translated_output.pml:29, state 12, "else"
+	/home/slade/defi_guardian/translated_output.pml:38, state 16, "state = 2"
+	/home/slade/defi_guardian/translated_output.pml:24, state 18, "printf('Executing program logic...\n')"
+	/home/slade/defi_guardian/translated_output.pml:42, state 22, "printf('Program terminated.\n')"
+	/home/slade/defi_guardian/translated_output.pml:46, state 26, "-end-"
+	(7 of 26 states)
+unreached in claim liveness_progress
+	_spin_nvr.tmp:15, state 6, "-end-"
+	(1 of 6 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL invariant_balance ---
+pan: ltl formula invariant_balance
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (invariant_balance)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:31, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim invariant_balance
+	_spin_nvr.tmp:24, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+
+────────────────────────────────────────────────────────────
+
+✅ VERIFICATION SUCCESSFUL!
+   ✓ All LTL properties satisfied
+   ✓ No counterexamples found
+   ✓ Invariants hold in all states
+────────────────────────────────────────────────────────────
+
+📊 States explored: 5
+📊 Depth reached: 11
+📊 Transitions: 6
+
+[5/5] 💾 Verification results saved to verification_state.json
+   📊 State graph with 6 nodes and 1 edges saved
+
+📊 State graph exported for dashboard visualization
+
+🌐 Opening dashboard in browser...
+⏳ Starting Streamlit… (first run can take 30–90s while Python loads)
+✅ Dashboard ready at http://localhost:8501
+
+📜 COQ VERIFICATION
+────────────────────────────────────────────────────────────
+❌ Coq failed: File "/tmp/tmp_bz_7r1h.v", line 22, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+
+
+
+🦀 KANI VERIFICATION
+────────────────────────────────────────────────────────────
+⏭️ Kani skipped: Anchor program requires Cargo dependencies not available in temp verifier compile
+
+🔧 PRUSTI VERIFICATION
+────────────────────────────────────────────────────────────
+⏭️ Prusti skipped: Anchor program requires Cargo dependencies not available in temp Prusti compile
+
+============================================================
+📐 CREUSOT VERIFICATION
+============================================================
+⏭️ Creusot skipped: Anchor program requires Cargo dependencies not available in temp verifier compile
+

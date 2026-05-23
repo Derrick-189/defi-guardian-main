@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Tools — DeFi Guardian{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">
+      <i class="fa-solid fa-screwdriver-wrench"></i> Verification Tools
+    </h1>
+    <p class="page-subtitle">8 formal verification engines</p>
+  </div>
+</div>
+
+<!-- Info Alert -->
+<div class="alert alert-info" role="alert">
+  <i class="fa-solid fa-circle-info"></i>
+  Tools marked <strong>'Simulated'</strong> will use realistic deterministic output.
+  Install the corresponding binaries to use real verification.
+</div>
+
+<!-- Current File Indicator -->
+<div class="card card-compact">
+  <div class="card-body">
+    <div class="current-file-row">
+      <span class="current-file-label">
+        <i class="fa-solid fa-file-code"></i> Current File:
+      </span>
+      <span class="current-file-value font-mono" id="current-file-display">
+        No file loaded
+      </span>
+      <a href="{{ url_for('new_run') }}" class="btn btn-sm btn-primary" style="margin-left: auto;">
+        <i class="fa-solid fa-folder-open"></i> Load File
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Tools Grid -->
+<div id="tools-grid" class="tools-grid" aria-label="Verification tools">
+  <!-- Populated by tools.js -->
+  <div class="tools-grid-loading">
+    <span class="spinner"></span>
+    <span>Loading tools…</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Expose current file from server context if available
+  window.DG_CURRENT_FILE = {{ ('"' + current_file + '"') | safe if current_file else 'null' }};
+
+  // Update the display
+  (function () {
+    const el = document.getElementById('current-file-display');
+    if (el && window.DG_CURRENT_FILE) {
+      el.textContent = window.DG_CURRENT_FILE;
+    }
+  })();
+</script>
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+{% endblock %}

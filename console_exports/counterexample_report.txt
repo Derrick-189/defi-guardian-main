@@ -1,0 +1,58 @@
+======================================================================
+COUNTEREXAMPLE ANALYSIS REPORT
+======================================================================
+
+❌ COUNTEREXAMPLE FOUND!
+
+📋 SPIN GUIDED SIMULATION:
+--------------------------------------------------
+ltl safety_no_overflow: [] (((amount>=0)) && ((amount<=1000000)))
+ltl safety_reentrancy: [] (! ((lock) && ((amount>100))))
+ltl liveness_progress: <> ((state==2))
+ltl invariant_collateral: [] ((user_collateral>=user_debt))
+ltl response_price_drop: [] ((! ((price_eth<50))) || (<> ((health_factor<150))))
+ltl stability: [] ((! ((lock==0))) || (<> (((amount>0)) && ((health_factor>200)))))
+ltl fairness: [] (<> ((lock==0)))
+ltl reachability_liquidation: [] ((! ((health_factor<100))) || (<> ((liquidation_executed==1))))
+starting claim 9
+Never claim moves to line 70	[((!(!((health_factor<100)))&&!((liquidation_executed==1))))]
+          Formal Verification: Contract Initialized
+  2:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:32 (state 1)	[printf('Formal Verification: Contract Initialized\\n')]
+  2:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:33 (state 2)	[state = 1]
+Never claim moves to line 75	[(!((liquidation_executed==1)))]
+  4:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:37 (state 4)	[((state==1))]
+  6:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:39 (state 5)	[assert((user_collateral>=0))]
+  6:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:40 (state 6)	[assert((user_debt>=0))]
+  6:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:41 (state 7)	[assert((price_eth>0))]
+  6:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:44 (state 8)	[health_factor = ((user_collateral*price_eth)/user_debt)]
+  7:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:52 (state 13)	[else]
+          Position healthy: health_factor = 166
+  8:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:53 (state 14)	[printf('Position healthy: health_factor = %d\\n',health_factor)]
+          Formal Verification: Execution Completed
+  8:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:55 (state 17)	[printf('Formal Verification: Execution Completed\\n')]
+  8:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:56 (state 18)	[state = 2]
+ 10:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:58 (state 20)	[((state==2))]
+          Contract execution terminated.
+ 12:	proc  0 (Contract:1) /home/slade/defi_guardian/translated_output.pml:59 (state 21)	[printf('Contract execution terminated.\\n')]
+ 14: proc 0 terminates
+  <<<<<START OF CYCLE>>>>>
+spin: trail ends after 16 steps
+#processes: 0
+		lock = 0
+		amount = 10
+		user_collateral = 5000
+		user_debt = 3000
+		price_eth = 100
+		health_factor = 166
+		liquidation_executed = 0
+		state = 2
+ 16:	proc  - (reachability_liquidation:1) _spin_nvr.tmp:74 (state 10)
+1 processes created
+
+
+🔧 RECOMMENDATIONS:
+--------------------------------------------------
+1. Review the LTL properties for correctness
+2. Check if the model accurately represents the system
+3. Verify that invariants are properly defined
+4. Consider adding more constraints to the model

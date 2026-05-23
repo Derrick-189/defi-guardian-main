@@ -1,0 +1,18 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DeFi Guardian
+Name[en]=DeFi Guardian
+GenericName=Formal Verification Suite
+GenericName[en]=Formal Verification Suite
+Comment=Formal verification platform for DeFi protocols
+Comment[en]=Formal verification platform for DeFi protocols
+Exec=python3 /home/slade/defi_guardian/defi_guardian_shortcut.py
+Icon=/home/slade/defi_guardian/defi_guardian.png
+Terminal=false
+StartupNotify=true
+Categories=Development;Security;Utility;
+Keywords=formal verification;SPIN;LTL;security;audit;defi;
+StartupWMClass=defi-guardian
+MimeType=
+X-Desktop-File-Install-Version=0.26

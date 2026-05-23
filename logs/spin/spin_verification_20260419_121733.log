@@ -1,0 +1,123 @@
+=== SPIN VERIFICATION LOG ===
+timestamp: 2026-04-19T12:17:33.744023
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+
+--- LTL safety_no_overflow ---
+pan: ltl formula safety_no_overflow
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (safety_no_overflow)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim safety_no_overflow
+	_spin_nvr.tmp:8, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL liveness_progress ---
+pan: ltl formula liveness_progress
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (liveness_progress)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 2, errors: 0
+        2 states, stored (4 visited)
+        0 states, matched
+        4 transitions (= visited+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	/home/slade/defi_guardian/translated_output.pml:32, state 11, "printf('Insufficient balance\n')"
+	/home/slade/defi_guardian/translated_output.pml:28, state 12, "((balance>=10))"
+	/home/slade/defi_guardian/translated_output.pml:28, state 12, "else"
+	/home/slade/defi_guardian/translated_output.pml:37, state 16, "state = 2"
+	/home/slade/defi_guardian/translated_output.pml:23, state 18, "printf('Executing program logic...\n')"
+	/home/slade/defi_guardian/translated_output.pml:41, state 22, "printf('Program terminated.\n')"
+	/home/slade/defi_guardian/translated_output.pml:45, state 26, "-end-"
+	(7 of 26 states)
+unreached in claim liveness_progress
+	_spin_nvr.tmp:15, state 6, "-end-"
+	(1 of 6 states)
+
+pan: elapsed time 0 seconds
+
+--- LTL invariant_balance ---
+pan: ltl formula invariant_balance
+
+(Spin Version 6.5.2 -- 6 December 2019)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (invariant_balance)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 28 byte, depth reached 11, errors: 0
+        5 states, stored
+        1 states, matched
+        6 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.000	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.287	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+unreached in proctype Program
+	/home/slade/defi_guardian/translated_output.pml:30, state 9, "printf('Withdrawal successful. New balance: %d\n',balance)"
+	(1 of 26 states)
+unreached in claim invariant_balance
+	_spin_nvr.tmp:24, state 10, "-end-"
+	(1 of 10 states)
+
+pan: elapsed time 0 seconds
+
+
+--- STDERR ---

@@ -1,0 +1,1 @@
+active proctype m() { do :: skip; od }

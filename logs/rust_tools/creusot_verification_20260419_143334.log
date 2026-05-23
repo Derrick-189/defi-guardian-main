@@ -1,0 +1,36 @@
+=== CREUSOT VERIFICATION LOG ===
+timestamp: 2026-04-19T14:33:34.213590
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+    Updating crates.io index
+   Compiling autocfg v1.5.0
+   Compiling proc-macro2 v1.0.106
+   Compiling libc v0.2.185
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.45
+   Compiling num-traits v0.2.19
+   Compiling getrandom v0.4.2
+   Compiling cfg-if v1.0.4
+    Checking num-integer v0.1.46
+   Compiling syn v2.0.117
+    Checking num-bigint v0.4.6
+   Compiling uuid v1.23.1
+    Checking num-rational v0.4.2
+   Compiling pearlite-syn v0.11.0-dev (/home/slade/creusot/pearlite-syn)
+   Compiling creusot-std-proc v0.11.0-dev (/home/slade/creusot/creusot-std-proc)
+    Checking creusot-std v0.11.0-dev (/home/slade/creusot/creusot-std)
+    Checking creusot_verify v0.1.0 (/tmp/tmpk53zxocs)
+warning: unused import: `creusot_std::prelude::*`
+ --> src/lib.rs:1:5
+  |
+1 | use creusot_std::prelude::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `creusot_verify` (lib) generated 1 warning (run `cargo fix --lib -p creusot_verify` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 06s

@@ -1,0 +1,12 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-04-27T22:51:51.175022
+file: /home/slade/Downloads/IERC3156FlashBorrower.sol
+
+--- STDOUT ---
+
+Error when reading /home/slade/defi_guardian/certora/confs/IERC3156FlashBorrower.conf: cloud appears in the 
+conf file but is not a known attribute. 
+
+
+
+--- STDERR ---

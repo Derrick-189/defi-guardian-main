@@ -1,0 +1,14 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-08T13:07:43.204050
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmp0t681pb0.v", line 34, characters 0-113:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmp0t681pb0.v", line 100, characters 4-10:
+Error: No such goal.
+

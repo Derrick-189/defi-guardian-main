@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi Guardian - Verification Suite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --panel: #ffffff;
+            --accent: #0d9488;
+            --accent-light: #ccfbf1;
+            --text: #1e293b;
+            --dim: #64748b;
+            --border: #cbd5e1;
+            --nav-bg: #1e293b;
+            --nav-text: #f1f5f9;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: var(--nav-bg);
+            border-bottom: 1px solid #334155;
+            padding: 0.85rem 2rem;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand {
+            color: #2dd4bf !important;
+            font-weight: 800;
+            font-size: 1.15rem;
+            text-decoration: none;
+        }
+        .nav-btn {
+            background: #0d9488;
+            color: #fff !important;
+            border: none;
+            border-radius: 8px;
+            padding: 0.45rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover { background: #0f766e; }
+        .nav-btn.secondary {
+            background: #7c3aed;
+        }
+        .nav-btn.secondary:hover { background: #6d28d9; }
+        .main-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .stat-info h3 { margin: 0; font-weight: 800; color: var(--text); font-size: 1.6rem; }
+        .stat-info p { margin: 0; color: var(--dim); font-size: 0.85rem; font-weight: 500; }
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .panel-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            color: var(--text);
+            background: #f8fafc;
+            font-size: 0.95rem;
+        }
+        .panel-body { padding: 1.5rem; }
+        .tool-status {
+            background: #f8fafc;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        .status-dot.online { background: #16a34a; }
+        .status-dot.offline { background: #dc2626; }
+        .badge-pass { background: #16a34a; }
+        .badge-fail { background: #dc2626; }
+        .badge-warn { background: #ca8a04; }
+        .text-accent { color: var(--accent); }
+        .text-muted { color: var(--dim) !important; }
+        .spinner-border { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-shield-halved"></i> DeFi Guardian
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <a href="http://localhost:5005/dashboard" class="nav-btn">
+                <i class="fas fa-chart-line me-1"></i> Verification Dashboard
+            </a>
+            <a href="http://localhost:5000/dashboard" class="nav-btn secondary">
+                <i class="fas fa-user-circle me-1"></i> Account Dashboard
+            </a>
+            <span class="ms-3" style="color:#94a3b8; font-size:0.85rem;">
+                <i class="fas fa-circle text-success me-1" style="color:#22c55e;"></i> System Online
+            </span>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Stats Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="passedCount">-</h3>
+                        <p>Properties Verified</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="failedCount">-</h3>
+                        <p>Violations Found</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #ccfbf1; color: #0d9488;">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="statesExplored">-</h3>
+                        <p>States Explored</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fef9c3; color: #ca8a04;">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="toolsAvailable">-</h3>
+                        <p>Tools Available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool Status -->
+        <div class="panel mb-4">
+            <div class="panel-header">
+                <i class="fas fa-microchip text-accent me-2"></i> Verification Tools
+            </div>
+            <div class="panel-body">
+                <div class="row" id="toolGrid">
+                    <div class="col-12 text-center text-muted py-3">
+                        <div class="spinner-border spinner-border-sm me-2"></div>
+                        Loading tool status...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="panel">
+            <div class="panel-header">
+                <i class="fas fa-history text-accent me-2"></i> Recent Verification Activity
+            </div>
+            <div class="panel-body">
+                <div id="activityFeed">
+                    <p class="text-muted text-center py-3">
+                        <i class="fas fa-inbox me-2"></i> No recent activity
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadStatus() {
+            try {
+                // Load verification state and tool availability in parallel
+                const [stateResp, toolResp] = await Promise.all([
+                    fetch('/api/v1/state/current'),
+                    fetch('/api/v1/tools/status')
+                ]);
+                const state = await stateResp.json();
+                const tools = await toolResp.json();
+
+                // ── Shared skip-key set (declared ONCE) ──────────────────
+                const SKIP_KEYS = new Set([
+                    'success','datetime','states_stored','transitions','depth',
+                    'specs','output','errors','model_name','verified',
+                    'ltl_results','errors_count','timestamp'
+                ]);
+
+                // ── Tool availability count ──────────────────────────────
+                const toolEntries = Object.entries(tools);
+                const availableTools = toolEntries.filter(([, v]) =>
+                    v === true || (v && v.installed) || (v && v.status === 'available') || (v && v.status === 'degraded')
+                ).length;
+                document.getElementById('toolsAvailable').textContent =
+                    `${availableTools}/${toolEntries.length}`;
+
+                // ── States explored ──────────────────────────────────────
+                const statesVal = state.states_stored || state.states || 0;
+                document.getElementById('statesExplored').textContent = statesVal;
+
+                // ── Properties verified / violations ─────────────────────
+                // Strategy 1: structured ltl_results array (most accurate)
+                const ltlResults = (state.spin && state.spin.ltl_results) || state.ltl_results || [];
+                let passed = 0, failed = 0;
+                if (Array.isArray(ltlResults) && ltlResults.length > 0) {
+                    ltlResults.forEach(r => {
+                        if (r.success) passed++; else failed++;
+                    });
+                } else {
+                    // Strategy 2: parse LTL blocks from SPIN output text
+                    const spinOutput = (state.spin && state.spin.output) || state.output || '';
+                    if (spinOutput) {
+                        spinOutput.split(/--- LTL /).slice(1).forEach(block => {
+                            const m = block.match(/errors:\s*(\d+)/);
+                            if (m) { if (parseInt(m[1]) === 0) passed++; else failed++; }
+                        });
+                    }
+                    // Strategy 3: tool-level pass/fail
+                    if (passed + failed === 0) {
+                        for (const [key, val] of Object.entries(state)) {
+                            if (SKIP_KEYS.has(key)) continue;
+                            if (val && typeof val === 'object' && 'success' in val) {
+                                if (val.success === true  || val.status === 'PASS') passed++;
+                                else if (val.success === false || val.status === 'FAIL') failed++;
+                            }
+                        }
+                    }
+                }
+                document.getElementById('passedCount').textContent = passed;
+                document.getElementById('failedCount').textContent = failed;
+
+                // ── Tool grid ────────────────────────────────────────────
+                const toolGrid = document.getElementById('toolGrid');
+                const toolNames = new Set(toolEntries.map(([t]) => t.toLowerCase()));
+
+                // Tools from /api/v1/tools/status
+                let gridHtml = toolEntries.map(([tool, v]) => {
+                    const available = v === true || (v && v.installed) ||
+                                      (v && (v.status === 'available' || v.status === 'degraded'));
+                    const toolState = state[tool.toLowerCase()];
+                    let badge = '';
+                    if (toolState && typeof toolState === 'object') {
+                        const ok      = toolState.success === true || toolState.status === 'PASS';
+                        const isInfra = toolState.status === 'INFRA_ERROR' || toolState.infra_error;
+                        const cls  = isInfra ? 'badge-warn' : (ok ? 'badge-pass' : 'badge-fail');
+                        const text = isInfra ? 'CONFIG'     : (ok ? 'PASS'       : 'FAIL');
+                        badge = `<span class="badge ${cls} ms-1" style="font-size:0.7rem;">${text}</span>`;
+                    }
+                    return `
+                    <div class="col-md-4 col-lg-3 mb-2">
+                        <div class="tool-status">
+                            <span class="status-dot ${available ? 'online' : 'offline'}"></span>
+                            <strong>${tool.toUpperCase()}</strong>
+                            ${badge}
+                            <span class="float-end text-muted small">${available ? 'Ready' : 'Not Found'}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                // Extra tools that ran but aren't in tools/status (e.g. Certora)
+                for (const [key, val] of Object.entries(state)) {
+                    if (SKIP_KEYS.has(key)) continue;
+                    if (toolNames.has(key.toLowerCase())) continue;
+                    if (!val || typeof val !== 'object' || !('success' in val || 'status' in val)) continue;
+                    const ok      = val.success === true || val.status === 'PASS';
+                    const isInfra = val.status === 'INFRA_ERROR' || val.infra_error;
+                    const cls  = isInfra ? 'badge-warn' : (ok ? 'badge-pass' : 'badge-fail');
+                    const text = isInfra ? 'CONFIG'     : (ok ? 'PASS'       : 'FAIL');
+                    gridHtml += `
+                    <div class="col-md-4 col-lg-3 mb-2">
+                        <div class="tool-status">
+                            <span class="status-dot online"></span>
+                            <strong>${key.toUpperCase()}</strong>
+                            <span class="badge ${cls} ms-1" style="font-size:0.7rem;">${text}</span>
+                            <span class="float-end text-muted small">Ran</span>
+                        </div>
+                    </div>`;
+                }
+                toolGrid.innerHTML = gridHtml || '<p class="text-muted text-center">No tool data available</p>';
+
+                // ── Recent activity feed ─────────────────────────────────
+                const activityFeed = document.getElementById('activityFeed');
+                try {
+                    const runsResp = await fetch('/api/v1/desktop-runs');
+                    const runs = await runsResp.json();
+                    if (Array.isArray(runs) && runs.length > 0) {
+                        activityFeed.innerHTML = runs.slice(0, 8).map(r => {
+                            const ok = ['SUCCESS','PASS','PASSED'].includes((r.status||'').toUpperCase());
+                            return `
+                            <div style="display:flex;align-items:center;gap:0.75rem;
+                                        padding:0.6rem 0;border-bottom:1px solid var(--border);">
+                                <span class="status-dot ${ok ? 'online' : 'offline'}"
+                                      style="flex-shrink:0;"></span>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-weight:600;font-size:0.9rem;
+                                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        ${r.file}
+                                    </div>
+                                    <div style="font-size:0.78rem;color:var(--dim);">
+                                        ${r.tool} · ${r.timestamp}
+                                        ${r.states ? `· ${r.states} states` : ''}
+                                    </div>
+                                </div>
+                                <span class="badge ${ok ? 'badge-pass' : 'badge-fail'}"
+                                      style="font-size:0.72rem;padding:3px 8px;border-radius:6px;
+                                             color:#fff;flex-shrink:0;">
+                                    ${ok ? 'PASS' : 'FAIL'}
+                                </span>
+                            </div>`;
+                        }).join('');
+                    } else {
+                        activityFeed.innerHTML = `
+                            <p class="text-muted text-center py-3">
+                                <i class="fas fa-inbox me-2"></i> No recent activity
+                            </p>`;
+                    }
+                } catch (_) {}
+
+            } catch (err) {
+                console.error('Failed to load status:', err);
+                // Show error state in stats instead of leaving dashes
+                ['passedCount','failedCount','statesExplored','toolsAvailable'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.textContent === '-') el.textContent = '—';
+                });
+            }
+        }
+        
+        loadStatus();
+        setInterval(loadStatus, 5000);
+    </script>
+</body>
+</html>

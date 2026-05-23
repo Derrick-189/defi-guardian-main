@@ -1,0 +1,10 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-05-13T16:42:59.102067
+file: /home/slade/Downloads/defi_guardian/test_contract.rs
+
+--- STDOUT ---
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---

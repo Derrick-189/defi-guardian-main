@@ -1,0 +1,39 @@
+/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
+ * Restarting with watchdog (inotify)
+/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
+ * Debugger is active!
+ * Debugger PIN: 225-288-822
+(83836) wsgi starting up on http://0.0.0.0:5001
+(83837) accepted ('127.0.0.1', 35900)
+127.0.0.1 - - [22/May/2026 22:01:04] "GET /static/js/main.js HTTP/1.1" 304 206 0.033251
+/home/slade/defi-guardian-main/web_portal/app.py:167: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+127.0.0.1 - - [22/May/2026 22:01:06] "GET /favicon.ico HTTP/1.1" 404 11362 0.081986
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /dashboard HTTP/1.1" 200 266396 0.150634
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /static/css/style.css HTTP/1.1" 304 209 0.001394
+(83837) accepted ('127.0.0.1', 36960)
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /static/js/socket.js HTTP/1.1" 304 208 0.001377
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /static/js/dashboard.js HTTP/1.1" 304 211 0.003474
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /api/v1/desktop-runs HTTP/1.1" 200 11071 0.013515
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /api/v1/state/current HTTP/1.1" 200 23245 0.005611
+.001361
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /api/v1/tools/status HTTP/1.1" 200 1269 0.005860
+127.0.0.1 - - [22/May/2026 22:01:28] "GET /api/v1/ltl-properties HTTP/1.1" 200 1216 0.012632

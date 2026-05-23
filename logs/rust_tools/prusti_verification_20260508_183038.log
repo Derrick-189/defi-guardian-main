@@ -1,0 +1,19 @@
+=== PRUSTI VERIFICATION LOG ===
+timestamp: 2026-05-08T18:30:38.486222
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+Kani Rust Verifier 0.67.0 (cargo plugin)
+error[E0636]: the feature `register_tool` has already been enabled
+ --> <crate attribute>:1:12
+  |
+1 | #![feature(register_tool)]
+  |            ^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0636`.
+error: Failed to execute cargo (exit status: 101). Found 1 compilation errors.
+
+
+--- STDERR ---
+   Compiling kani_verify v0.1.0 (/tmp/tmpmxt4yb9p)
+error: could not compile `kani_verify` (lib) due to 1 previous error

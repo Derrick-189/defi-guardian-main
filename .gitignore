@@ -1,0 +1,5 @@
+venv/
+web_portal/uploads/
+web_portal/defi_guardian.db
+__pycache__/
+*.pyc

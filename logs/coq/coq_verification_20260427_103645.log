@@ -1,0 +1,11 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-04-27T10:36:45.333862
+file: /home/slade/defi_guardian/SimpleLending.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpsi2urcz3.v", line 28, characters 1-2:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+

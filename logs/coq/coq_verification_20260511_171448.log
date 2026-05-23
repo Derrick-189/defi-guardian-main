@@ -1,0 +1,17 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-11T17:14:48.999023
+file: /home/slade/defi_guardian/SimpleLending.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmpl3b6v2p5.v", line 19, characters 0-42:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmpl3b6v2p5.v", line 107, characters 6-14:
+Error:
+In environment
+s : ContractState
+The term "paused s" has type "nat" while it is expected to have type "Prop".
+

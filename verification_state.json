@@ -1,0 +1,123 @@
+{
+  "timestamp": 1778922863.3360178,
+  "datetime": "2026-05-16 12:14:23",
+  "success": false,
+  "output": "\n--- LTL safety_no_overflow ---\npan: ltl formula safety_no_overflow\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (safety_no_overflow)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim safety_no_overflow\n\t_spin_nvr.tmp:8, state 10, \"-end-\"\n\t(1 of 10 states)\n\npan: elapsed time 0 seconds\n\n--- LTL safety_reentrancy ---\npan: ltl formula safety_reentrancy\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (safety_reentrancy)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim safety_reentrancy\n\t_spin_nvr.tmp:17, state 10, \"-end-\"\n\t(1 of 10 states)\n\npan: elapsed time 0 seconds\n\n--- LTL liveness_progress ---\npan: ltl formula liveness_progress\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (liveness_progress)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 8, errors: 0\n        4 states, stored (8 visited)\n        2 states, matched\n       10 transitions (= visited+matched)\n        4 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.000\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:59, state 23, \"printf('Contract execution terminated.\\n')\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:63, state 27, \"-end-\"\n\t(4 of 27 states)\nunreached in claim liveness_progress\n\t_spin_nvr.tmp:24, state 6, \"-end-\"\n\t(1 of 6 states)\n\npan: elapsed time 0 seconds\n\n--- LTL invariant_collateral ---\npan: ltl formula invariant_collateral\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (invariant_collateral)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim invariant_collateral\n\t_spin_nvr.tmp:33, state 10, \"-end-\"\n\t(1 of 10 states)\n\npan: elapsed time 0 seconds\n\n--- LTL response_price_drop ---\npan: ltl formula response_price_drop\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (response_price_drop)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim response_price_drop\n\t_spin_nvr.tmp:42, state 10, \"(!((health_factor<150)))\"\n\t_spin_nvr.tmp:44, state 13, \"-end-\"\n\t(2 of 13 states)\n\npan: elapsed time 0 seconds\n\n--- LTL stability ---\npan: ltl formula stability\npan:1: acceptance cycle (at depth 14)\npan: wrote translated_output.pml.trail\n\n(Spin Version 6.5.2 -- 6 December 2019)\nWarning: Search not completed\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (stability)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 1\n        7 states, stored\n        0 states, matched\n        7 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\n\npan: elapsed time 0 seconds\n\n--- LTL fairness ---\npan: ltl formula fairness\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (fairness)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim fairness\n\t_spin_nvr.tmp:64, state 10, \"(!((lock==0)))\"\n\t_spin_nvr.tmp:66, state 13, \"-end-\"\n\t(2 of 13 states)\n\npan: elapsed time 0 seconds\n\n--- LTL reachability_liquidation ---\npan: ltl formula reachability_liquidation\npan:1: acceptance cycle (at depth 14)\npan: wrote translated_output.pml.trail\n\n(Spin Version 6.5.2 -- 6 December 2019)\nWarning: Search not completed\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (reachability_liquidation)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 1\n        7 states, stored\n        0 states, matched\n        7 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\n\npan: elapsed time 0 seconds\n",
+  "errors": "",
+  "model_name": "Account.sol",
+  "verified": true,
+  "ltl_results": [
+    {
+      "name": "safety_no_overflow",
+      "success": true,
+      "formula": "[] (amount >= 0 && amount <= 1000000)",
+      "errors": 0
+    },
+    {
+      "name": "safety_reentrancy",
+      "success": true,
+      "formula": "[] !(lock && amount > 100)",
+      "errors": 0
+    },
+    {
+      "name": "liveness_progress",
+      "success": true,
+      "formula": "<> (state == 2)",
+      "errors": 0
+    },
+    {
+      "name": "invariant_collateral",
+      "success": true,
+      "formula": "[] (user_collateral >= user_debt)",
+      "errors": 0
+    },
+    {
+      "name": "response_price_drop",
+      "success": true,
+      "formula": "[] (price_eth < 50 -> <> (health_factor < 150))",
+      "errors": 0
+    },
+    {
+      "name": "stability",
+      "success": false,
+      "formula": "[] (lock == false -> <> (amount > 0 && health_factor > 200))",
+      "errors": 1
+    },
+    {
+      "name": "fairness",
+      "success": true,
+      "formula": "[] <> (lock == false)",
+      "errors": 0
+    },
+    {
+      "name": "reachability_liquidation",
+      "success": false,
+      "formula": "[] (health_factor < 100 -> <> (liquidation_executed == 1))",
+      "errors": 1
+    }
+  ],
+  "depth": 15,
+  "states_stored": 7,
+  "transitions": 8,
+  "errors_count": 0,
+  "spin": {
+    "timestamp": "2026-05-16T12:14:23.336200",
+    "status": "FAIL",
+    "success": false,
+    "output": "\n--- LTL safety_no_overflow ---\npan: ltl formula safety_no_overflow\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (safety_no_overflow)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim safety_no_overflow\n\t_spin_nvr.tmp:8, state 10, \"-end-\"\n\t(1 of 10 states)\n\npan: elapsed time 0 seconds\n\n--- LTL safety_reentrancy ---\npan: ltl formula safety_reentrancy\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (safety_reentrancy)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim safety_reentrancy\n\t_spin_nvr.tmp:17, state 10, \"-end-\"\n\t(1 of 10 states)\n\npan: elapsed time 0 seconds\n\n--- LTL liveness_progress ---\npan: ltl formula liveness_progress\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (liveness_progress)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 8, errors: 0\n        4 states, stored (8 visited)\n        2 states, matched\n       10 transitions (= visited+matched)\n        4 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.000\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:59, state 23, \"printf('Contract execution terminated.\\n')\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:63, state 27, \"-end-\"\n\t(4 of 27 states)\nunreached in claim liveness_progress\n\t_spin_nvr.tmp:24, state 6, \"-end-\"\n\t(1 of 6 states)\n\npan: elapsed time 0 seconds\n\n--- LTL invariant_collateral ---\npan: ltl formula invariant_collateral\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (invariant_collateral)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim invariant_collateral\n\t_spin_nvr.tmp:33, state 10, \"-end-\"\n\t(1 of 10 states)\n\npan: elapsed time 0 seconds\n\n--- LTL response_price_drop ---\npan: ltl formula response_price_drop\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (response_price_drop)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim response_price_drop\n\t_spin_nvr.tmp:42, state 10, \"(!((health_factor<150)))\"\n\t_spin_nvr.tmp:44, state 13, \"-end-\"\n\t(2 of 13 states)\n\npan: elapsed time 0 seconds\n\n--- LTL stability ---\npan: ltl formula stability\npan:1: acceptance cycle (at depth 14)\npan: wrote translated_output.pml.trail\n\n(Spin Version 6.5.2 -- 6 December 2019)\nWarning: Search not completed\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (stability)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 1\n        7 states, stored\n        0 states, matched\n        7 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\n\npan: elapsed time 0 seconds\n\n--- LTL fairness ---\npan: ltl formula fairness\n\n(Spin Version 6.5.2 -- 6 December 2019)\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (fairness)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 0\n        7 states, stored\n        1 states, matched\n        8 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\nunreached in proctype Contract\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:50, state 11, \"liquidation_executed = 1\"\n\t/home/slade/defi-guardian-main/generated/models/translated_output.pml:51, state 12, \"state = 2\"\n\t(2 of 27 states)\nunreached in claim fairness\n\t_spin_nvr.tmp:64, state 10, \"(!((lock==0)))\"\n\t_spin_nvr.tmp:66, state 13, \"-end-\"\n\t(2 of 13 states)\n\npan: elapsed time 0 seconds\n\n--- LTL reachability_liquidation ---\npan: ltl formula reachability_liquidation\npan:1: acceptance cycle (at depth 14)\npan: wrote translated_output.pml.trail\n\n(Spin Version 6.5.2 -- 6 December 2019)\nWarning: Search not completed\n\t+ Partial Order Reduction\n\nFull statespace search for:\n\tnever claim         \t+ (reachability_liquidation)\n\tassertion violations\t+ (if within scope of claim)\n\tacceptance   cycles \t+ (fairness disabled)\n\tinvalid end states\t- (disabled by never claim)\n\nState-vector 52 byte, depth reached 15, errors: 1\n        7 states, stored\n        0 states, matched\n        7 transitions (= stored+matched)\n        2 atomic steps\nhash conflicts:         0 (resolved)\n\nStats on memory usage (in Megabytes):\n    0.001\tequivalent memory usage for states (stored*(State-vector + overhead))\n    0.279\tactual memory usage for states\n  128.000\tmemory used for hash table (-w24)\n    0.534\tmemory used for DFS stack (-m10000)\n  128.730\ttotal actual memory usage\n\n\n\npan: elapsed time 0 seconds\n",
+    "errors": "",
+    "ltl_results": [
+      {
+        "name": "safety_no_overflow",
+        "success": true,
+        "formula": "[] (amount >= 0 && amount <= 1000000)",
+        "errors": 0
+      },
+      {
+        "name": "safety_reentrancy",
+        "success": true,
+        "formula": "[] !(lock && amount > 100)",
+        "errors": 0
+      },
+      {
+        "name": "liveness_progress",
+        "success": true,
+        "formula": "<> (state == 2)",
+        "errors": 0
+      },
+      {
+        "name": "invariant_collateral",
+        "success": true,
+        "formula": "[] (user_collateral >= user_debt)",
+        "errors": 0
+      },
+      {
+        "name": "response_price_drop",
+        "success": true,
+        "formula": "[] (price_eth < 50 -> <> (health_factor < 150))",
+        "errors": 0
+      },
+      {
+        "name": "stability",
+        "success": false,
+        "formula": "[] (lock == false -> <> (amount > 0 && health_factor > 200))",
+        "errors": 1
+      },
+      {
+        "name": "fairness",
+        "success": true,
+        "formula": "[] <> (lock == false)",
+        "errors": 0
+      },
+      {
+        "name": "reachability_liquidation",
+        "success": false,
+        "formula": "[] (health_factor < 100 -> <> (liquidation_executed == 1))",
+        "errors": 1
+      }
+    ],
+    "states_stored": 7,
+    "transitions": 8,
+    "depth": 15
+  }
+}

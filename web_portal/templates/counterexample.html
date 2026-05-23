@@ -1,0 +1,621 @@
+{% extends "base.html" %}
+
+{% block title %}Counterexample Analysis — DeFi Guardian{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-content {
+    padding: 0 !important;
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Report header ── */
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .report-header-left { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; min-width: 0; }
+  .report-header-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+  .audit-filename { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); }
+
+  /* Stats row */
+  .ce-stats-row {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.4rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    font-size: 0.78rem;
+  }
+  .ce-stats-row .stat-item { display: flex; gap: 0.4rem; align-items: center; }
+  .ce-stats-row .label { color: var(--text2); }
+  .ce-stats-row .value { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+  /* ── Three-panel layout ── */
+  .report-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    height: 100%;
+    overflow: hidden;
+  }
+  .report-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 0;
+  }
+  .report-panel:last-child { border-right: none; }
+
+  /* ── Main Scrollable Area ── */
+  .report-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panels-wrapper {
+    height: 520px;
+    min-height: 400px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  /* ── Diagnostics Cards ── */
+  .diagnostics-area {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background: var(--bg-dim);
+    flex: 1;
+  }
+
+  .diagnostic-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .diagnostic-card-header {
+    padding: 0.75rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .diagnostic-card-body {
+    padding: 1rem;
+  }
+
+  .card-warning {\ border-top: 3px solid var(--warning); }
+  .card-warning .diagnostic-card-header { color: var(--warning); }
+  
+  .card-recommendation { border-top: 3px solid var(--accent); }
+  .card-recommendation .diagnostic-card-header { color: var(--accent); }
+
+  .diagnostic-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .diagnostic-item {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .diagnostic-item i {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .warning-item i { color: var(--warning); }
+  .rec-item i { color: var(--accent); }
+
+
+  .panel-header {
+    padding: 0.5rem 0.85rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .panel-header-tabs { padding: 0; }
+  .panel-tabs { display: flex; }
+  .panel-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text2);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .panel-tab:hover { color: var(--text); }
+  .panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .panel-body { flex: 1; overflow-y: auto; min-height: 0; }
+
+  /* Rule items */
+  .rule-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+    font-size: 0.82rem;
+  }
+  .rule-item:hover { background: var(--bg3); }
+  .rule-item.active { background: rgba(88,166,255,0.08); border-left-color: var(--accent); color: var(--accent); }
+  .rule-icon { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .rule-icon.verified { background: var(--success); box-shadow: 0 0 4px var(--success); }
+  .rule-icon.violated { background: var(--danger);  box-shadow: 0 0 4px var(--danger); }
+  .rule-icon.timeout  { background: var(--warning); }
+  .rule-icon.unknown  { background: var(--text2); }
+
+  /* Trace steps */
+  .trace-step {
+    padding: 0.4rem 0.85rem;
+    border-left: 2px solid transparent;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: background 0.1s;
+    line-height: 1.5;
+  }
+  .trace-step:hover { background: var(--bg3); }
+  .trace-step.active { border-left-color: var(--accent); background: rgba(88,166,255,0.05); }
+  .trace-step.error  { border-left-color: var(--danger);  background: rgba(248,81,73,0.05); }
+  .step-num  { color: var(--text2); margin-right: 0.5rem; min-width: 2rem; display: inline-block; }
+  .step-proc { color: var(--purple); font-size: 0.72rem; }
+  .step-action { color: var(--text); }
+
+  /* Trace search bar */
+  .trace-search-bar { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+  .trace-search-bar input { font-size: 0.8rem; }
+
+  /* Variables */
+  .var-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.4rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+  }
+  .var-name  { color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+  .var-value { color: var(--text);  font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+  .var-changed { color: var(--accent); font-weight: 700; }
+  .var-before  { color: var(--text2); text-decoration: line-through; font-size: 0.72rem; margin-right: 0.3rem; }
+
+  /* Variables */
+  .var-group { margin-bottom: 0.75rem; }
+  .var-group-header {
+    padding: 0.3rem 0.85rem;
+    background: var(--bg-dim);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .var-row.changed { background: rgba(88,166,255,0.05); }
+
+  /* Source Code Viewer */
+  .code-line { display: flex; gap: 1rem; padding: 0.1rem 0; transition: background 0.2s; }
+  .code-line:hover { background: rgba(255,255,255,0.05); }
+  .code-line.highlight { background: rgba(88,166,255,0.15); border-left: 3px solid var(--accent); }
+  .line-number { color: var(--text3); font-family: monospace; font-size: 0.75rem; text-align: right; min-width: 2.5rem; user-select: none; }
+  .line-content { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; white-space: pre; }
+  .code-line.highlight .line-content { color: var(--accent); font-weight: 600; }
+
+
+
+  /* Tab content */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Panel placeholder */
+  .panel-placeholder { text-align: center; padding: 2rem 1rem; color: var(--text2); font-size: 0.82rem; line-height: 1.8; }
+
+  /* Raw output */
+  #raw-output-pre {
+    margin: 0; padding: 0.85rem; font-size: 0.75rem;
+    background: transparent; border: none; border-radius: 0;
+    white-space: pre-wrap; word-break: break-all;
+    color: var(--text2); font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+  }
+
+  /* ── Tooltip system ── */
+  .dg-tooltip-host { position: relative; display: inline-block; }
+  .dg-tooltip {
+    visibility: hidden; opacity: 0;
+    position: absolute; z-index: 9000;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--text);
+    width: 280px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    pointer-events: none;
+    transition: opacity 0.15s;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: normal;
+  }
+  .dg-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+  }
+  .dg-tooltip-host:hover .dg-tooltip,
+  .dg-tooltip-host:focus-within .dg-tooltip {
+    visibility: visible; opacity: 1;
+  }
+  .dg-tooltip .tt-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+  .dg-tooltip .tt-body  { color: var(--text2); }
+  .dg-tooltip .tt-formula { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+                             color: var(--accent); background: var(--bg); padding: 0.15rem 0.35rem;
+                             border-radius: 3px; display:block; margin-top:0.35rem; word-break:break-all; }
+  .dg-tooltip .tt-ok   { color: var(--success); }
+  .dg-tooltip .tt-fail { color: var(--danger); }
+  /* Trace step tooltip (right-side, narrower) */
+  .trace-step .dg-tooltip { left: 100%; top: 0; transform: none; bottom: auto; width: 240px; }
+  .trace-step .dg-tooltip::after { top: 0.6rem; left: -12px; transform: none;
+    border: 6px solid transparent; border-right-color: var(--border); border-top-color: transparent; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── SPIN Switch Banner (shown when current run is not SPIN but SPIN data exists) ── -->
+<div id="spin-switch-banner" hidden
+     style="display:none;align-items:center;gap:0.75rem;padding:0.55rem 1rem;
+            background:rgba(88,166,255,0.10);border-bottom:2px solid var(--accent);
+            font-size:0.82rem;flex-shrink:0;">
+  <i class="fa-solid fa-atom" style="color:var(--accent);"></i>
+  <span>SPIN is the only tool that produces a full step-by-step trace and state diagram.
+        A SPIN run exists for this file.</span>
+  <button id="spin-switch-btn" class="btn btn-sm btn-primary" style="margin-left:auto;white-space:nowrap;">
+    <i class="fa-solid fa-rotate"></i> View SPIN Analysis
+  </button>
+</div>
+
+<!-- ── Header Bar ── -->
+<div class="report-header">
+  <div class="report-header-left">
+    <!-- Run selector -->
+    <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+      <select id="run-selector" class="input select input-sm"
+              style="max-width:260px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"
+              title="Select a verification run">
+        <option value="latest">Latest run</option>
+      </select>
+      <div class="audit-info" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span class="audit-filename">
+          <i class="fa-solid fa-file-code"></i>
+          <span id="ce-filename">{{ audit.filename if audit and audit.filename else 'Loading…' }}</span>
+        </span>
+        <!-- Tool + status badges injected by JS -->
+      </div>
+    </div>
+  </div>
+  <div class="report-header-right">
+    <div style="position:relative;">
+      <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);color:var(--text2);font-size:0.75rem;pointer-events:none;"></i>
+      <input type="search" id="trace-search" class="input input-sm"
+             style="padding-left:2rem;width:180px;" placeholder="Search trace…">
+    </div>
+    <!-- "View SPIN" compact button (shown in header too on wider screens) -->
+    <button id="spin-switch-btn-hdr" class="btn btn-sm btn-outline-accent" hidden
+            title="Switch to SPIN analysis for full trace and state diagram"
+            style="display:none;white-space:nowrap;">
+      <i class="fa-solid fa-atom"></i> SPIN
+    </button>
+    <button class="btn btn-sm btn-ghost" id="hex-toggle">
+      <i class="fa-solid fa-code"></i> HEX
+    </button>
+    <button class="btn btn-sm btn-ghost" id="download-trail-btn" title="Download trail file" hidden>
+      <i class="fa-solid fa-download"></i> Trail
+    </button>
+    <button class="btn btn-sm btn-ghost" id="share-btn">
+      <i class="fa-solid fa-share-nodes"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ── Stats row ── -->
+<div class="ce-stats-row" id="ce-stats">
+  <span class="stat-item"><span class="label">States</span><span class="value" id="ce-stat-states">—</span></span>
+  <span class="stat-item"><span class="label">Transitions</span><span class="value" id="ce-stat-trans">—</span></span>
+  <span class="stat-item"><span class="label">Depth</span><span class="value" id="ce-stat-depth">—</span></span>
+  <span class="stat-item"><span class="label">Rules</span><span class="label"></span><span class="value" id="ce-stat-rules">—</span></span>
+  <span class="stat-item"><span class="label">Violations</span><span class="value text-danger" id="ce-stat-violations">—</span></span>
+  <span style="margin-left:auto;" class="text-muted" style="font-size:0.72rem;" id="ce-last-run"></span>
+</div>
+
+<!-- ── Main Scrollable Area ── -->
+<div class="report-scroll-container">
+  
+  <div class="panels-wrapper">
+    <!-- ── Three-Panel Layout ── -->
+    <div class="report-layout" id="report-layout">
+
+      <!-- Panel 1: Rules -->
+      <div class="report-panel" id="panel-rules">
+        <div class="panel-header">
+          <i class="fa-solid fa-list-check"></i> RULES / PROPERTIES
+        </div>
+        <div class="panel-body" id="rules-panel">
+          <p class="panel-placeholder">
+            <i class="fa-solid fa-list-check" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+            Loading rules…
+          </p>
+        </div>
+      </div>
+
+      <!-- Panel 2: Call Trace -->
+      <div class="report-panel report-panel-main" id="panel-trace">
+        <div class="panel-header panel-header-tabs">
+          <div class="panel-tabs" role="tablist">
+            <button class="panel-tab active" role="tab" aria-selected="true"
+                    data-tab="call-trace" id="tab-call-trace">Call Trace</button>
+            <button class="panel-tab" role="tab" aria-selected="false"
+                    data-tab="source-code" id="tab-source-code">Source Code</button>
+            <button class="panel-tab" role="tab" aria-selected="false"
+                    data-tab="raw-output" id="tab-raw-output">Raw Output</button>
+            <button class="panel-tab" role="tab" aria-selected="false"
+                    data-tab="state-diagram" id="tab-state-diagram">State Diagram</button>
+          </div>
+        </div>
+        <div class="panel-body" id="trace-panel">
+          <div class="tab-content active" id="tab-content-call-trace">
+            <div class="trace-search-bar">
+              <input type="search" class="input input-sm w-full" id="trace-filter-input"
+                     placeholder="Filter steps by action or process…">
+            </div>
+            <div id="trace-steps-container">
+              <p class="panel-placeholder">
+                <i class="fa-solid fa-timeline" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+                Loading trace…
+              </p>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-content-source-code" hidden>
+            <div id="source-code-viewer" style="height:100%;display:flex;flex-direction:column;">
+                <div id="source-filename" style="padding:0.5rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text2);font-family:monospace;"></div>
+                <div id="source-pre-container" style="flex:1;overflow:auto;position:relative;">
+                    <pre id="source-code-pre" style="margin:0;padding:1rem;font-size:0.8rem;line-height:1.5;"></pre>
+                </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-content-raw-output" hidden>
+            <pre id="raw-output-pre">Loading…</pre>
+          </div>
+          <div class="tab-content" id="tab-content-state-diagram" hidden style="height:100%;">
+            <div id="mermaid-container" style="padding:1rem;height:100%;overflow:auto;">
+              <div class="mermaid" id="state-machine-diagram">
+                stateDiagram-v2
+                [*] --> Loading
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Variables -->
+      <div class="report-panel" id="panel-vars">
+        <div class="panel-header">
+          <i class="fa-solid fa-database"></i> VARIABLES
+        </div>
+        <div class="panel-body" id="vars-panel">
+          <p class="panel-placeholder">
+            <i class="fa-solid fa-database" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+            Select a trace step
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Diagnostics Area ── -->
+  <div class="diagnostics-area">
+    
+    <!-- Warnings Card -->
+    <div id="warnings" class="diagnostic-card card-warning" hidden>
+      <div class="diagnostic-card-header">
+        <i class="fa-solid fa-triangle-exclamation"></i> Warnings
+      </div>
+      <div class="diagnostic-card-body" id="warnings-content"></div>
+    </div>
+
+    <!-- Recommendations Card -->
+    <div id="recommendations" class="diagnostic-card card-recommendation" hidden>
+      <div class="diagnostic-card-header">
+        <i class="fa-solid fa-lightbulb"></i> Recommendations
+      </div>
+      <div class="diagnostic-card-body" id="recommendations-content"></div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  window.DG_AUDIT_ID = "{{ audit_id }}";
+</script>
+<script src="{{ url_for('static', filename='js/counterexample.js') }}">
+// ── Tooltip system ─────────────────────────────────────────────────────────
+// Term glossary — shown as tooltips on rule badges & trace steps
+var DG_TERMS = {
+  reentrancy: {
+    title: "Reentrancy Attack",
+    body: "A vulnerability where an external contract calls back into the current contract before the first execution completes, allowing repeated withdrawals.",
+    fix: "Use a reentrancy guard or the Checks-Effects-Interactions pattern.",
+  },
+  overflow: {
+    title: "Integer Overflow / Underflow",
+    body: "Arithmetic that exceeds the type's range wraps around silently in older Solidity, producing unexpected values.",
+    fix: "Use Solidity ≥0.8 (built-in checks) or SafeMath.",
+  },
+  access_control: {
+    title: "Access Control",
+    body: "Functions that should only be callable by the owner or specific roles are reachable by any address.",
+    fix: "Add onlyOwner / role-based modifiers and verify msg.sender.",
+  },
+  collateral: {
+    title: "Collateral Safety Invariant",
+    body: "The LTL invariant [] (debt ≤ collateral × price) ensures a borrower can never owe more than their deposited collateral is worth.",
+    fix: "Re-verify after price oracle updates; add liquidation logic.",
+  },
+  liveness: {
+    title: "Liveness Property",
+    body: "A liveness formula (<> φ) asserts that something good eventually happens — e.g. a repaid loan always enables withdrawal.",
+    fix: "Check for deadlocks or state traps that prevent progress.",
+  },
+  ltl: {
+    title: "Linear Temporal Logic (LTL)",
+    body: "A formal language for expressing how properties evolve over time.  [] = always,  <> = eventually,  U = until.",
+    fix: "Write [] (safety) and <> (liveness) properties for your protocol.",
+  },
+  spin: {
+    title: "SPIN Model Checker",
+    body: "Exhaustively explores all reachable states of your Promela model to verify LTL properties.  Produces a .trail counterexample on violation.",
+    fix: "Reduce state-space by abstracting irrelevant variables.",
+  },
+  counterexample: {
+    title: "Counterexample",
+    body: "A concrete execution trace that violates a specified property.  Each step shows variable values and the action taken.",
+    fix: "Step through the trace to identify which transition breaks your invariant.",
+  },
+};
+
+function buildTooltip(key, extra) {
+  var t = DG_TERMS[key];
+  if (!t) return "";
+  var body = extra || t.body;
+  return '<div class="dg-tooltip">' +
+    '<div class="tt-title">' + t.title + '</div>' +
+    '<div class="tt-body">' + body + '</div>' +
+    (t.fix ? '<div class="tt-body" style="margin-top:0.35rem;"><b>Fix:</b> ' + t.fix + '</div>' : '') +
+  '</div>';
+}
+
+function wrapTooltipHost(el, key, extra) {
+  var wrapper = document.createElement("span");
+  wrapper.className = "dg-tooltip-host";
+  wrapper.style.cursor = "help";
+  el.parentNode.insertBefore(wrapper, el);
+  wrapper.appendChild(el);
+  wrapper.insertAdjacentHTML("beforeend", buildTooltip(key, extra));
+}
+
+// Attach tooltips to rule/property badges after they're rendered
+function attachRuleTooltips() {
+  document.querySelectorAll("#rules-panel .rule-item, #rules-panel [data-name]").forEach(function(el) {
+    if (el.dataset.ttAttached) return;
+    el.dataset.ttAttached = "1";
+    var name = (el.dataset.name || el.textContent || "").toLowerCase();
+    var key = Object.keys(DG_TERMS).find(function(k){ return name.includes(k); });
+    if (key) wrapTooltipHost(el, key);
+  });
+}
+
+// Attach tooltips to trace steps
+function attachStepTooltips() {
+  document.querySelectorAll(".trace-step").forEach(function(el) {
+    if (el.dataset.ttAttached) return;
+    el.dataset.ttAttached = "1";
+    var action = (el.querySelector(".step-action") || {}).textContent || "";
+    var key = Object.keys(DG_TERMS).find(function(k){ return action.toLowerCase().includes(k); });
+    if (key) {
+      var existingTooltip = el.querySelector(".dg-tooltip");
+      if (!existingTooltip) {
+        el.classList.add("dg-tooltip-host");
+        el.style.cursor = "help";
+        el.insertAdjacentHTML("beforeend", buildTooltip(key));
+      }
+    }
+  });
+}
+
+// Also add info icons to the stats row items
+document.querySelectorAll(".ce-stats-row .stat-item").forEach(function(el) {
+  var label = (el.querySelector(".label") || {}).textContent || "";
+  if (label.toLowerCase().includes("violation")) {
+    var icon = document.createElement("span");
+    icon.className = "dg-tooltip-host";
+    icon.innerHTML = ' <i class="fa-solid fa-circle-info" style="color:var(--text2);font-size:0.7rem;cursor:help;"></i>' +
+      buildTooltip("counterexample", "A counterexample trace was found — the property is violated. Step through the trace below.");
+    el.appendChild(icon);
+  }
+  if (label.toLowerCase().includes("rule") || label.toLowerCase().includes("propert")) {
+    var icon2 = document.createElement("span");
+    icon2.className = "dg-tooltip-host";
+    icon2.innerHTML = ' <i class="fa-solid fa-circle-info" style="color:var(--text2);font-size:0.7rem;cursor:help;"></i>' +
+      buildTooltip("ltl", "Rules are LTL formulas checked by the verifier. Each one is either verified (holds for all states) or violated (a counterexample exists).");
+    el.appendChild(icon2);
+  }
+});
+
+// Observe DOM changes so new steps get tooltips
+var _ttObserver = new MutationObserver(function(){
+  attachRuleTooltips();
+  attachStepTooltips();
+});
+_ttObserver.observe(document.body, { childList: true, subtree: true });
+
+// Initial attach
+attachRuleTooltips();
+attachStepTooltips();
+
+</script>
+{% endblock %}

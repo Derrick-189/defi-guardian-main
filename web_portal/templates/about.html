@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}About — DeFi Guardian{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="page-hero">
+  <h1 class="page-hero-title">
+    <span class="brand-icon">⛨</span> About DeFi Guardian
+  </h1>
+  <p class="page-hero-subtitle">
+    A unified formal verification suite for smart contracts and DeFi protocols.
+  </p>
+</section>
+
+<!-- What is DeFi Guardian -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-circle-info"></i> What is DeFi Guardian?</h2>
+  </div>
+  <div class="card-body prose">
+    <p>
+      DeFi Guardian is an open-source formal verification platform that integrates eight
+      industry-leading verification engines into a single, developer-friendly interface.
+      It enables smart contract developers and security researchers to apply mathematical
+      proof techniques to their code — catching bugs that testing alone cannot find.
+    </p>
+    <p>
+      Unlike fuzzing or unit testing, formal verification exhaustively explores all possible
+      execution paths and proves (or disproves) correctness properties. DeFi Guardian makes
+      this power accessible through a web portal, REST API, and desktop application.
+    </p>
+  </div>
+</div>
+
+<!-- The 8 Tools -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-screwdriver-wrench"></i> The 8 Verification Tools</h2>
+  </div>
+  <div class="card-body card-body-flush">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Type</th>
+            <th>Language</th>
+            <th>Technique</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>SPIN</strong></td>
+            <td><span class="badge badge-neutral">Model Checker</span></td>
+            <td class="font-mono">Promela</td>
+            <td>LTL model checking</td>
+            <td>Concurrency, protocol verification</td>
+          </tr>
+          <tr>
+            <td><strong>Coq</strong></td>
+            <td><span class="badge badge-neutral">Proof Assistant</span></td>
+            <td class="font-mono">Gallina / Coq</td>
+            <td>Dependent type theory</td>
+            <td>Mathematical invariants, full correctness</td>
+          </tr>
+          <tr>
+            <td><strong>Lean 4</strong></td>
+            <td><span class="badge badge-neutral">Proof Assistant</span></td>
+            <td class="font-mono">Lean 4</td>
+            <td>Dependent type theory</td>
+            <td>Readable proofs, Mathlib integration</td>
+          </tr>
+          <tr>
+            <td><strong>Certora</strong></td>
+            <td><span class="badge badge-neutral">Formal Verifier</span></td>
+            <td class="font-mono">Solidity / CVL</td>
+            <td>SMT-based verification</td>
+            <td>EVM smart contracts, DeFi protocols</td>
+          </tr>
+          <tr>
+            <td><strong>Kani</strong></td>
+            <td><span class="badge badge-neutral">Model Checker</span></td>
+            <td class="font-mono">Rust</td>
+            <td>Bounded model checking (CBMC)</td>
+            <td>Rust smart contracts, off-chain code</td>
+          </tr>
+          <tr>
+            <td><strong>Prusti</strong></td>
+            <td><span class="badge badge-neutral">Deductive Verifier</span></td>
+            <td class="font-mono">Rust</td>
+            <td>Viper-based verification</td>
+            <td>Pre/post conditions, loop invariants</td>
+          </tr>
+          <tr>
+            <td><strong>Creusot</strong></td>
+            <td><span class="badge badge-neutral">Deductive Verifier</span></td>
+            <td class="font-mono">Rust</td>
+            <td>Why3 / SMT</td>
+            <td>Functional correctness of Rust code</td>
+          </tr>
+          <tr>
+            <td><strong>Verus</strong></td>
+            <td><span class="badge badge-neutral">Verification System</span></td>
+            <td class="font-mono">Rust</td>
+            <td>SMT-based (Z3)</td>
+            <td>Systems code, low-level Rust</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- How It Works -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-gears"></i> How It Works</h2>
+  </div>
+  <div class="card-body">
+    <ol class="pipeline-steps">
+      <li class="pipeline-step">
+        <div class="pipeline-step-num">1</div>
+        <div class="pipeline-step-body">
+          <strong>Upload Contract</strong>
+          <p>Upload your Solidity (.sol), Rust (.rs), or Promela (.pml) source file via the web portal or API.</p>
+        </div>
+      </li>
+      <li class="pipeline-step">
+        <div class="pipeline-step-num">2</div>
+        <div class="pipeline-step-body">
+          <strong>Select Tools</strong>
+          <p>Choose one or more verification engines. Each tool targets different properties and languages.</p>
+        </div>
+      </li>
+      <li class="pipeline-step">
+        <div class="pipeline-step-num">3</div>
+        <div class="pipeline-step-body">
+          <strong>Write Specifications</strong>
+          <p>Define LTL properties or CVL rules. Use the LLM generator to translate plain-English descriptions.</p>
+        </div>
+      </li>
+      <li class="pipeline-step">
+        <div class="pipeline-step-num">4</div>
+        <div class="pipeline-step-body">
+          <strong>Run Verification</strong>
+          <p>DeFi Guardian invokes the selected tools and streams live output to your dashboard via WebSocket.</p>
+        </div>
+      </li>
+      <li class="pipeline-step">
+        <div class="pipeline-step-num">5</div>
+        <div class="pipeline-step-body">
+          <strong>Analyse Results</strong>
+          <p>Explore counterexamples, replay execution traces, and visualise the state space interactively.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<!-- Architecture Diagram -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fa-solid fa-sitemap"></i> Architecture</h2>
+  </div>
+  <div class="card-body">
+    <div class="architecture-image-container" style="text-align: center; padding: 1rem;">
+      <!-- Placeholder while image is being uploaded -->
+      <div style="background: var(--bg3); border: 2px dashed var(--border); border-radius: 8px; padding: 3rem; color: var(--text2);">
+        <i class="fa-solid fa-image" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p>Architecture Diagram Placeholder</p>
+        <p style="font-size: 0.8rem;">(Save your image as <code>web_portal/static/img/architecture.png</code> to see it here)</p>
+      </div>
+      
+      <img src="{{ url_for('static', filename='img/architecture.png') }}" 
+           alt="DeFi Guardian Architecture" 
+           onerror="this.style.display='none'"
+           onload="this.previousElementSibling.style.display='none'"
+           style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    </div>
+  </div>
+</div>
+
+{% endblock %}

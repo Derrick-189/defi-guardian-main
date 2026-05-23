@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Contact — DeFi Guardian{% endblock %}
+
+{% block content %}
+
+<!-- Page Hero -->
+<section class="page-hero">
+  <h1 class="page-hero-title">Get in Touch</h1>
+  <p class="page-hero-subtitle">
+    Questions, bug reports, or enterprise enquiries — we'd love to hear from you.
+  </p>
+</section>
+
+<!-- Two-column layout -->
+<div class="contact-layout">
+
+  <!-- Left: Contact Info -->
+  <div class="contact-info-col">
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-address-card"></i> Contact Info</h2>
+      </div>
+      <div class="card-body">
+        <ul class="contact-info-list">
+          <li class="contact-info-item">
+            <span class="contact-info-icon"><i class="fa-solid fa-envelope"></i></span>
+            <div>
+              <div class="contact-info-label">Email</div>
+              <a href="mailto:hello@defiguardian.dev" class="link">hello@defiguardian.dev</a>
+            </div>
+          </li>
+          <li class="contact-info-item">
+            <span class="contact-info-icon"><i class="fa-brands fa-github"></i></span>
+            <div>
+              <div class="contact-info-label">GitHub</div>
+              <a href="https://github.com/defiguardian" class="link" target="_blank" rel="noopener noreferrer">
+                github.com/defiguardian
+              </a>
+            </div>
+          </li>
+          <li class="contact-info-item">
+            <span class="contact-info-icon"><i class="fa-solid fa-book"></i></span>
+            <div>
+              <div class="contact-info-label">Documentation</div>
+              <a href="https://docs.defiguardian.dev" class="link" target="_blank" rel="noopener noreferrer">
+                docs.defiguardian.dev
+              </a>
+            </div>
+          </li>
+          <li class="contact-info-item">
+            <span class="contact-info-icon"><i class="fa-brands fa-discord"></i></span>
+            <div>
+              <div class="contact-info-label">Discord</div>
+              <a href="https://discord.gg/defiguardian" class="link" target="_blank" rel="noopener noreferrer">
+                discord.gg/defiguardian
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1rem;">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-bug"></i> Report a Bug</h2>
+      </div>
+      <div class="card-body">
+        <p class="text-muted text-sm">
+          Found a bug? Please open an issue on GitHub with steps to reproduce,
+          expected behaviour, and actual behaviour.
+        </p>
+        <a href="https://github.com/defiguardian/issues/new" class="btn btn-secondary btn-sm"
+           target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-github"></i> Open Issue
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /.contact-info-col -->
+
+  <!-- Right: Contact Form -->
+  <div class="contact-form-col">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-paper-plane"></i> Send a Message</h2>
+      </div>
+      <div class="card-body">
+        <form id="contact-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contact-name" class="form-label">Name <span class="required">*</span></label>
+              <input type="text" id="contact-name" name="name" class="input"
+                     placeholder="Your name" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="contact-email" class="form-label">Email <span class="required">*</span></label>
+              <input type="email" id="contact-email" name="email" class="input"
+                     placeholder="you@example.com" required autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contact-subject" class="form-label">Subject <span class="required">*</span></label>
+            <input type="text" id="contact-subject" name="subject" class="input"
+                   placeholder="How can we help?" required />
+          </div>
+
+          <div class="form-group">
+            <label for="contact-message" class="form-label">Message <span class="required">*</span></label>
+            <textarea id="contact-message" name="message" class="input textarea" rows="6"
+                      placeholder="Describe your question or issue in detail…" required></textarea>
+          </div>
+
+          <div id="contact-msg" class="alert" hidden></div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-send">
+              <i class="fa-solid fa-paper-plane"></i> Send Message
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- /.contact-form-col -->
+
+</div><!-- /.contact-layout -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  var form   = document.getElementById('contact-form');
+  var msgEl  = document.getElementById('contact-msg');
+  var sendBtn = document.getElementById('btn-send');
+
+  function showMsg(type, text) {
+    msgEl.className = 'alert alert-' + type;
+    msgEl.textContent = text;
+    msgEl.hidden = false;
+  }
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name    = document.getElementById('contact-name').value.trim();
+      var email   = document.getElementById('contact-email').value.trim();
+      var subject = document.getElementById('contact-subject').value.trim();
+      var message = document.getElementById('contact-message').value.trim();
+
+      if (!name || !email || !subject || !message) {
+        showMsg('danger', 'Please fill in all required fields.');
+        return;
+      }
+
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span class="spinner-sm"></span> Sending…';
+
+      fetch('/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ name: name, email: email, subject: subject, message: message })
+      })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        showMsg('success', data.message || 'Message sent! We\'ll get back to you soon.');
+        form.reset();
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+      })
+      .catch(function (err) {
+        showMsg('danger', 'Failed to send message. Please try emailing us directly.');
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+      });
+    });
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-04T19:51:03.404664
+file: /home/slade/Downloads/VestingWallet.sol
+
+--- STDOUT ---
+
+Error when reading /home/slade/defi_guardian/certora/confs/VestingWallet.conf: cloud appears in the conf file
+but is not a known attribute. 
+
+
+
+--- STDERR ---

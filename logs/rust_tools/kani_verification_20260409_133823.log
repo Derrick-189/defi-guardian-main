@@ -1,0 +1,395 @@
+=== KANI VERIFICATION LOG ===
+timestamp: 2026-04-09T13:38:23.282410
+file: /home/slade/defi_guardian/defi_vault.rs
+
+--- STDOUT ---
+Kani Rust Verifier 0.67.0 (cargo plugin)
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:330:7
+    |
+330 | #[cfg(prusti)]
+    |       ^^^^^^
+    |
+    = help: expected names are: `docsrs`, `feature`, `kani`, and `test` and 31 more
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+    = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:338:7
+    |
+338 | #[cfg(prusti)]
+    |       ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:345:7
+    |
+345 | #[cfg(prusti)]
+    |       ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `creusot`
+   --> src/lib.rs:417:7
+    |
+417 | #[cfg(creusot)]
+    |       ^^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(creusot)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unused import: `std::cmp::min`
+  --> src/lib.rs:10:5
+   |
+10 | use std::cmp::min;
+   |     ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unexpected `cfg` condition name: `prusti`
+  --> src/lib.rs:55:15
+   |
+55 |     #[cfg(any(prusti, creusot))]
+   |               ^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `creusot`
+  --> src/lib.rs:55:23
+   |
+55 |     #[cfg(any(prusti, creusot))]
+   |                       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(creusot)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+  --> src/lib.rs:64:15
+   |
+64 |     #[cfg(any(prusti, creusot))]
+   |               ^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `creusot`
+  --> src/lib.rs:64:23
+   |
+64 |     #[cfg(any(prusti, creusot))]
+   |                       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(creusot)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+  --> src/lib.rs:71:15
+   |
+71 |     #[cfg(any(prusti, creusot))]
+   |               ^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `creusot`
+  --> src/lib.rs:71:23
+   |
+71 |     #[cfg(any(prusti, creusot))]
+   |                       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(creusot)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+  --> src/lib.rs:78:15
+   |
+78 |     #[cfg(any(prusti, creusot))]
+   |               ^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `creusot`
+  --> src/lib.rs:78:23
+   |
+78 |     #[cfg(any(prusti, creusot))]
+   |                       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(creusot)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:105:11
+    |
+105 |     #[cfg(prusti)]
+    |           ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:148:11
+    |
+148 |     #[cfg(prusti)]
+    |           ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:180:11
+    |
+180 |     #[cfg(prusti)]
+    |           ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:227:11
+    |
+227 |     #[cfg(prusti)]
+    |           ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:263:11
+    |
+263 |     #[cfg(prusti)]
+    |           ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:303:11
+    |
+303 |     #[cfg(prusti)]
+    |           ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `prusti`
+   --> src/lib.rs:314:15
+    |
+314 |     #[cfg(any(prusti, creusot))]
+    |               ^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(prusti)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(prusti)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `creusot`
+   --> src/lib.rs:314:23
+    |
+314 |     #[cfg(any(prusti, creusot))]
+    |                       ^^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(creusot)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+error[E0599]: no method named `transfer` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:375:28
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `transfer` not found for this struct
+...
+375 |         let result = vault.transfer(from, to, amount);
+    |                            ^^^^^^^^ method not found in `DeFiVault`
+
+error[E0599]: no method named `invariant_total_supply` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:380:27
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `invariant_total_supply` not found for this struct
+...
+380 |             assert!(vault.invariant_total_supply());
+    |                           ^^^^^^^^^^^^^^^^^^^^^^ method not found in `DeFiVault`
+
+error[E0599]: no method named `borrow` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:392:28
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `borrow` not found for this struct
+...
+392 |         let result = vault.borrow(0, amount);
+    |                            ^^^^^^
+    |
+   --> /home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/borrow.rs:179:7
+    |
+    = note: the method is available for `DeFiVault` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `borrow_mut` with a similar name, but with different arguments
+   --> /home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/borrow.rs:207:4
+help: trait `Borrow` which provides `borrow` is implemented but not in scope; perhaps you want to import it
+    |
+358 +     use std::borrow::Borrow;
+    |
+
+error[E0599]: no method named `invariant_solvency` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:395:27
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `invariant_solvency` not found for this struct
+...
+395 |             assert!(vault.invariant_solvency());
+    |                           ^^^^^^^^^^^^^^^^^^ method not found in `DeFiVault`
+
+error[E0425]: cannot find function `safe_add` in this scope
+   --> src/lib.rs:406:26
+    |
+406 |             let result = safe_add(x, y);
+    |                          ^^^^^^^^ not found in this scope
+    |
+note: found an item that was configured out
+   --> src/lib.rs:333:8
+    |
+330 | #[cfg(prusti)]
+    |       ------ the item is gated here
+...
+333 | pub fn safe_add(x: u64, y: u64) -> u64 {
+    |        ^^^^^^^^
+
+error[E0599]: no method named `health_factor` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:451:44
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `health_factor` not found for this struct
+...
+451 |     println!("Health Factor: {:.2}", vault.health_factor() as f64 / 100.0);
+    |                                            ^^^^^^^^^^^^^ method not found in `DeFiVault`
+
+error[E0599]: no method named `transfer` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:454:17
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `transfer` not found for this struct
+...
+454 |     match vault.transfer(0, 1, 100) {
+    |                 ^^^^^^^^ method not found in `DeFiVault`
+
+error[E0599]: no method named `borrow` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:460:17
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `borrow` not found for this struct
+...
+460 |     match vault.borrow(1, 500) {
+    |                 ^^^^^^
+    |
+   --> /home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/borrow.rs:179:7
+    |
+    = note: the method is available for `DeFiVault` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `borrow_mut` with a similar name, but with different arguments
+   --> /home/runner/.rustup/toolchains/nightly-2025-11-21-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/borrow.rs:207:4
+help: trait `Borrow` which provides `borrow` is implemented but not in scope; perhaps you want to import it
+    |
+ 10 + use std::borrow::Borrow;
+    |
+
+error[E0599]: no method named `health_factor` found for struct `DeFiVault` in the current scope
+   --> src/lib.rs:468:44
+    |
+ 17 | pub struct DeFiVault {
+    | -------------------- method `health_factor` not found for this struct
+...
+468 |     println!("Health Factor: {:.2}", vault.health_factor() as f64 / 100.0);
+    |                                            ^^^^^^^^^^^^^ method not found in `DeFiVault`
+
+Some errors have detailed explanations: E0425, E0599.
+For more information about an error, try `rustc --explain E0425`.
+error: Failed to execute cargo (exit status: 101). Found 9 compilation errors.
+
+
+--- STDERR ---
+   Compiling kani_verify v0.1.0 (/tmp/tmpyir3_oio)
+error: could not compile `kani_verify` (lib) due to 9 previous errors; 21 warnings emitted

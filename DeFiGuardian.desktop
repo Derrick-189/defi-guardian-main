@@ -1,0 +1,57 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DeFi Guardian
+Name[en]=DeFi Guardian
+GenericName=Formal Verification Suite
+GenericName[en]=Formal Verification Suite
+Comment=Formal verification platform for DeFi protocols with SPIN model checker
+Comment[en]=Formal verification platform for DeFi protocols with SPIN model checker
+Exec=python3 /home/slade/defi_guardian/defi_guardian_shortcut.py
+Icon=/home/slade/defi_guardian/defi_guardian.png
+Terminal=false
+StartupNotify=true
+StartupWMClass=defi-guardian
+Categories=Development;Security;Utility;
+Keywords=formal verification;SPIN;LTL;security;audit;defi;blockchain;model checker;
+MimeType=
+X-Desktop-File-Install-Version=0.26
+
+# Custom icon themes support
+IconFallback=defi-guardian
+IconTheme=hicolor
+
+# Right-click actions menu
+Actions=DesktopApp;Dashboard;Both;Terminal;
+
+[Desktop Action DesktopApp]
+Name=Launch Desktop Application
+Name[en]=Launch Desktop Application
+Comment=Open the desktop GUI application
+Exec=python3 /home/slade/defi_guardian/desktop_app.py
+Icon=/home/slade/defi_guardian/defi_guardian.png
+StartupNotify=true
+
+[Desktop Action Dashboard]
+Name=Launch Web Dashboard
+Name[en]=Launch Web Dashboard
+Comment=Open Streamlit dashboard in browser
+Exec=streamlit run /home/slade/defi_guardian/app.py --server.port 8501
+Icon=/home/slade/defi_guardian/defi_guardian.png
+StartupNotify=true
+
+[Desktop Action Both]
+Name=Launch Both (Desktop + Dashboard)
+Name[en]=Launch Both (Desktop + Dashboard)
+Comment=Launch both desktop app and dashboard
+Exec=python3 /home/slade/defi_guardian/launch_both.py
+Icon=/home/slade/defi_guardian/defi_guardian.png
+StartupNotify=true
+
+[Desktop Action Terminal]
+Name=Launch in Terminal
+Name[en]=Launch in Terminal
+Comment=Launch with terminal output visible
+Exec=gnome-terminal -- python3 /home/slade/defi_guardian/desktop_app.py
+Icon=/home/slade/defi_guardian/defi_guardian.png
+StartupNotify=true

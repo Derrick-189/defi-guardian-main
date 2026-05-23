@@ -1,0 +1,9 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-04-19T13:22:30.562889
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+info: downloading https://releases.lean-lang.org/lean4/v4.30.0-rc2/lean-4.30.0-rc2-linux.tar.zst

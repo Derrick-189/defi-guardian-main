@@ -1,0 +1,23 @@
+=== PRUSTI VERIFICATION LOG ===
+timestamp: 2026-04-19T12:53:46.798509
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+  __          __        __  ___             
+ |__)  _\/_  |__) |  | /__`  |   ____\/_  | 
+ |      /\   |  \ \__/ .__/  |       /\   | 
+
+
+Verification of 1 items...
+error: [Prusti: verification error] assertion might fail with "attempt to multiply with overflow"
+  --> /tmp/tmplaa4vayw/lib.rs:16:13
+   |
+16 |             (self.total_borrows * 10000) / self.total_deposits  // basis points
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Verification failed
+error: aborting due to previous error
+

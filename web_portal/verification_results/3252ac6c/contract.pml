@@ -1,0 +1,1 @@
+active proctype main() { do :: amount = amount + 1; od }

@@ -1,0 +1,13 @@
+=== KANI VERIFICATION LOG ===
+timestamp: 2026-04-12T13:26:41.888664
+file: /home/slade/defi_guardian/user_lending.rs
+
+--- STDOUT ---
+Kani Rust Verifier 0.67.0 (cargo plugin)
+Manual Harness Summary:
+No proof harnesses (functions with #[kani::proof]) were found to verify.
+
+
+--- STDERR ---
+   Compiling kani_verify v0.1.0 (/tmp/tmpine4x2wh)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s

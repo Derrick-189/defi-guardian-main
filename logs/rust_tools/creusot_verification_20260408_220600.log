@@ -1,0 +1,24 @@
+=== CREUSOT VERIFICATION LOG ===
+timestamp: 2026-04-08T22:06:00.599383
+file: /home/slade/HIDING/creusot_test.rs
+
+--- STDOUT ---
+
+
+--- STDERR ---
+Error: `cargo metadata` exited with an error:     Updating crates.io index
+warning: spurious network error (3 tries remaining): [6] Could not resolve hostname (Could not resolve host: index.crates.io)
+warning: spurious network error (2 tries remaining): [6] Could not resolve hostname (Could not resolve host: index.crates.io)
+warning: spurious network error (1 try remaining): [6] Could not resolve hostname (Could not resolve host: index.crates.io)
+error: failed to get `num-rational` as a dependency of package `creusot-std v0.11.0-dev (/home/slade/creusot/creusot-std)`
+    ... which satisfies path dependency `creusot-std` of package `creusot_verify v0.1.0 (/tmp/tmpyrai9h_a)`
+
+Caused by:
+  download of config.json failed
+
+Caused by:
+  failed to download from `https://index.crates.io/config.json`
+
+Caused by:
+  [6] Could not resolve hostname (Could not resolve host: index.crates.io)
+

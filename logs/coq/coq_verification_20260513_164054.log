@@ -1,0 +1,14 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-05-13T16:40:54.547804
+file: /home/slade/Downloads/ALL/Account.sol
+
+--- STDOUT ---
+
+
+--- STDERR ---
+File "/tmp/tmprmbatx6d.v", line 19, characters 0-42:
+Warning: To avoid stack overflow, large numbers in nat are interpreted as
+applications of Init.Nat.of_num_uint. [abstract-large-number,numbers,default]
+File "/tmp/tmprmbatx6d.v", line 53, characters 39-40:
+Error: Syntax error: '.' expected after [gallina] (in [vernac_aux]).
+

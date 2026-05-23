@@ -1,0 +1,8 @@
+=== COQ VERIFICATION LOG ===
+timestamp: 2026-04-24T17:28:22.083086
+file: /home/slade/Downloads/Account.sol
+
+--- STDOUT ---
+✅ Coq verification successful!
+
+--- STDERR ---
