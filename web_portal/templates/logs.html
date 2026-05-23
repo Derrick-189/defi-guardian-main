@@ -258,7 +258,7 @@
         logContent.hidden = false;
         loadingEl.style.display = 'none';
         if (downloadBtn) {
-          downloadBtn.href = '/api/v1/log-content?path=' + encodeURIComponent(path);
+          downloadBtn.href = '/api/v1/log-download/' + encodeURIComponent(path);
           downloadBtn.download = name;
         }
       })

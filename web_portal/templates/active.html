@@ -234,24 +234,31 @@
     if (terminal) terminal.scrollTop = terminal.scrollHeight;
   });
 
-  // ── Tool progress cards ────────────────────────────────────────────────
-  function setToolStatus(tool, status, pct) {
-    var card   = document.getElementById('prog-' + tool);
-    var fill   = document.getElementById('prog-fill-' + tool);
-    var label  = document.getElementById('prog-status-' + tool);
-    if (!card) return;
+   // ── Tool progress cards ────────────────────────────────────────────────
+   function setToolStatus(tool, status, pct) {
+     var card   = document.getElementById('prog-' + tool);
+     var fill   = document.getElementById('prog-fill-' + tool);
+     var label  = document.getElementById('prog-status-' + tool);
+     if (!card) return;
 
-    var s = (status || '').toUpperCase();
-    card.className = 'tool-prog-card ' +
-      (s === 'RUNNING' ? 'running' : s === 'PASS' ? 'pass' : s === 'FAIL' ? 'fail' : '');
+     var s = (status || '').toUpperCase();
+     card.className = 'tool-prog-card ' +
+       (s === 'RUNNING' ? 'running' : s === 'PASS' ? 'pass' : s === 'FAIL' ? 'fail' : '');
 
-    if (label) label.textContent = s || 'Not run';
-    if (fill) {
-      fill.style.width = (pct || 0) + '%';
-      fill.className = 'tool-prog-fill ' +
-        (s === 'RUNNING' ? 'running' : s === 'PASS' ? 'pass' : s === 'FAIL' ? 'fail' : '');
-    }
-  }
+     if (label) {
+       // Show status with optional progress details for RUNNING state
+       if (s === 'RUNNING' && pct !== undefined) {
+         label.textContent = 'Running...';
+       } else {
+         label.textContent = s || 'Not run';
+       }
+     }
+     if (fill) {
+       fill.style.width = (pct || 0) + '%';
+       fill.className = 'tool-prog-fill ' +
+         (s === 'RUNNING' ? 'running' : s === 'PASS' ? 'pass' : s === 'FAIL' ? 'fail' : '');
+     }
+   }
 
   // ── Stats panel ────────────────────────────────────────────────────────
   function updateStats(data) {
@@ -348,10 +355,24 @@
         if (!data) return;
         updateStats(data);
 
-        // Update tool cards from state
+        // Update tool cards from state, but don't override RUNNING state with older data
         ['spin','coq','lean','certora','kani','prusti','creusot','verus'].forEach(function (t) {
           var ts = data[t];
-          if (ts) setToolStatus(t.toUpperCase(), ts.status, ts.status === 'PASS' ? 100 : ts.status === 'FAIL' ? 100 : 0);
+          if (ts) {
+            var currentCard = document.getElementById('prog-' + t.toUpperCase());
+            var currentStatus = currentCard ? currentCard.className : '';
+            // Don't override RUNNING state with older data from server
+            if (currentStatus.indexOf('running') >= 0 && ts.status !== 'RUNNING') {
+              // Keep the RUNNING state, but update percentage if we have progress data
+              var progress = ts.progress !== undefined ? ts.progress : 0;
+              setToolStatus(t.toUpperCase(), 'RUNNING', progress);
+            } else {
+              // Update normally - use progress from state if available, otherwise default based on status
+              var progress = ts.progress !== undefined ? ts.progress : 
+                            (ts.status === 'PASS' || ts.status === 'FAIL' ? 100 : 0);
+              setToolStatus(t.toUpperCase(), ts.status, progress);
+            }
+          }
         });
 
         // LTL
@@ -385,22 +406,33 @@
     loadRecentRuns();
   });
 
-  document.addEventListener('dg:state_update', function (e) {
-    if (e.detail) {
-      updateStats(e.detail);
-      var ltl = e.detail.ltl_results || [];
-      if (ltl.length) renderLTL(ltl);
-      
-      // Log LTL results to terminal if not already there
-      var term = document.getElementById('active-terminal');
-      ltl.forEach(function (r) {
-        var msg = 'LTL ' + (r.name || '?') + ': ' + (r.success ? 'VERIFIED' : 'VIOLATED');
-        if (term && term.innerHTML.indexOf(msg) === -1) {
-          termLine(msg, r.success ? 'pass' : 'error');
-        }
-      });
-    }
-  });
+   document.addEventListener('dg:state_update', function (e) {
+     if (e.detail) {
+       updateStats(e.detail);
+       var ltl = e.detail.ltl_results || [];
+       if (ltl.length) renderLTL(ltl);
+       
+       // Log LTL results to terminal if not already there
+       var term = document.getElementById('live-terminal');
+       ltl.forEach(function (r) {
+         var msg = 'LTL ' + (r.name || '?') + ': ' + (r.success ? 'VERIFIED' : 'VIOLATED');
+         if (term && term.innerHTML.indexOf(msg) === -1) {
+           termLine(msg, r.success ? 'pass' : 'error');
+         }
+       });
+       
+       // Update tool progress cards from state update
+       ['spin','coq','lean','certora','kani','prusti','creusot','verus'].forEach(function (t) {
+         var ts = e.detail[t];
+         if (ts && ts.status) {
+           // Use progress from state if available, otherwise default based on status
+           var progress = ts.progress !== undefined ? ts.progress : 
+                         (ts.status === 'PASS' || ts.status === 'FAIL' ? 100 : 0);
+           setToolStatus(t.toUpperCase(), ts.status, progress);
+         }
+       });
+     }
+   });
 
   // ── Init ───────────────────────────────────────────────────────────────
   loadState();

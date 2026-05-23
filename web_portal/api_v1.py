@@ -447,16 +447,12 @@ def api_log_content():
                 return jsonify({"error": "Log not found in DB"}), 404
             
             content = audit.verification_output or ""
-            # If the content in DB is actually a path, try to resolve it
-            if len(content) < 500 and ("/" in content or "\\" in content):
-                resolved = _load_verification_content(content)
-                if resolved != content:
-                    return jsonify({"content": resolved})
-            
-            return jsonify({"content": content})
+            # Use the full path resolution logic that includes DB fallback
+            resolved = _load_verification_content(content, audit.report_path or "", audit_id=audit_id)
+            return jsonify({"content": resolved})
         except Exception as e:
             return jsonify({"error": f"DB error: {str(e)}"}), 500
-
+    
     # Handle physical file logs
     content = _load_verification_content(path)
     if content == path and not os.path.exists(path):
@@ -466,10 +462,10 @@ def api_log_content():
     if os.path.exists(path):
         abs_p = os.path.abspath(path)
         if not abs_p.startswith(str(PROJECT_DIR.resolve())):
-             # Allow if it's in /tmp or something common if needed, but for now stick to project
-             if not abs_p.startswith("/tmp"):
-                 return jsonify({"error": "Access denied"}), 403
-
+              # Allow if it's in /tmp or something common if needed, but for now stick to project
+              if not abs_p.startswith("/tmp"):
+                  return jsonify({"error": "Access denied"}), 403
+    
     return jsonify({"content": content[:100000]}) # Limit to 100k for browser performance
 
 def _build_counterexample_payload(row, audit_id_label):
@@ -1252,5 +1248,63 @@ def api_log_view(audit_id):
         })
     except (ValueError, TypeError) as e:
         return jsonify({"error": f"Invalid ID: {e}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api_v1.route("/log-download/<path:log_ref>")
+@login_required
+def api_log_download(log_ref):
+    """Download verification log as a downloadable text file.
+    Accepts either an audit ID (integer), a db:// ID, or a file path.
+    """
+    try:
+        u_id    = current_user.get_id()
+        user_id = int(u_id) if u_id else None
+        
+        # Strip db:// prefix if present
+        if log_ref.startswith("db://"):
+            log_ref = log_ref.replace("db://", "")
+        
+        # Try as audit ID first
+        try:
+            row_id = int(log_ref)
+            row = AuditHistory.query.filter_by(id=row_id).filter(
+                (AuditHistory.user_id == user_id) | (AuditHistory.user_id.is_(None))
+            ).first()
+            if row:
+                content = row.verification_output or ""
+                resolved = _load_verification_content(content, row.report_path or "", audit_id=row.id)
+                if resolved and resolved != content:
+                    content = resolved
+                filename = row.filename or f"verification_log_{row.id}.txt"
+                if not filename.endswith(".txt") and not "." in filename:
+                    filename = filename + ".txt"
+                return Response(
+                    content,
+                    mimetype="text/plain; charset=utf-8",
+                    headers={"Content-Disposition": f"attachment; filename={filename}"}
+                )
+        except ValueError:
+            pass
+        
+        # Treat as file path
+        content = _load_verification_content(log_ref)
+        if content == log_ref and not os.path.exists(log_ref):
+            return jsonify({"error": "File not found"}), 404
+        
+        # Security check for file path
+        if os.path.exists(log_ref):
+            abs_p = os.path.abspath(log_ref)
+            if not abs_p.startswith(str(PROJECT_DIR.resolve())):
+                if not abs_p.startswith("/tmp"):
+                    return jsonify({"error": "Access denied"}), 403
+        
+        filename = Path(log_ref).name
+        return Response(
+            content,
+            mimetype="text/plain; charset=utf-8",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
