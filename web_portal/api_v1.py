@@ -419,7 +419,14 @@ def api_job_status(job_id):
                 }
             })
     except (ValueError, TypeError):
-        pass
+        # job_id was not an integer audit id
+        # For the web new-run UI, return a JSON running payload instead of proxying.
+        return jsonify({"status": "running", "result": {}})
+
+    # If no AuditHistory row exists for this audit id, don't proxy to the
+    # verification server (it can return HTML on errors/404). Return JSON.
+    if not audit:
+        return jsonify({"status": "running", "result": {}})
 
     # Fallback to proxying to the verification server
     verif_url = _get_verif_url()
@@ -429,6 +436,7 @@ def api_job_status(job_id):
         return jsonify(resp.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @api_v1.route("/artifact/<job_id>/<filename>")
 @login_required
