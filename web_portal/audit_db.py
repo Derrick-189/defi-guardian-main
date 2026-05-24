@@ -119,19 +119,23 @@ def _read_trail_content(trail_path: str = None) -> str:
     return ""
 
 
-def sync_audit_log() -> int:
+def sync_audit_log(audit_jobs: list | None = None) -> int:
     """
     Import desktop audit_log.json into DB.
     Inlines log file content so records remain useful on Render where the
     original desktop file paths don't exist.
     Returns count of new rows added.
     """
-    if not AUDIT_LOG.exists():
-        return 0
-    try:
-        jobs = json.loads(AUDIT_LOG.read_text(encoding="utf-8"))
-    except Exception:
-        return 0
+    if audit_jobs is None:
+        if not AUDIT_LOG.exists():
+            return 0
+        try:
+            audit_jobs = json.loads(AUDIT_LOG.read_text(encoding="utf-8"))
+        except Exception:
+            return 0
+
+    jobs = audit_jobs
+
 
     new_count = 0
     for job in jobs:

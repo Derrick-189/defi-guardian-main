@@ -206,6 +206,43 @@ def api_sync_audit():
     n = sync_audit_log()
     return jsonify({"status": "success", "new_records": n})
 
+
+@api_v1.route("/audit-log/raw")
+def api_audit_log_raw():
+    """Serve the remote desktop audit log JSON so other instances can sync."""
+    try:
+        if not AUDIT_LOG_FILE.exists():
+            return jsonify({"error": "audit_log.json not found"}), 404
+        return Response(AUDIT_LOG_FILE.read_text(encoding="utf-8"), mimetype="application/json")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api_v1.route("/sync-audit-remote", methods=["POST"])
+@login_required
+def api_sync_audit_remote():
+    """Download audit_log.json from the Render instance and import into local DB."""
+    try:
+        render_base = os.environ.get("RENDER_BASE_URL")
+        if not render_base:
+            return jsonify({"error": "RENDER_BASE_URL env var not set"}), 400
+
+        url = render_base.rstrip('/') + "/api/v1/audit-log/raw"
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+
+        audit_jobs = resp.json()
+        if not isinstance(audit_jobs, list):
+            return jsonify({"error": "remote audit log is not a JSON list"}), 400
+
+        n = sync_audit_log(audit_jobs=audit_jobs)
+        return jsonify({"status": "success", "new_records": n})
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"remote fetch failed: {str(e)}"}), 502
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @api_v1.route("/set-theme", methods=["POST"])
 def api_set_theme():
     theme = (request.get_json() or {}).get("theme", "dark")
