@@ -348,14 +348,25 @@
 
     const url = "/api/v1/trace/" + encodeURIComponent(auditId);
 
-    fetch(url, { credentials: "same-origin" })
+fetch(url, { credentials: "same-origin" })
       .then(function (r) {
         if (!r.ok) return Promise.reject("HTTP " + r.status);
         return r.json();
       })
       .then(function (data) {
+        if (data && data.is_ready === false) {
+          // Retry shortly to enable real-time-ish trace rendering.
+          window.__DG_TRACE_RETRY__ = window.__DG_TRACE_RETRY__ || {};
+          window.__DG_TRACE_RETRY__[auditId] = (window.__DG_TRACE_RETRY__[auditId] || 0) + 1;
+          const attempt = window.__DG_TRACE_RETRY__[auditId];
+          if (attempt <= 8) {
+            setTimeout(function () { loadTrace(auditId); }, 1500);
+            return;
+          }
+        }
+
         // API returns both "steps" and "trace" for compatibility
-        _steps = data.steps || data.trace || [];
+        _steps = data && (data.steps || data.trace) ? (data.steps || data.trace) : [];
         renderTimeline(_steps);
         updateStats();
         updateControls();
@@ -364,6 +375,7 @@
           goToStep(0);
         }
       })
+
       .catch(function (err) {
         console.error("[Trace] Load failed:", err);
         setText("stat-total-steps", "—");
