@@ -203,8 +203,17 @@ def api_state_current():
 @api_v1.route("/sync-audit", methods=["POST"])
 @login_required
 def api_sync_audit():
+    # If REMOTE_AUDIT_SYNC is enabled, automatically sync from the Render instance.
+    # This makes the UI sync button work for cross-instance real-time updates.
+    if os.environ.get("REMOTE_AUDIT_SYNC", "").lower() in ("1", "true", "yes", "on"):
+        try:
+            return api_sync_audit_remote()
+        except Exception as e:
+            return jsonify({"status": "error", "error": str(e)}), 500
+
     n = sync_audit_log()
     return jsonify({"status": "success", "new_records": n})
+
 
 
 @api_v1.route("/audit-log/raw")
