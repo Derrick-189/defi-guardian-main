@@ -11,23 +11,7 @@ if _RAW_DB_URL and _RAW_DB_URL.startswith("postgres://"):
 class Config:
     """Base configuration."""
     PROJECT_DIR = Path(__file__).parent.parent
-
-    # IMPORTANT: Flask-Login remember-me tokens are signed with SECRET_KEY.
-    # Render deploys must use a stable SECRET_KEY (set it in env vars).
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-me-in-production"
-
-    # Session cookie defaults tuned for production/Render (HTTPS).
-    # These ensure the remember-me cookie is sent correctly by the browser.
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = os.environ.get("SESSION_COOKIE_SAMESITE", "Lax")
-    REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_SAMESITE = os.environ.get("REMEMBER_COOKIE_SAMESITE", "Lax")
-
-    # If Render serves over HTTPS and SESSION_COOKIE_SECURE is left False,
-    # browsers will drop the cookie.
-    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() in ("1","true","yes","on")
-    REMEMBER_COOKIE_SECURE = SESSION_COOKIE_SECURE
-
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me-in-production")
 
     # Use the module-level _RAW_DB_URL so the value is always consistent
     # whether config.py is imported stand-alone or via flask-sqlalchemy.
