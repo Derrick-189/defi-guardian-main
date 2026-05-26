@@ -442,18 +442,34 @@ endblock %} {% block extra_css %}
         </div>
     </div>
 
-    <-V State Machine Diagram Section -->
     <div class="viz-state-machine-section">
         <div class="viz-section-label">
-            <i class="fa-solid fa-diagram-nested"></i> State Machine Diagram
-            <button class="btn btn-xs btn-ghost" id="btn-refresh-sm" style="margin-left: auto">
-                <i class="fa-solid fa-arrows-rotate"></i> Sync
-            </button>
+            <i class="fa-solid fa-diagram-nested"></i> State Machine Diagram (Graphviz)
+            <div style="margin-left: auto; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                <input type="search" id="gv-filter" class="input input-sm" placeholder="Highlight node..." style="width: 140px; font-size: 0.72rem;" />
+                <label style="margin: 0; font-size: 0.72rem;"><input type="checkbox" id="gv-behavioral" style="width: auto; margin-right: 0.2rem;" />Behavioral</label>
+                <label style="margin: 0; font-size: 0.72rem;"><input type="checkbox" id="gv-show-procs" checked style="width: auto; margin-right: 0.2rem;" />Procs</label>
+                <label style="margin: 0; font-size: 0.72rem;"><input type="checkbox" id="gv-show-vars" checked style="width: auto; margin-right: 0.2rem;" />Vars</label>
+                <label style="margin: 0; font-size: 0.72rem;"><input type="checkbox" id="gv-show-invariants" checked style="width: auto; margin-right: 0.2rem;" />Invariants</label>
+                <div class="btn-group">
+                    <button class="btn btn-xs btn-ghost" id="btn-refresh-sm" title="Refresh Diagram">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                    <a href="{{ url_for('api_v1.api_visualization_state_diagram_download') }}" class="btn btn-xs btn-ghost" id="btn-download-pdf" title="Download PDF">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="mermaid-wrap" id="mermaid-container">
-            <div class="mermaid" id="state-machine-diagram">
-                stateDiagram-v2
-                [*] --> Loading
+        <div class="mermaid-wrap" id="graphviz-container" style="background: var(--bg3); height: 500px; padding: 1rem; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; position: relative;">
+            <div id="state-diagram-svg" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: grab;">
+                <p class="text-muted">Generating improved diagram...</p>
+            </div>
+            <!-- Zoom Controls -->
+            <div style="position: absolute; bottom: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px;">
+                <button class="btn btn-xs btn-circle btn-ghost" onclick="zoomGv(1.2)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button class="btn btn-xs btn-circle btn-ghost" onclick="zoomGv(0.8)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button class="btn btn-xs btn-circle btn-ghost" onclick="resetGv()" title="Reset"><i class="fa-solid fa-expand"></i></button>
             </div>
         </div>
     </div>
@@ -525,6 +541,7 @@ endblock %} {% block extra_css %}
             graphData = normalise(rawGraph, ltlData);
             init();
             renderStateMachine();
+            renderImprovedStateDiagram(); // New improved diagram
             renderLTLList(ltlData);
           })
           .catch(function(err) {
@@ -540,111 +557,61 @@ endblock %} {% block extra_css %}
           });
       }
 
-      function renderStateMachine() {
-        var container = document.getElementById('mermaid-container');
+      function renderImprovedStateDiagram() {
+        var container = document.getElementById('state-diagram-svg');
         if (!container) return;
         
-        // Build mermaid syntax
-        var lines = ['stateDiagram-v2'];
-        var nodes = graphData.nodes.filter(function(n) { return !n.id.startsWith('LTL'); });
-        var nodeIds = new Set(nodes.map(function(n) { return n.id; }));
+        var showProcs = document.getElementById('gv-show-procs').checked;
+        var showVars = document.getElementById('gv-show-vars').checked;
+        var showInvariants = document.getElementById('gv-show-invariants').checked;
+        var behavioral = document.getElementById('gv-behavioral').checked;
+        var filterStr = document.getElementById('gv-filter').value.trim();
+        var activeStep = (currentTracePath && currentTracePath.length > 0) ? currentTraceStep : -1;
         
-        // Find if any LTL property associated with these nodes failed
-        var failedProps = new Set(ltlData.filter(function(p) { return p.success === false; }).map(function(p) { return p.name; }));
-
-        nodes.forEach(function(n) {
-          var label = n.label.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-          lines.push('    state "' + n.label + '" as ' + label);
-          
-          if (n.type === 'initial') {
-            lines.push('    [*] --> ' + label);
-            lines.push('    class ' + label + ' initialState');
-          } else if (n.type === 'accept') {
-            lines.push('    class ' + label + ' acceptState');
-          } else if (n.type === 'deadlock') {
-            lines.push('    class ' + label + ' deadlockState');
-          } else if (n.type === 'error' || failedProps.has(n.label)) {
-            lines.push('    class ' + label + ' failedState');
-          }
-        });
+        var url = '/api/v1/visualization/state-diagram?procs=' + showProcs + 
+                  '&vars=' + showVars + '&invariants=' + showInvariants + 
+                  '&behavioral=' + behavioral + '&step=' + activeStep +
+                  '&filter=' + encodeURIComponent(filterStr);
         
-        graphData.links.forEach(function(l) {
-          var sid = typeof l.source === 'object' ? l.source.id : String(l.source);
-          var tid = typeof l.target === 'object' ? l.target.id : String(l.target);
-          if (nodeIds.has(sid) && nodeIds.has(tid)) {
-            var sLabel = sid.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-            var tLabel = tid.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-            var edgeLabel = l.label ? ' : ' + l.label : '';
-            lines.push('    ' + sLabel + ' --> ' + tLabel + edgeLabel);
-          }
-        });
-
-        if (lines.length === 1) lines.push('    [*] --> NoData');
-        
-        // Add styling for states
-        lines.push('    classDef initialState fill:#4ade80,stroke:#fff,stroke-width:2px,color:#000');
-        lines.push('    classDef failedState fill:#f85149,stroke:#fff,stroke-width:2px,color:#fff');
-        lines.push('    classDef acceptState fill:#f59e0b,stroke:#fff,stroke-width:2px,color:#fff');
-        lines.push('    classDef deadlockState fill:#bc8cff,stroke:#fff,stroke-width:2px,color:#fff');
-        lines.push('    classDef activeState stroke:#fff,stroke-width:4px,stroke-dasharray: 5 5');
-
-        var code = lines.join('\n');
-        var output = document.getElementById('state-machine-diagram');
-        
-        // Re-render mermaid
-        try {
-          output.removeAttribute('data-processed');
-          output.innerHTML = code;
-          mermaid.run({ 
-            nodes: [output],
-            postRender: function(id) {
-              setupMermaidNodeClicks();
-              if (currentTracePath.length) highlightMermaidTrace();
+        fetch(url, { credentials: 'same-origin' })
+          .then(function(r) { return r.ok ? r.text() : null; })
+          .then(function(svg) {
+            if (svg) {
+              container.innerHTML = svg;
+              // Ensure SVG fits container and is interactive
+              var svgEl = container.querySelector('svg');
+              if (svgEl) {
+                svgEl.setAttribute('width', '100%');
+                svgEl.setAttribute('height', '100%');
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.maxHeight = '100%';
+                svgEl.style.transition = 'transform 0.2s ease-out';
+                resetGv();
+              }
+            } else {
+              container.innerHTML = '<p class="text-muted">Could not generate improved diagram.</p>';
             }
+          })
+          .catch(function(err) {
+            console.error('Failed to load improved state diagram:', err);
+            container.innerHTML = '<p class="text-muted">Error loading diagram.</p>';
           });
-        } catch (e) {
-          console.error('Mermaid render failed:', e);
-        }
+      }
+
+      function renderStateMachine() {
+        var container = document.getElementById('graphviz-container');
+        if (!container) return;
+        
+        // This function now primarily handles the improved Graphviz diagram
+        renderImprovedStateDiagram();
       }
 
       function highlightMermaidTrace() {
-        if (!currentTracePath.length) return;
-        var svg = document.querySelector('#state-machine-diagram svg');
-        if (!svg) return;
-        
-        var activeIds = new Set(currentTracePath.slice(0, currentTraceStep + 1).map(function(id) {
-          return id.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-        }));
-
-        svg.querySelectorAll('.node').forEach(function(node) {
-          var idMatch = node.id.match(/state-([^-]+)-\d+/);
-          var id = idMatch ? idMatch[1] : null;
-          if (id && activeIds.has(id)) {
-            node.classList.add('activeState');
-          } else {
-            node.classList.remove('activeState');
-          }
-        });
+        // Trace highlighting for the Graphviz SVG can be implemented here if needed
       }
 
       function setupMermaidNodeClicks() {
-        var svg = document.querySelector('#state-machine-diagram svg');
-        if (!svg) return;
-
-        svg.querySelectorAll('.node').forEach(function(group) {
-          var idMatch = group.id.match(/state-([^-]+)-\d+/);
-          var label = idMatch ? idMatch[1] : '';
-          
-          if (!label) return;
-          group.style.cursor = 'pointer';
-          group.addEventListener('click', function() {
-            // Find the original node to get the true label/id
-            var originalNode = graphData.nodes.find(function(n) {
-              return n.id.replace(/\./g, '_').replace(/[^a-zA-Z0-9_]/g, '') === label;
-            });
-            if (originalNode) zoomToNode(originalNode.id);
-          });
-        });
+        // Node interaction for the Graphviz SVG can be implemented here if needed
       }
 
       function zoomToNode(id) {
@@ -721,28 +688,34 @@ endblock %} {% block extra_css %}
 
       function highlightTrace(path, step) {
         var svg = document.querySelector('#viz-canvas svg');
-        if (!svg) return;
-        var activeIds = new Set(path.slice(0, step + 1));
+        if (svg) {
+          var activeIds = new Set(path.slice(0, step + 1));
 
-        svg.querySelectorAll('line').forEach(function(line) {
-          var source = line.getAttribute('data-source');
-          var target = line.getAttribute('data-target');
-          var highlight = false;
-          for (var i = 0; i < path.length - 1; i++) {
-            if (path[i] === source && path[i + 1] === target) {
-              highlight = i <= step - 1;
-              break;
+          svg.querySelectorAll('line').forEach(function(line) {
+            var source = line.getAttribute('data-source');
+            var target = line.getAttribute('data-target');
+            var highlight = false;
+            for (var i = 0; i < path.length - 1; i++) {
+              if (path[i] === source && path[i + 1] === target) {
+                highlight = i <= step - 1;
+                break;
+              }
             }
-          }
-          line.classList.toggle('trace-link', highlight);
-        });
+            line.classList.toggle('trace-link', highlight);
+          });
 
-        svg.querySelectorAll('g').forEach(function(group) {
-          var title = group.querySelector('title');
-          var label = title ? title.textContent.trim() : (group.querySelector('text') ? group.querySelector('text').textContent.trim() : '');
-          if (!label) return;
-          group.classList.toggle('selected-node', activeIds.has(label) || activeIds.has(group.getAttribute('id')));
-        });
+          svg.querySelectorAll('g').forEach(function(group) {
+            var title = group.querySelector('title');
+            var label = title ? title.textContent.trim() : (group.querySelector('text') ? group.querySelector('text').textContent.trim() : '');
+            if (!label) return;
+            group.classList.toggle('selected-node', activeIds.has(label) || activeIds.has(group.getAttribute('id')));
+          });
+        }
+
+        // Also sync the improved state diagram if behavioral mode is on
+        if (document.getElementById('gv-behavioral').checked) {
+          renderImprovedStateDiagram();
+        }
       }
 
       function clearTraceHighlight() {
@@ -1385,8 +1358,27 @@ endblock %} {% block extra_css %}
       }
 
       document.getElementById('btn-refresh-sm').addEventListener('click', function() {
-        renderStateMachine();
+        renderImprovedStateDiagram();
       });
+
+      window.addEventListener('resize', function() {
+        if (currentMode === '2d') render2D();
+        else render3D();
+      });
+
+      ['gv-show-procs', 'gv-show-vars', 'gv-show-invariants', 'gv-behavioral'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', renderImprovedStateDiagram);
+      });
+
+      var gvFilter = document.getElementById('gv-filter');
+      if (gvFilter) {
+        gvFilter.addEventListener('input', function() {
+          // Debounce search
+          clearTimeout(window.gvFilterTimeout);
+          window.gvFilterTimeout = setTimeout(renderImprovedStateDiagram, 300);
+        });
+      }
 
       document.getElementById('btn-export-viz').addEventListener('click', function () {
         if (currentMode === '3d' && threeCtx) {

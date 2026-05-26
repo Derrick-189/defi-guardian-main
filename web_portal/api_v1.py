@@ -4,7 +4,7 @@ import os, json, re, requests, shutil, subprocess, time, sys
 from pathlib import Path
 from web_portal.audit_db import db, AuditHistory, User, sync_audit_log
 from tasks import run_verification_task
-from utils import _load_state_graph, _parse_spin_output_to_steps, _spin_recs, _property_category
+from utils import _load_state_graph, _parse_spin_output_to_steps, _spin_recs, _property_category, create_custom_state_diagram, generate_state_diagram_svg, generate_state_diagram_output
 from werkzeug.utils import secure_filename
 
 # ── Ensure web_portal/trace_parsers.py is imported, NOT the root package ─────
@@ -1516,6 +1516,115 @@ def api_log_download(log_ref):
         return Response(
             content,
             mimetype="text/plain; charset=utf-8",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api_v1.route("/visualization/state-diagram")
+@login_required
+def api_visualization_state_diagram():
+    """
+    Generate and return the improved state diagram SVG for the current model.
+    """
+    try:
+        u_id = current_user.get_id() if current_user.is_authenticated else None
+        user_id = int(u_id) if u_id else None
+        
+        # Get settings from query params
+        show_procs = request.args.get("procs", "true").lower() == "true"
+        show_vars = request.args.get("vars", "true").lower() == "true"
+        show_invariants = request.args.get("invariants", "true").lower() == "true"
+        behavioral = request.args.get("behavioral", "false").lower() == "true"
+        active_step = int(request.args.get("step", "-1"))
+        filter_str = request.args.get("filter", "").strip()
+        theme = session.get("theme", "dark")
+        
+        # Get the latest audit for context
+        row = AuditHistory.query.filter(
+            (AuditHistory.user_id == user_id) | (AuditHistory.user_id == None)
+        ).order_by(AuditHistory.audit_date.desc()).first()
+        
+        trace_steps = None
+        if row and row.trace_data:
+            try:
+                trace_steps = json.loads(row.trace_data)
+            except:
+                pass
+
+        # Determine content and name
+        if row and row.source_code:
+            pml_content = row.source_code
+            model_name = row.filename or "Model"
+        else:
+            # Try loading SimpleLending.sol as fallback if no audit exists
+            sol_path = PROJECT_DIR / "SimpleLending.sol"
+            if sol_path.exists():
+                pml_content = sol_path.read_text(encoding="utf-8")
+                model_name = "SimpleLending"
+            else:
+                return jsonify({"error": "No source code available for visualization"}), 404
+
+        # Generate DOT content using improved logic from utils
+        dot_content = create_custom_state_diagram(
+            pml_content, 
+            model_name,
+            show_procs=show_procs,
+            show_vars=show_vars,
+            show_invariants=show_invariants,
+            theme=theme,
+            filter_str=filter_str,
+            behavioral=behavioral,
+            active_step=active_step,
+            trace_steps=trace_steps
+        )
+        
+        # Convert to SVG using Graphviz 'dot' command
+        svg_content = generate_state_diagram_svg(dot_content)
+        
+        if not svg_content:
+            return jsonify({"dot": dot_content, "error": "SVG generation failed"}), 500
+            
+        return Response(svg_content, mimetype="image/svg+xml")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api_v1.route("/visualization/state-diagram/download")
+@login_required
+def api_visualization_state_diagram_download():
+    """
+    Download the state diagram as a PDF file.
+    """
+    try:
+        u_id = current_user.get_id() if current_user.is_authenticated else None
+        user_id = int(u_id) if u_id else None
+        
+        # Always use light theme for PDFs for better printing
+        theme = "light"
+        
+        # Get the latest audit
+        row = AuditHistory.query.filter(
+            (AuditHistory.user_id == user_id) | (AuditHistory.user_id == None)
+        ).order_by(AuditHistory.audit_date.desc()).first()
+        
+        if row and row.source_code:
+            pml_content = row.source_code
+            model_name = row.filename or "Model"
+        else:
+            return jsonify({"error": "No source code available"}), 404
+
+        dot_content = create_custom_state_diagram(pml_content, model_name, theme=theme)
+        pdf_bytes = generate_state_diagram_output(dot_content, "pdf")
+        
+        if not pdf_bytes:
+            return jsonify({"error": "PDF generation failed"}), 500
+            
+        filename = f"state_diagram_{model_name.replace('.', '_')}.pdf"
+        return Response(
+            pdf_bytes,
+            mimetype="application/pdf",
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
