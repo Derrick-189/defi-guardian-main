@@ -11,6 +11,8 @@
   let _filteredSteps = [];
   let _allSteps = [];
   let _useHex = false;
+  let _diffMode = false;
+  let _minimizeTrace = false;
 
   function escapeHtml(str) {
     return String(str)
@@ -146,6 +148,15 @@
 
     container.innerHTML = steps
       .map(function (step, displayIdx) {
+        // If minimize is on, hide internal steps (those without a line number or with specific keywords)
+        if (_minimizeTrace && !step.line && !step.is_error) {
+            const action = (step.action || "").toLowerCase();
+            const internalKeywords = ["system", "scheduler", "internal", "yield", "poll"];
+            if (internalKeywords.some(kw => action.includes(kw))) {
+                return '';
+            }
+        }
+
         const stepNum =
           step.step !== undefined ? step.step : (step.step_number !== undefined ? step.step_number : displayIdx);
         const action = step.action || step.label || "";
@@ -189,7 +200,7 @@
           renderVariables(step);
           el.scrollIntoView({ block: "nearest", behavior: "smooth" });
           highlightStateMachineStep(idx);
-          highlightSourceLine(step.line);
+          highlightSourceLine(step.line, step.action || step.label);
           
           // Auto-switch to variables panel if it's hidden or we're on mobile
           if (window.innerWidth < 768) {
@@ -219,23 +230,67 @@
     const lines = code.split("\n");
     pre.innerHTML = lines
       .map(function (line, i) {
+        const lineNum = i + 1;
+        let tooltip = '';
+        const lowLine = line.toLowerCase();
+        
+        // Simple heuristic for tooltip content
+        if (lowLine.includes('lock = true') || lowLine.includes('islocked = true')) {
+          tooltip = '<div class="code-tooltip"><span class="tooltip-tag tag-danger">Mutex</span> Reentrancy lock acquired</div>';
+        } else if (lowLine.includes('require(') || lowLine.includes('assert(')) {
+          tooltip = '<div class="code-tooltip"><span class="tooltip-tag tag-info">Guard</span> Safety condition check</div>';
+        } else if (lowLine.includes('transfer(') || lowLine.includes('call{')) {
+          tooltip = '<div class="code-tooltip"><span class="tooltip-tag tag-danger">External</span> Potential reentrancy vector</div>';
+        }
+
         return (
-          '<div class="code-line" data-line="' + (i + 1) + '">' +
-          '<span class="line-number">' + (i + 1) + '</span>' +
+          '<div class="code-line" data-line="' + lineNum + '">' +
+          '<span class="line-number">' + lineNum + '</span>' +
           '<span class="line-content">' + escapeHtml(line) + '</span>' +
+          tooltip +
           '</div>'
         );
       })
       .join("");
   }
 
-  function highlightSourceLine(lineNum) {
+  function highlightSourceLine(lineNum, actionText) {
     if (!lineNum) return;
     const pre = document.getElementById("source-code-pre");
     if (!pre) return;
 
     pre.querySelectorAll(".code-line").forEach(function (el) {
       el.classList.toggle("highlight", parseInt(el.getAttribute("data-line"), 10) === parseInt(lineNum, 10));
+      
+      // Update AI Explanation tooltip if it's the highlighted line
+      if (parseInt(el.getAttribute("data-line"), 10) === parseInt(lineNum, 10) && actionText) {
+          let aiTooltip = el.querySelector(".ai-explanation-tooltip");
+          if (!aiTooltip) {
+              aiTooltip = document.createElement("div");
+              aiTooltip.className = "code-tooltip ai-explanation-tooltip";
+              aiTooltip.style.borderColor = "var(--success)";
+              aiTooltip.style.left = "auto";
+              aiTooltip.style.right = "1rem";
+              el.appendChild(aiTooltip);
+          }
+          aiTooltip.innerHTML = '<span class="tooltip-tag" style="background:var(--success);color:white;">AI Insight</span> Generating explanation...';
+          
+          // Simulate AI explanation fetch
+          setTimeout(() => {
+              const explanations = {
+                  "lock": "The contract is setting a reentrancy lock. This is a common safety pattern to prevent multiple calls to the same function.",
+                  "transfer": "An external asset transfer is occurring. This is a critical point where reentrancy must be guarded.",
+                  "require": "The contract is enforcing a safety condition. If this fails in the trace, it indicates a boundary condition was met.",
+                  "state": "A state transition is happening, which might change the contract's behavior for future calls."
+              };
+              let exp = "This step represents a state change or action in the contract execution flow.";
+              const lowAction = actionText.toLowerCase();
+              for (const key in explanations) {
+                  if (lowAction.includes(key)) { exp = explanations[key]; break; }
+              }
+              aiTooltip.innerHTML = '<span class="tooltip-tag" style="background:var(--success);color:white;">AI Insight</span> ' + exp;
+          }, 600);
+      }
     });
 
     const active = pre.querySelector('.code-line.highlight');
@@ -357,13 +412,26 @@
     // Grouping logic
     const groups = {};
     names.forEach(name => {
+        const beforeVal = before[name];
+        const afterVal = after[name];
+        const changed = beforeVal !== undefined && beforeVal !== afterVal;
+        
+        // If diff mode is on, only include changed variables
+        if (_diffMode && !changed) return;
+
         const parts = name.split(/[:.]/);
         const groupName = parts.length > 1 ? parts[0] : "Global";
         if (!groups[groupName]) groups[groupName] = [];
         groups[groupName].push(name);
     });
 
-    panel.innerHTML = Object.keys(groups).sort().map(groupName => {
+    const groupsKeys = Object.keys(groups).sort();
+    if (groupsKeys.length === 0 && _diffMode) {
+        panel.innerHTML = '<div class="text-muted" style="padding:1rem;font-size:0.82rem;">No variables changed in this step</div>';
+        return;
+    }
+
+    panel.innerHTML = groupsKeys.map(groupName => {
         const groupHtml = groups[groupName].map(function (name) {
             const beforeVal = before[name];
             const afterVal = after[name];
@@ -817,6 +885,24 @@
           window._ceLoadData(val);
         }
       });
+    }
+
+    // ── Diff & Minimize Toggles ──────────────────────────────────────────
+    const diffToggle = document.getElementById('diff-toggle');
+    if (diffToggle) {
+        diffToggle.addEventListener('change', function() {
+            _diffMode = diffToggle.checked;
+            const step = _activeStepIndex !== null ? _filteredSteps[_activeStepIndex] : null;
+            renderVariables(step);
+        });
+    }
+
+    const minimizeToggle = document.getElementById('minimize-toggle');
+    if (minimizeToggle) {
+        minimizeToggle.addEventListener('change', function() {
+            _minimizeTrace = minimizeToggle.checked;
+            renderTrace(_filteredSteps);
+        });
     }
 
     // ── Panel tab switching ──────────────────────────────────────────────

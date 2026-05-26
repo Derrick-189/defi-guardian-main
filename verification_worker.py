@@ -211,30 +211,37 @@ def run_verification_job(job):
             db.session.commit()
             print(f"Database updated for audit {audit.id}")
 
-            # --- 3. Update global state for UI visibility ---
-            try:
-                from web_portal.api_v1 import load_state, save_state
-                state = load_state()
-                t_low = tool.lower()
-                state[t_low] = {
-                    "status": audit.status,
-                    "timestamp": audit.audit_date.isoformat() if audit.audit_date else "",
-                    "model_name": Path(contract_path).name,
-                    "success": audit.status == "PASS",
-                    "progress": 100,
-                    "ltl_results": result.get("ltl_results", []),
-                    "states_stored": result.get("states_stored", 0),
-                    "transitions": result.get("transitions", 0),
-                    "depth": result.get("depth", 0)
-                }
-                state["active_tool"] = tool.upper()
-                state["active_status"] = audit.status
-                state["success"] = audit.status == "PASS"
-                state["ltl_results"] = result.get("ltl_results", [])
-                save_state(state)
-                print(f"Global state updated for {tool}")
-            except Exception as se:
-                print(f"Global state update failed: {se}")
+        # --- 3. Update global state for UI visibility ---
+        try:
+            # FIX: Ensure we use the correct project-level state file
+            state_path = Path(ROOT_DIR) / "verification_state.json"
+            state = {}
+            if state_path.exists():
+                try:
+                    state = _json.loads(state_path.read_text(encoding="utf-8"))
+                except: pass
+            
+            t_low = tool.lower()
+            state[t_low] = {
+                "status": audit.status,
+                "timestamp": audit.audit_date.isoformat() if audit.audit_date else "",
+                "model_name": Path(contract_path).name,
+                "success": audit.status == "PASS",
+                "progress": 100,
+                "ltl_results": result.get("ltl_results", []),
+                "states_stored": result.get("states_stored", 0),
+                "transitions": result.get("transitions", 0),
+                "depth": result.get("depth", 0)
+            }
+            state["active_tool"] = tool.upper()
+            state["active_status"] = audit.status
+            state["success"] = audit.status == "PASS"
+            state["ltl_results"] = result.get("ltl_results", [])
+            
+            state_path.write_text(_json.dumps(state, indent=2), encoding="utf-8")
+            print(f"Global state updated for {tool} at {state_path}")
+        except Exception as se:
+            print(f"Global state update failed: {se}")
 
         # --- 4. Mark job complete in queue DB ---
         complete_job(job_id, result)

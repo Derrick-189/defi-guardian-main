@@ -99,6 +99,29 @@ def _parse_spin_ltl(output: str) -> list:
 
 def _spin_sim(contract_name: str, seed: int = 0) -> dict:
     """Simulate SPIN output deterministically based on contract name."""
+    # ── Error Simulation Logic ──────────────────────────────────────────────
+    is_buggy = "vulnerable" in contract_name.lower() or "buggy" in contract_name.lower()
+    
+    if is_buggy:
+        # Simulate a reentrancy failure
+        steps = [
+            {"step": 1, "line": 5,  "proc": "User", "action": "request_withdraw(100)", "variables": {"balance": 1000, "lock": False}},
+            {"step": 2, "line": 8,  "proc": "Vault", "action": "transfer(100)", "variables": {"balance": 900, "lock": False}},
+            {"step": 3, "line": 5,  "proc": "User", "action": "reentrant_call()", "variables": {"balance": 900, "lock": False}},
+            {"step": 4, "line": 8,  "proc": "Vault", "action": "transfer(100)", "variables": {"balance": 800, "lock": False}, "is_error": True, "error": "Reentrancy Detected"}
+        ]
+        return {
+            "success": False,
+            "status": "FAIL",
+            "errors_count": 1,
+            "states_stored": 45,
+            "transitions": 82,
+            "depth": 12,
+            "ltl_results": [{"name": "safety_reentrancy", "status": "VIOLATED"}],
+            "trace_data": {"steps": steps},
+            "output": "Verification failed: Safety property safety_reentrancy violated.\nCounterexample trail found."
+        }
+
     h = int(hashlib.md5(contract_name.encode()).hexdigest(), 16)
     fail_mask = (h >> seed) & 0xFF   # which props fail
 

@@ -1438,6 +1438,13 @@
               "icon": "file",
               "path": "generated/images/state_diagram_1779813100.png",
               "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813479.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813479.png",
+              "size": 452933
             }
           ]
         },
@@ -5392,7 +5399,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 178843
+      "size": 183703
     },
     {
       "name": "fix_admin.py",

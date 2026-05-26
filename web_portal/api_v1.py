@@ -38,9 +38,12 @@ def load_state() -> dict:
 
 def save_state(state: dict):
     try:
-        VERIFICATION_STATE.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+        # Use absolute path to project root
+        p = Path("/home/slade/defi-guardian-main/verification_state.json")
+        p.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        print(f"DEBUG: State saved to {p}")
+    except Exception as e:
+        print(f"DEBUG: State save failed: {e}")
 
 def _get_verif_url():
     # Priority: Env var > Config > Hardcoded default

@@ -247,6 +247,43 @@
 
 
 
+  /* Code Line Tooltip */
+  .code-line { position: relative; }
+  .code-tooltip {
+    position: absolute;
+    left: 4rem;
+    top: -2.5rem;
+    background: var(--bg3);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateY(5px);
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .code-line:hover .code-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tooltip-tag {
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .tag-danger { background: var(--danger); color: white; }
+  .tag-info { background: var(--accent); color: white; }
+
   /* Tab content */
   .tab-content { display: none; }
   .tab-content.active { display: block; }
@@ -400,7 +437,7 @@
 
       <!-- Panel 2: Call Trace -->
       <div class="report-panel report-panel-main" id="panel-trace">
-        <div class="panel-header panel-header-tabs">
+        <div class="panel-header panel-header-tabs" style="justify-content: space-between; align-items: center; display: flex;">
           <div class="panel-tabs" role="tablist">
             <button class="panel-tab active" role="tab" aria-selected="true"
                     data-tab="call-trace" id="tab-call-trace">Call Trace</button>
@@ -410,6 +447,10 @@
                     data-tab="raw-output" id="tab-raw-output">Raw Output</button>
             <button class="panel-tab" role="tab" aria-selected="false"
                     data-tab="state-diagram" id="tab-state-diagram">State Diagram</button>
+          </div>
+          <div class="form-check form-switch" style="margin: 0; padding: 0; display: flex; align-items: center; gap: 0.5rem; padding-right: 0.5rem;">
+            <label class="text-xs text-muted" style="text-transform: none; letter-spacing: normal; font-size: 0.65rem;" for="minimize-toggle">Minimize</label>
+            <input class="form-check-input" type="checkbox" id="minimize-toggle" style="margin: 0; cursor: pointer;">
           </div>
         </div>
         <div class="panel-body" id="trace-panel">
@@ -449,8 +490,16 @@
 
       <!-- Panel 3: Variables -->
       <div class="report-panel" id="panel-vars">
-        <div class="panel-header">
-          <i class="fa-solid fa-database"></i> VARIABLES
+        <div class="panel-header" style="justify-content: space-between;">
+          <div style="display: flex; gap: 0.25rem; align-items: center;">
+            <i class="fa-solid fa-database"></i> VARIABLES
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; padding-right: 0.5rem;">
+            <div class="form-check form-switch" style="margin: 0; padding: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <label class="text-xs text-muted" style="text-transform: none; letter-spacing: normal; font-size: 0.65rem;" for="diff-toggle">Diff Mode</label>
+              <input class="form-check-input" type="checkbox" id="diff-toggle" style="margin: 0; cursor: pointer;">
+            </div>
+          </div>
         </div>
         <div class="panel-body" id="vars-panel">
           <p class="panel-placeholder">

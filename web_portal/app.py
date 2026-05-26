@@ -367,7 +367,16 @@ def new_run():
 def active_verification():
     return render_template("active.html")
 
+@app.route("/counterexample")
+@login_required
+def counterexample_redirect():
+    audit_id = request.args.get("audit_id")
+    if audit_id:
+        return redirect(url_for("counterexample_analysis", audit_id=audit_id))
+    return redirect(url_for("counterexample_latest"))
+
 @app.route("/counterexample/latest")
+@login_required
 def counterexample_latest():
     # Resolve "latest" to an actual audit row so the template gets real data
     audit = {}
@@ -382,6 +391,14 @@ def counterexample_latest():
     except Exception:
         pass
     return render_template("counterexample.html", audit_id=audit.get("id", "latest"), audit=audit)
+
+@app.route("/trace")
+@login_required
+def trace_redirect():
+    audit_id = request.args.get("audit_id")
+    if audit_id:
+        return redirect(url_for("trace_analysis", audit_id=audit_id))
+    return redirect(url_for("trace_latest"))
 
 @app.route("/trace/latest")
 @login_required
@@ -434,6 +451,7 @@ def trace_viewer(audit_id):
     return render_template("trace.html", audit_id=audit_id, audit=audit)
 
 @app.route("/visualization")
+@login_required
 def visualization():
     return render_template("visualization.html")
 

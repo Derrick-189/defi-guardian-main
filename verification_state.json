@@ -56,7 +56,8 @@
     "model_name": ""
   },
   "active_tool": "SPIN",
-  "active_status": "IDLE",
+  "active_status": "PENDING",
   "success": null,
-  "ltl_results": []
+  "ltl_results": [],
+  "model_name": "VulnerableVault.pml"
 }
