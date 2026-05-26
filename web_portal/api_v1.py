@@ -262,10 +262,13 @@ def api_sync_audit():
     if sync_token and provided_token == sync_token:
         try:
             payload = request.get_json()
-            if not payload or "jobs" not in payload:
+            if not payload or ("jobs" not in payload and "users" not in payload):
                 return jsonify({"status": "error", "message": "Invalid sync payload"}), 400
             
-            n = sync_audit_log(audit_jobs=payload["jobs"])
+            n = sync_audit_log(
+                audit_jobs=payload.get("jobs"),
+                users=payload.get("users")
+            )
             return jsonify({"status": "success", "new_records": n})
         except Exception as e:
             return jsonify({"status": "error", "error": str(e)}), 500
@@ -459,7 +462,8 @@ def api_run():
             os.makedirs(job_dir, exist_ok=True)
 
             # Persist the contract text so the worker can find it
-            contract_path = os.path.join(job_dir, "contract.pml")
+            ext = os.path.splitext(filename)[1] or ".pml"
+            contract_path = os.path.join(job_dir, f"contract{ext}")
             with open(contract_path, "w", encoding="utf-8") as _cf:
                 _cf.write(contract_content)
 

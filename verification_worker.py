@@ -91,6 +91,14 @@ def run_verification_job(job):
             output_dir=output_dir
         )
 
+        # Ensure success key exists
+        if "success" not in result:
+            if result.get("status") in ("error", "failed", "timeout"):
+                result["success"] = False
+            else:
+                # For spin/certora etc which use counterexample_found
+                result["success"] = not result.get("counterexample_found", False)
+
         # --- 1. Parse traces if a trail file was produced ---
         trace_data = None
         try:
@@ -247,7 +255,33 @@ def run_verification_job(job):
         complete_job(job_id, result)
         print(f"Job {job_id} completed: {result.get('status')}")
 
-        # --- 4. Cleanup intermediate files ---
+        # --- 5. Notify UI via SocketIO ---
+        try:
+            from web_portal.app import socketio
+            event_data = {
+                "tool": tool.upper(),
+                "status": audit.status,
+                "filename": Path(contract_path).name,
+                "states": audit.states_explored,
+                "transitions": audit.transitions,
+                "depth": audit.depth_reached,
+                "ltl_results": result.get("ltl_results", []),
+                "job_id": job_id
+            }
+            socketio.emit("verification_complete", event_data, namespace="/")
+            
+            # Also emit a general state update
+            state_path = Path(ROOT_DIR) / "verification_state.json"
+            if state_path.exists():
+                import json as _json
+                state = _json.loads(state_path.read_text(encoding="utf-8"))
+                socketio.emit("verification_update", state, namespace="/")
+            
+            print(f"SocketIO notification sent for {tool}")
+        except Exception as e:
+            print(f"SocketIO notification failed: {e}")
+
+        # --- 6. Cleanup intermediate files ---
         try:
             for tmp_ext in ["pan.c", "pan.b", "pan.m", "pan.p", "pan.t", "pan"]:
                 tmp_file = Path(output_dir) / tmp_ext

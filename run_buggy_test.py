@@ -45,7 +45,7 @@ ltl safety_reentrancy { [] !(balance < 0) }
         "tool": "SPIN",
         "code": buggy_code,
         "filename": "VulnerableVault.pml",
-        "verif_url": "http://127.0.0.1:9006"
+        "verif_url": "http://127.0.0.1:9000" # Real verification server port
     })
     
     if not run_resp.ok:

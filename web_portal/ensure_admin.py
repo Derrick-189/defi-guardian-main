@@ -17,22 +17,19 @@ def ensure_admin():
         # 1. Check/Update demo user
         demo = User.query.filter_by(username='demo').first()
         if demo:
-            if demo.role != 'admin':
-                demo.role = 'admin'
-                db.session.commit()
-                print(f"Updated user '{demo.username}' to admin role.")
-            else:
-                print(f"User '{demo.username}' is already an admin.")
+            demo.role = 'user'
+            db.session.commit()
+            print(f"Updated user '{demo.username}' to user role.")
         else:
             demo = User(
                 username='demo',
                 email='demo@defiguardian.local',
                 password_hash=generate_password_hash("demo1234"),
-                role='admin'
+                role='user'
             )
             db.session.add(demo)
             db.session.commit()
-            print(f"Created user '{demo.username}' with admin role.")
+            print(f"Created user '{demo.username}' with user role.")
 
         # 2. Check/Create dedicated admin user
         admin = User.query.filter_by(username='admin').first()

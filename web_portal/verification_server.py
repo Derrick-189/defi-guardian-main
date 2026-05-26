@@ -340,9 +340,35 @@ def download_artifact(job_id, filename):
 
 def run_real_verification(tool, contract_path, spec_path, output_dir):
     """
-    Execute real verifier based on tool type.
+    Execute real verifier based on tool type with file type awareness.
     """
     try:
+        tool = tool.lower()
+        # Determine file type
+        suffix = Path(contract_path).suffix.lower()
+        is_sol = suffix == '.sol'
+        is_rs = suffix == '.rs'
+
+        # Tool-to-language compatibility check
+        rust_only_tools = ('kani', 'verus', 'prusti', 'creusot')
+        solidity_only_tools = ('certora',)
+
+        if tool in rust_only_tools and not is_rs:
+            return {
+                "status": "error",
+                "success": False,
+                "tool": tool,
+                "output": f"Tool {tool.upper()} only supports Rust files (.rs), but got {suffix}"
+            }
+
+        if tool in solidity_only_tools and not is_sol:
+            return {
+                "status": "error",
+                "success": False,
+                "tool": tool,
+                "output": f"Tool {tool.upper()} only supports Solidity files (.sol), but got {suffix}"
+            }
+
         if tool == "spin":
             return run_spin(contract_path, spec_path, output_dir)
         elif tool == "verus":
@@ -362,17 +388,20 @@ def run_real_verification(tool, contract_path, spec_path, output_dir):
         else:
             return {
                 "status": "error",
+                "success": False,
                 "message": f"Unsupported tool: {tool}"
             }
     except subprocess.TimeoutExpired:
         return {
             "status": "timeout",
+            "success": False,
             "tool": tool,
             "message": "Verification timed out after 300 seconds"
         }
     except Exception as e:
         return {
             "status": "error",
+            "success": False,
             "tool": tool,
             "message": str(e)
         }

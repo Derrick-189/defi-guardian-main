@@ -275,6 +275,8 @@ def services():
          "features": ["Full 8-tool suite", "Rust verification", "Coq & Lean proofs", "Priority support", "API access"]},
         {"name": "Enterprise", "price": -1, "featured": False,
          "features": ["Dedicated instance", "Custom integrations", "SLA guarantee", "On-premise", "Training"]},
+        {"name": "Installation Service", "price": 999, "featured": False, "description": "One-time setup fee",
+         "features": ["Custom & Remote installation", "Toolchain configuration", "Environment optimization", "Development team support", "Server-side hardening"]},
     ]
     return render_template("services.html", plans=plans)
 

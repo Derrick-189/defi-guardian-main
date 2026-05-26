@@ -125,13 +125,31 @@ def _read_trail_content(trail_path: str = None) -> str:
     return ""
 
 
-def sync_audit_log(audit_jobs: list | None = None) -> int:
+def sync_audit_log(audit_jobs: list | None = None, users: list | None = None) -> int:
     """
     Import desktop audit_log.json into DB.
     Inlines log file content so records remain useful on Render where the
     original desktop file paths don't exist.
-    Returns count of new rows added.
+    Also syncs user accounts if provided.
+    Returns count of new audit rows added.
     """
+    if users:
+        from werkzeug.security import generate_password_hash
+        for u in users:
+            uname = u.get("username")
+            if not uname: continue
+            existing_user = User.query.filter_by(username=uname).first()
+            if not existing_user:
+                new_user = User(
+                    username=uname,
+                    email=u.get("email", f"{uname}@defiguardian.local"),
+                    password_hash=u.get("password_hash") or generate_password_hash("default1234"),
+                    role=u.get("role", "user"),
+                    organization=u.get("organization")
+                )
+                db.session.add(new_user)
+        db.session.commit()
+
     if audit_jobs is None:
         if not AUDIT_LOG.exists():
             return 0
@@ -457,14 +475,30 @@ Why3 backend: all obligations discharged.
 """
 
     # Demo user
-    if not User.query.filter_by(username='demo').first():
-        demo_user = User(
+    demo = User.query.filter_by(username='demo').first()
+    if not demo:
+        demo = User(
             username='demo',
             email='demo@defiguardian.local',
             password_hash=generate_password_hash("demo1234"),
             role='user'
         )
-        db.session.add(demo_user)
+        db.session.add(demo)
+    else:
+        demo.role = 'user'
+
+    # Admin user
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User(
+            username='admin',
+            email='admin@defiguardian.local',
+            password_hash=generate_password_hash("admin1234"),
+            role='admin'
+        )
+        db.session.add(admin)
+    else:
+        admin.role = 'admin'
 
     # Seed audit records if empty
     if AuditHistory.query.count() == 0:
