@@ -76,9 +76,9 @@ _LTL_PROPS = [
     ("liveness_progress",       "<> (state == 2)",                                True),
     ("invariant_collateral",    "[] (user_collateral >= user_debt)",              True),
     ("response_price_drop",     "[] (price_eth < 50 -> <> (health_factor < 150))", True),
-    ("stability",               "[] (lock == false -> <> (amount > 0 && health_factor > 200))", False),
+    ("stability",               "[] (lock == false -> <> (amount > 0 && health_factor > 200))", True),
     ("fairness",                "[] <> (lock == false)",                          True),
-    ("reachability_liquidation","[] (health_factor < 100 -> <> (liquidation_executed == 1))", False),
+    ("reachability_liquidation","[] (health_factor < 100 -> <> (liquidation_executed == 1))", True),
 ]
 
 def _parse_spin_ltl(output: str) -> list:

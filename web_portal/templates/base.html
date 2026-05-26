@@ -232,6 +232,11 @@
             <span class="sidebar-icon">👥</span>
             <span>Users</span>
           </a>
+          <a href="{{ url_for('admin_streamlit') }}"
+             class="sidebar-link {% if request.path == url_for('admin_streamlit') %}active{% endif %}">
+            <span class="sidebar-icon">📊</span>
+            <span>Analytics Suite</span>
+          </a>
           {% endif %}
           <a href="{{ url_for('settings') }}"
              class="sidebar-link {% if request.path == '/settings' %}active{% endif %}">

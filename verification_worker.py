@@ -136,6 +136,12 @@ def run_verification_job(job):
                         global_graph.parent.mkdir(parents=True, exist_ok=True)
                         with open(global_graph, "w") as gf:
                             _json.dump(graph, gf, indent=2)
+                    else:
+                        # Clear global graph if no trace (e.g. PASS)
+                        global_graph = Path(ROOT_DIR) / "generated" / "reports" / "state_graph.json"
+                        if global_graph.exists():
+                            with open(global_graph, "w") as gf:
+                                _json.dump({"nodes": [], "edges": []}, gf)
                 except Exception as ge:
                     print(f"State graph generation failed: {ge}")
 
@@ -157,11 +163,14 @@ def run_verification_job(job):
                 ).order_by(AuditHistory.audit_date.desc()).first()
 
             if audit:
-                audit.status = "PASS" if not result.get("counterexample_found") else "FAIL"
+                # FIX: Check success or errors_count instead of missing counterexample_found
+                has_failed = not result.get("success", True) or result.get("errors_count", 0) > 0
+                audit.status = "FAIL" if has_failed else "PASS"
+                
                 audit.states_explored = result.get("states_stored", 0)
                 audit.transitions = result.get("transitions", 0)
                 audit.depth_reached = result.get("depth", 0)
-                audit.verification_output = result.get("stdout", "")[:10000] # Increased limit
+                audit.verification_output = result.get("output", "")[:10000] # Using 'output' instead of 'stdout'
                 audit.report_path = result.get("trail_path", "") or ""
                 audit.trace_data = trace_data
                 audit.job_id = job_id
@@ -182,15 +191,16 @@ def run_verification_job(job):
                 except Exception:
                     pass
 
+                has_failed = not result.get("success", True) or result.get("errors_count", 0) > 0
                 audit = AuditHistory(
                     filename=Path(contract_path).name,
                     file_type=Path(contract_path).suffix or "",
                     tool_used=tool.upper(),
-                    status="PASS" if not result.get("counterexample_found") else "FAIL",
+                    status="FAIL" if has_failed else "PASS",
                     states_explored=result.get("states_stored", 0),
                     transitions=result.get("transitions", 0),
                     depth_reached=result.get("depth", 0),
-                    verification_output=result.get("stdout", "")[:10000],
+                    verification_output=result.get("output", "")[:10000],
                     report_path=result.get("trail_path", "") or "",
                     trace_data=trace_data,
                     source_code=s_code,
@@ -201,7 +211,32 @@ def run_verification_job(job):
             db.session.commit()
             print(f"Database updated for audit {audit.id}")
 
-        # --- 3. Mark job complete in queue DB ---
+            # --- 3. Update global state for UI visibility ---
+            try:
+                from web_portal.api_v1 import load_state, save_state
+                state = load_state()
+                t_low = tool.lower()
+                state[t_low] = {
+                    "status": audit.status,
+                    "timestamp": audit.audit_date.isoformat() if audit.audit_date else "",
+                    "model_name": Path(contract_path).name,
+                    "success": audit.status == "PASS",
+                    "progress": 100,
+                    "ltl_results": result.get("ltl_results", []),
+                    "states_stored": result.get("states_stored", 0),
+                    "transitions": result.get("transitions", 0),
+                    "depth": result.get("depth", 0)
+                }
+                state["active_tool"] = tool.upper()
+                state["active_status"] = audit.status
+                state["success"] = audit.status == "PASS"
+                state["ltl_results"] = result.get("ltl_results", [])
+                save_state(state)
+                print(f"Global state updated for {tool}")
+            except Exception as se:
+                print(f"Global state update failed: {se}")
+
+        # --- 4. Mark job complete in queue DB ---
         complete_job(job_id, result)
         print(f"Job {job_id} completed: {result.get('status')}")
 

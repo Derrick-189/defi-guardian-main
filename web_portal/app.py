@@ -38,6 +38,7 @@ def _augment_path():
         str(home / ".cargo" / "bin"),
         str(home / ".opam" / "default" / "bin"),
         str(home / ".local" / "bin"),
+        str(home / "Library/Python/3.9/bin"), # Common for Certora on macOS
         "/usr/local/bin",
         "/opt/verus",
     ]
@@ -80,6 +81,10 @@ os.makedirs(SPECS_DIR, exist_ok=True)
 # ── SocketIO Setup ────────────────────────────────────────────────────────────
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet",
                     logger=False, engineio_logger=False)
+
+# Initialize Benchmark Runner
+from benchmarks_runner import BenchmarkRunner
+bench_runner = BenchmarkRunner(socketio)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -440,6 +445,15 @@ def specifications():
     contract_src = sol_path.read_text(encoding="utf-8") if sol_path.exists() else ""
     return render_template("specifications.html", contract_src=contract_src)
 
+@app.route("/api/v1/benchmarks/run", methods=["POST"])
+@login_required
+def api_run_benchmarks():
+    if bench_runner.is_running:
+        return jsonify({"status": "already_running"}), 400
+    
+    bench_runner.run_all()
+    return jsonify({"status": "started"})
+
 @app.route("/benchmarks")
 @login_required
 def benchmarks():
@@ -583,6 +597,14 @@ def admin_users():
     
     users = User.query.order_by(User.created_at.desc()).all()
     return render_template("admin_users.html", users=users)
+
+@app.route("/admin/streamlit")
+@login_required
+def admin_streamlit():
+    if getattr(current_user, 'role', 'user') != 'admin':
+        flash("Unauthorized access. Admin privileges required.", "danger")
+        return redirect(url_for("dashboard"))
+    return render_template("streamlit.html")
 
 @app.route("/admin/users/delete/<int:user_id>", methods=["POST"])
 @login_required

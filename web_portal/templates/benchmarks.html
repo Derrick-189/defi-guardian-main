@@ -8,13 +8,34 @@
     <h1 class="page-title"><i class="fa-solid fa-chart-bar"></i> Benchmarks</h1>
     <p class="page-subtitle">Performance and accuracy benchmarks across all verification tools.</p>
   </div>
-  {% if results %}
   <div class="page-header-right">
+    <button class="btn btn-primary btn-sm" id="btn-run-live-bench">
+      <i class="fa-solid fa-play"></i> Run Live Benchmarks
+    </button>
+    {% if results %}
     <button class="btn btn-secondary btn-sm" id="btn-export-csv">
       <i class="fa-solid fa-download"></i> Export CSV
     </button>
+    {% endif %}
   </div>
-  {% endif %}
+</div>
+
+<!-- Live Progress Section (Hidden by default) -->
+<div id="live-bench-container" class="card" style="display:none; margin-bottom:1.5rem; border-color: var(--primary);">
+  <div class="card-header" style="background: rgba(88, 166, 255, 0.05);">
+    <h2 class="card-title text-primary"><i class="fa-solid fa-bolt"></i> Live Performance Tracker</h2>
+    <div class="card-header-actions">
+      <span id="live-bench-status" class="badge badge-info">Initializing...</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div id="live-bench-progress-grid" class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+      <!-- Dynamic tool progress cards will be injected here -->
+    </div>
+    <div id="live-bench-log" class="console-box mt-3" style="max-height: 150px; font-size: 0.8rem;">
+      <div class="console-line text-muted">Waiting for benchmark start...</div>
+    </div>
+  </div>
 </div>
 
 {% if results %}
@@ -178,6 +199,117 @@
   });
 
   var PALETTE = ['#58a6ff','#3fb950','#f78166','#d29922','#bc8cff','#79c0ff','#56d364','#ff7b72'];
+
+  // ── Live Benchmarks Logic ───────────────────────────────────────────
+  var btnRunBench = document.getElementById('btn-run-live-bench');
+  var liveContainer = document.getElementById('live-bench-container');
+  var liveStatus = document.getElementById('live-bench-status');
+  var liveGrid = document.getElementById('live-bench-progress-grid');
+  var liveLog = document.getElementById('live-bench-log');
+
+  if (btnRunBench) {
+    btnRunBench.addEventListener('click', function() {
+      btnRunBench.disabled = true;
+      liveContainer.style.display = 'block';
+      liveGrid.innerHTML = '';
+      liveLog.innerHTML = '<div class="console-line text-info">Starting benchmark suite...</div>';
+      
+      fetch('/api/v1/benchmarks/run', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.status === 'started') {
+            liveStatus.className = 'badge badge-info';
+            liveStatus.innerText = 'Running...';
+          } else {
+            btnRunBench.disabled = false;
+          }
+        })
+        .catch(function(err) {
+          console.error('Bench start error:', err);
+          btnRunBench.disabled = false;
+        });
+    });
+  }
+
+  if (window.DGSocket && window.DGSocket.socket) {
+    var socket = window.DGSocket.socket;
+
+    socket.on('benchmark_start', function(data) {
+      liveLog.innerHTML += '<div class="console-line text-success">Benchmark suite initialized. Total tasks: ' + data.total + '</div>';
+    });
+
+    socket.on('benchmark_update', function(data) {
+      var line = document.createElement('div');
+      line.className = 'console-line';
+      line.innerText = '[' + data.tool + '] ' + data.message;
+      liveLog.appendChild(line);
+      liveLog.scrollTop = liveLog.scrollHeight;
+
+      // Update or create progress card
+      var cardId = 'bench-card-' + data.tool;
+      var card = document.getElementById(cardId);
+      if (!card) {
+        card = document.createElement('div');
+        card.id = cardId;
+        card.className = 'kpi-card';
+        card.innerHTML = 
+          '<div class="kpi-label">' + data.tool + '</div>' +
+          '<div class="kpi-value text-info" style="font-size:1.1rem">Running...</div>' +
+          '<div class="text-muted text-xs mt-1">' + data.contract + '</div>';
+        liveGrid.appendChild(card);
+      } else {
+        card.querySelector('.kpi-value').innerText = 'Running...';
+        card.querySelector('.text-muted').innerText = data.contract;
+      }
+    });
+
+    socket.on('benchmark_step_complete', function(data) {
+      var card = document.getElementById('bench-card-' + data.tool);
+      if (card) {
+        var val = card.querySelector('.kpi-value');
+        val.innerText = data.time.toFixed(3) + 's';
+        val.className = 'kpi-value ' + (data.passed ? 'text-success' : 'text-danger');
+        card.querySelector('.text-muted').innerText = data.contract + ' (Done)';
+      }
+      
+      // Optionally add to table in real-time
+      var tbody = document.getElementById('bench-tbody');
+      if (tbody) {
+        var row = document.createElement('tr');
+        row.className = 'bench-row';
+        row.innerHTML = 
+          '<td><span class="badge badge-tool">' + data.tool + '</span></td>' +
+          '<td class="font-mono text-sm">' + data.contract + '</td>' +
+          '<td class="font-mono">' + data.time.toFixed(3) + '</td>' +
+          '<td class="font-mono">' + (data.states || '—') + '</td>' +
+          '<td>' +
+            '<div class="progress-bar-inline">' +
+              '<div class="progress-bar-track-sm">' +
+                '<div class="progress-bar-fill-sm ' + (data.passed ? 'fill-success' : 'fill-danger') + '" style="width:' + data.pass_rate + '%"></div>' +
+              '</div>' +
+              '<span class="progress-label-sm">' + data.pass_rate + '%</span>' +
+            '</div>' +
+          '</td>' +
+          '<td>' + (data.passed ? '<span class="badge badge-pass">Passed</span>' : '<span class="badge badge-fail">Failed</span>') + '</td>' +
+          '<td class="text-muted text-sm">' + data.date + '</td>';
+        tbody.insertBefore(row, tbody.firstChild);
+      }
+    });
+
+    socket.on('benchmark_complete', function(data) {
+      liveStatus.className = 'badge badge-success';
+      liveStatus.innerText = 'Completed';
+      btnRunBench.disabled = false;
+      liveLog.innerHTML += '<div class="console-line text-success">Benchmark suite completed. ' + data.results_count + ' results saved.</div>';
+      
+      // Trigger a page reload or chart refresh after a short delay
+      setTimeout(function() {
+        if (confirm('Benchmarks complete. Refresh page to update charts?')) {
+          window.location.reload();
+        }
+      }, 1500);
+    });
+  }
 
   // ── Chart 1: Grouped bar — Pass / Fail by tool ─────────────────────────
   var ctx1 = document.getElementById('chart-pass-fail');

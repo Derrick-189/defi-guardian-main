@@ -97,7 +97,11 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
         # Check for results in various formats (direct or nested in result)
         res_data = result.get("result", result) if isinstance(result.get("result"), dict) else result
         
-        status = "PASS" if not res_data.get("counterexample_found") else "FAIL"
+        # FIX: The server returns 'success', but the worker was checking 'counterexample_found'
+        # Also check errors_count for SPIN-specific results.
+        has_failed = not res_data.get("success", True) or res_data.get("errors_count", 0) > 0
+        status = "FAIL" if has_failed else "PASS"
+        
         audit.status = status
         audit.states_explored = res_data.get("states_stored", 0)
         audit.transitions = res_data.get("transitions", 0)

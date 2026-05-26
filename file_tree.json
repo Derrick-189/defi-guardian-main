@@ -57,7 +57,7 @@
           "type": "file",
           "icon": "json",
           "path": "benchmarks/benchmark_results.json",
-          "size": 11196
+          "size": 17598
         },
         {
           "name": "run_benchmarks.py",
@@ -1262,6 +1262,181 @@
               "type": "file",
               "icon": "file",
               "path": "generated/images/state_diagram_1779532044.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779811047.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779811047.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779811112.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779811112.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779811138.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779811138.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779811180.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779811180.png",
+              "size": 436688
+            },
+            {
+              "name": "state_diagram_1779811185.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779811185.png",
+              "size": 436688
+            },
+            {
+              "name": "state_diagram_1779812636.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812636.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812642.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812642.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812672.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812672.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812684.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812684.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812714.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812714.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812749.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812749.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812829.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812829.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812834.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812834.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812837.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812837.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812840.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812840.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812842.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812842.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812844.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812844.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812896.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812896.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779812956.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779812956.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813027.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813027.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813062.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813062.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813095.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813095.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813098.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813098.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813099.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813099.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779813100.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779813100.png",
               "size": 452933
             }
           ]
@@ -4374,6 +4549,13 @@
               "size": 17253
             },
             {
+              "name": "admin_users.html",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/admin_users.html",
+              "size": 4850
+            },
+            {
               "name": "artifacts.html",
               "type": "file",
               "icon": "file",
@@ -4385,14 +4567,14 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/base.html",
-              "size": 15304
+              "size": 15884
             },
             {
               "name": "benchmarks.html",
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/benchmarks.html",
-              "size": 11313
+              "size": 17238
             },
             {
               "name": "contact.html",
@@ -4649,6 +4831,114 @@
                   "size": 900
                 }
               ]
+            },
+            {
+              "name": "job-125",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-125/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-125/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-125/pan.h",
+                  "size": 17812
+                }
+              ]
+            },
+            {
+              "name": "job-126",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-126/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-126/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-126/pan.h",
+                  "size": 17812
+                }
+              ]
+            },
+            {
+              "name": "job-127",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-127/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-127/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-127/pan.h",
+                  "size": 17812
+                }
+              ]
+            },
+            {
+              "name": "job-128",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-128/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-128/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-128/pan.h",
+                  "size": 17812
+                }
+              ]
             }
           ]
         },
@@ -4785,7 +5075,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 60188
+          "size": 62739
         },
         {
           "name": "api_v1.py.bak",
@@ -4799,7 +5089,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/app.py",
-          "size": 27217
+          "size": 29531
         },
         {
           "name": "app.py.bak",
@@ -4813,7 +5103,14 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/audit_db.py",
-          "size": 18945
+          "size": 19404
+        },
+        {
+          "name": "benchmarks_runner.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/benchmarks_runner.py",
+          "size": 4535
         },
         {
           "name": "config.py",
@@ -4827,7 +5124,7 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/defi_guardian.db",
-          "size": 663552
+          "size": 675840
         },
         {
           "name": "defi_guardian.db.migrated",
@@ -4837,11 +5134,25 @@
           "size": 327680
         },
         {
+          "name": "ensure_admin.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/ensure_admin.py",
+          "size": 1996
+        },
+        {
           "name": "llm_spec.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/llm_spec.py",
           "size": 5641
+        },
+        {
+          "name": "make_admin.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/make_admin.py",
+          "size": 303
         },
         {
           "name": "queue_manager.py",
@@ -4851,11 +5162,18 @@
           "size": 1976
         },
         {
+          "name": "reset_state.py",
+          "type": "file",
+          "icon": "python",
+          "path": "web_portal/reset_state.py",
+          "size": 786
+        },
+        {
           "name": "tasks.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/tasks.py",
-          "size": 6234
+          "size": 6464
         },
         {
           "name": "trace_parsers.py",
@@ -4876,7 +5194,7 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/verification_queue.db",
-          "size": 32768
+          "size": 49152
         },
         {
           "name": "verification_server.py",
@@ -4890,7 +5208,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_simulator.py",
-          "size": 15980
+          "size": 15978
         }
       ]
     },
@@ -4955,7 +5273,7 @@
       "type": "file",
       "icon": "text",
       "path": "cookies.txt",
-      "size": 309
+      "size": 375
     },
     {
       "name": "coq_verifier.py",
@@ -5025,7 +5343,7 @@
       "type": "file",
       "icon": "python",
       "path": "desktop_app.py",
-      "size": 267680
+      "size": 269339
     },
     {
       "name": "desktop_bridge.py",
@@ -5074,7 +5392,14 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 171527
+      "size": 178843
+    },
+    {
+      "name": "fix_admin.py",
+      "type": "file",
+      "icon": "python",
+      "path": "fix_admin.py",
+      "size": 936
     },
     {
       "name": "FIXES.md",
@@ -5152,6 +5477,13 @@
       "icon": "python",
       "path": "llm_spec_generator.py",
       "size": 9404
+    },
+    {
+      "name": "make_admin.py",
+      "type": "file",
+      "icon": "python",
+      "path": "make_admin.py",
+      "size": 325
     },
     {
       "name": "metrics.py",
@@ -5284,7 +5616,7 @@
       "type": "file",
       "icon": "file",
       "path": "start_defi_guardian.sh",
-      "size": 10637
+      "size": 11452
     },
     {
       "name": "start_manual.sh",
@@ -5298,7 +5630,7 @@
       "type": "file",
       "icon": "python",
       "path": "sync_to_remote.py",
-      "size": 3339
+      "size": 3737
     },
     {
       "name": "test.v",
@@ -5327,6 +5659,13 @@
       "icon": "python",
       "path": "test_report.py",
       "size": 748
+    },
+    {
+      "name": "test_verification.py",
+      "type": "file",
+      "icon": "python",
+      "path": "test_verification.py",
+      "size": 3470
     },
     {
       "name": "theme_config.json",
@@ -5385,6 +5724,13 @@
       "size": 12891
     },
     {
+      "name": "trigger_benchmarks.py",
+      "type": "file",
+      "icon": "python",
+      "path": "trigger_benchmarks.py",
+      "size": 697
+    },
+    {
       "name": "user_lending.rs",
       "type": "file",
       "icon": "rust",
@@ -5410,14 +5756,14 @@
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 35246
+      "size": 1094
     },
     {
       "name": "verification_worker.py",
       "type": "file",
       "icon": "python",
       "path": "verification_worker.py",
-      "size": 9962
+      "size": 11850
     },
     {
       "name": "verifier_plugins.py",

@@ -257,25 +257,11 @@ class ThemeManager:
 
     # Predefined themes matching the image
     THEMES = {
-        "Solarized Dark": {
-            "bg": "#002b36",
-            "fg": "#839496",
-            "accent": "#268bd2",
-            "success": "#2aa198",
-            "error": "#dc322f",
-            "warning": "#cb4b16",
-            "editor_bg": "#073642",
-            "editor_fg": "#93a1a1",
-            "terminal_bg": "#002b36",
-            "terminal_fg": "#00ff00",
-            "sidebar_bg": "#002b36",
-            "button_bg": "#268bd2",
-            "button_hover": "#2aa198"
-        },
         "Dark+ (Default)": {
             "bg": "#1e1e1e",
             "fg": "#cccccc",
             "accent": "#007acc",
+            "accent_secondary": "#0451a5",
             "success": "#6a9955",
             "error": "#f48771",
             "warning": "#dcdcaa",
@@ -285,12 +271,33 @@ class ThemeManager:
             "terminal_fg": "#00ff00",
             "sidebar_bg": "#252526",
             "button_bg": "#007acc",
-            "button_hover": "#0451a5"
+            "button_hover": "#0451a5",
+            "card_bg": "#2d2d2d",
+            "border": "#3e3e42",
+        },
+        "Solarized Dark": {
+            "bg": "#002b36",
+            "fg": "#839496",
+            "accent": "#268bd2",
+            "accent_secondary": "#2aa198",
+            "success": "#2aa198",
+            "error": "#dc322f",
+            "warning": "#cb4b16",
+            "editor_bg": "#073642",
+            "editor_fg": "#93a1a1",
+            "terminal_bg": "#002b36",
+            "terminal_fg": "#00ff00",
+            "sidebar_bg": "#002b36",
+            "button_bg": "#268bd2",
+            "button_hover": "#2aa198",
+            "card_bg": "#073642",
+            "border": "#586e75",
         },
         "Monokai": {
             "bg": "#272822",
             "fg": "#f8f8f2",
             "accent": "#66d9ef",
+            "accent_secondary": "#a6e22e",
             "success": "#a6e22e",
             "error": "#f92672",
             "warning": "#fd971f",
@@ -300,12 +307,15 @@ class ThemeManager:
             "terminal_fg": "#00ff00",
             "sidebar_bg": "#272822",
             "button_bg": "#66d9ef",
-            "button_hover": "#a6e22e"
+            "button_hover": "#a6e22e",
+            "card_bg": "#3e3d32",
+            "border": "#49483e",
         },
         "Tokyo Night": {
             "bg": "#1a1b26",
             "fg": "#a9b1d6",
             "accent": "#7aa2f7",
+            "accent_secondary": "#bb9af7",
             "success": "#9ece6a",
             "error": "#f7768e",
             "warning": "#e0af68",
@@ -315,12 +325,15 @@ class ThemeManager:
             "terminal_fg": "#00ff00",
             "sidebar_bg": "#16161e",
             "button_bg": "#7aa2f7",
-            "button_hover": "#bb9af7"
+            "button_hover": "#bb9af7",
+            "card_bg": "#24283b",
+            "border": "#414868",
         },
         "Abyss": {
             "bg": "#0b0c10",
             "fg": "#c5c6c7",
             "accent": "#45a29e",
+            "accent_secondary": "#66fcf1",
             "success": "#66fcf1",
             "error": "#f05454",
             "warning": "#f2a900",
@@ -330,12 +343,15 @@ class ThemeManager:
             "terminal_fg": "#66fcf1",
             "sidebar_bg": "#1f2833",
             "button_bg": "#45a29e",
-            "button_hover": "#66fcf1"
+            "button_hover": "#66fcf1",
+            "card_bg": "#1f2833",
+            "border": "#45a29e",
         },
         "Quiet Light": {
             "bg": "#f3f3f3",
             "fg": "#333333",
             "accent": "#0066cc",
+            "accent_secondary": "#0052a3",
             "success": "#008000",
             "error": "#cc0000",
             "warning": "#e6b800",
@@ -345,7 +361,45 @@ class ThemeManager:
             "terminal_fg": "#008000",
             "sidebar_bg": "#eaeaea",
             "button_bg": "#0066cc",
-            "button_hover": "#0052a3"
+            "button_hover": "#0052a3",
+            "card_bg": "#ffffff",
+            "border": "#cccccc",
+        },
+        "Nord": {
+            "bg": "#2e3440",
+            "fg": "#eceff4",
+            "accent": "#88c0d0",
+            "accent_secondary": "#81a1c1",
+            "success": "#a3be8c",
+            "error": "#bf616a",
+            "warning": "#ebcb8b",
+            "editor_bg": "#3b4252",
+            "editor_fg": "#e5e9f0",
+            "terminal_bg": "#242933",
+            "terminal_fg": "#8fbcbb",
+            "sidebar_bg": "#2e3440",
+            "button_bg": "#5e81ac",
+            "button_hover": "#81a1c1",
+            "card_bg": "#3b4252",
+            "border": "#4c566a",
+        },
+        "Matrix": {
+            "bg": "#0a0f0a",
+            "fg": "#00ff41",
+            "accent": "#00ff41",
+            "accent_secondary": "#008f11",
+            "success": "#00ff41",
+            "error": "#ff3333",
+            "warning": "#ffff00",
+            "editor_bg": "#0d140d",
+            "editor_fg": "#00ff41",
+            "terminal_bg": "#050805",
+            "terminal_fg": "#00ff41",
+            "sidebar_bg": "#0a0f0a",
+            "button_bg": "#008f11",
+            "button_hover": "#00cc1a",
+            "card_bg": "#111a11",
+            "border": "#1a3a1a",
         }
     }
 
@@ -1311,34 +1365,31 @@ class FormalVerifierApp(ctk.CTk):
         self.file_info.pack(fill="x", padx=20, pady=(0, 4))
 
         # ── CORE VERIFICATION ────────────────────────────────────────
-        self._sidebar_section("VERIFICATION")
+        self._sidebar_section("FORMAL VERIFICATION")
 
         self.verify_btn = self._sidebar_item_button(
-            "Run SPIN Verification", self.run_verification,
+            "Run SPIN (Promela)", self.run_verification,
             icon="▶", tag="spin", state="disabled"
         )
         self.stop_spin_btn = self._sidebar_stop_button("spin")
-
-        self.coq_btn = self._sidebar_item_button(
-            "Coq Proof Assistant", self.verify_with_coq, icon="∀", tag="coq"
-        )
-        self.stop_coq_btn = self._sidebar_stop_button("coq")
-
-        # ── BYTECODE VERIFICATION ────────────────────────────────────
-        self._sidebar_section("BYTECODE")
 
         self.verify_with_certora_btn = self._sidebar_item_button(
             "Verify with Certora", self.verify_with_certora, icon="⬡", tag="certora"
         )
         self.stop_certora_btn = self._sidebar_stop_button("certora")
 
+        self.coq_btn = self._sidebar_item_button(
+            "Coq Proof Assistant", self.verify_with_coq, icon="∀", tag="coq"
+        )
+        self.stop_coq_btn = self._sidebar_stop_button("coq")
+
         self.lean_btn = self._sidebar_item_button(
             "Lean Theorem Prover", self.run_lean_verification, icon="λ", tag="lean"
         )
         self.stop_lean_btn = self._sidebar_stop_button("lean")
 
-        # ── RUST ANALYSIS ────────────────────────────────────────────
-        self._sidebar_section("RUST ANALYSIS")
+        # ── RUST & ADVANCED ──────────────────────────────────────────
+        self._sidebar_section("RUST & ADVANCED")
 
         self.kani_btn = self._sidebar_item_button(
             "Kani Model Checker", self.verify_with_kani, icon="🦀", tag="kani"

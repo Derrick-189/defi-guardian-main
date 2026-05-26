@@ -295,6 +295,47 @@ def api_audit_log_raw():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# ── Streamlit Control ─────────────────────────────────────────────────────────
+_streamlit_proc = None
+
+@api_v1.route("/streamlit/start")
+@login_required
+def streamlit_start():
+    global _streamlit_proc
+    if getattr(current_user, 'role', 'user') != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    if _streamlit_proc and _streamlit_proc.poll() is None:
+        return jsonify({"status": "already_running"})
+    
+    try:
+        # root app.py is PROJECT_DIR / "app.py"
+        cmd = [sys.executable, "-m", "streamlit", "run", str(PROJECT_DIR / "app.py"), 
+               "--server.port", "8501", "--server.address", "0.0.0.0", "--server.headless", "true"]
+        _streamlit_proc = subprocess.Popen(cmd, cwd=str(PROJECT_DIR))
+        return jsonify({"status": "starting"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_v1.route("/streamlit/stop")
+@login_required
+def streamlit_stop():
+    global _streamlit_proc
+    if getattr(current_user, 'role', 'user') != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    if _streamlit_proc:
+        _streamlit_proc.terminate()
+        _streamlit_proc = None
+    return jsonify({"status": "stopped"})
+
+@api_v1.route("/streamlit/status")
+@login_required
+def streamlit_status():
+    global _streamlit_proc
+    running = _streamlit_proc is not None and _streamlit_proc.poll() is None
+    return jsonify({"running": running})
+
 
 @api_v1.route("/sync-audit-remote", methods=["POST"])
 @login_required
@@ -350,6 +391,23 @@ def api_run():
     filename = request.form.get("filename", "contract")
     spec_text = request.form.get("spec_text", "")
     code = request.form.get("code", "")
+
+    # ── Reset Global State for a Fresh Run ──────────────────────────────────
+    # This prevents old "FAIL" or "PASS" statuses from appearing in the UI
+    state = load_state()
+    TOOLS = ["spin", "coq", "lean", "certora", "kani", "prusti", "creusot", "verus"]
+    for t in TOOLS:
+        if t not in state:
+            state[t] = {}
+        state[t]["status"] = "Not run"
+        state[t]["progress"] = 0
+        state[t]["success"] = None
+    state["active_tool"] = tool
+    state["active_status"] = "PENDING"
+    state["model_name"] = filename
+    state["success"] = None
+    state["ltl_results"] = []
+    save_state(state)
 
     # Handle file uploads
     contract_content = code
