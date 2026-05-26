@@ -141,6 +141,38 @@ def migrate(app=None, db=None, User=None, AuditHistory=None, ContactMessage=None
     conn.close()
     print("Migration complete!")
 
+def migrate_legacy_sqlite(legacy_path, app, db, User):
+    """Sync users from a legacy Streamlit database into the active DB."""
+    if not os.path.exists(legacy_path):
+        return
+
+    print(f"Syncing legacy users from {legacy_path}...")
+    try:
+        conn = sqlite3.connect(legacy_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        rows = cursor.execute("SELECT * FROM users").fetchall()
+        
+        with app.app_context():
+            added = 0
+            for row in rows:
+                if not User.query.filter_by(username=row['username']).first():
+                    user = User(
+                        username=row['username'],
+                        email=row['email'],
+                        password_hash=row['password_hash'],
+                        organization=row.get('organization'),
+                        role=row.get('role', 'user'),
+                        created_at=_parse_dt(row.get('created_at'))
+                    )
+                    db.session.add(user)
+                    added += 1
+            db.session.commit()
+            print(f"Successfully synced {added} legacy users.")
+        conn.close()
+    except Exception as e:
+        print(f"Legacy sync failed: {e}")
+
 if __name__ == "__main__":
     if not os.environ.get("DATABASE_URL"):
         print("Error: DATABASE_URL environment variable not set.")

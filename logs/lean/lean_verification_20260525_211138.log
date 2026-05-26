@@ -1,0 +1,19 @@
+=== LEAN VERIFICATION LOG ===
+timestamp: 2026-05-25T21:11:38.651694
+file: /home/slade/Downloads/ALL/IERC3156FlashBorrower.sol
+
+--- STDOUT ---
+/tmp/tmp7mnjn63n.lean:39:34: error: Application type mismatch: The argument
+  lock
+has type
+  Nat
+but is expected to have type
+  Prop
+in the application
+  And lock
+/tmp/tmp7mnjn63n.lean:49:40: error: unexpected token '<'; expected term
+balance_non_negative (b : Nat) : b ≥ 0
+lock_acquired (locked : Bool) (h : locked = false) : lock_after_op locked = true
+
+
+--- STDERR ---

@@ -1,0 +1,9 @@
+=== CERTORA VERIFICATION LOG ===
+timestamp: 2026-05-25T21:10:55.021207
+file: /home/slade/Downloads/ALL/IERC3156FlashBorrower.sol
+
+--- STDOUT ---
+[Errno 21] Is a directory: '.certora_internal/latest'
+
+
+--- STDERR ---

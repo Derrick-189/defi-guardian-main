@@ -95,7 +95,7 @@
               "type": "file",
               "icon": "file",
               "path": "certora/confs/IERC3156FlashBorrower.conf",
-              "size": 426
+              "size": 436
             },
             {
               "name": "Kabvote.conf",
@@ -433,6 +433,13 @@
           "size": 12121
         },
         {
+          "name": "spiral.txt",
+          "type": "file",
+          "icon": "text",
+          "path": "console_exports/spiral.txt",
+          "size": 16631
+        },
+        {
           "name": "statev.txt",
           "type": "file",
           "icon": "text",
@@ -501,6 +508,128 @@
           "icon": "text",
           "path": "console_exports/zara.txt",
           "size": 16646
+        }
+      ]
+    },
+    {
+      "name": "defi-guardian-fixes",
+      "type": "folder",
+      "children": [
+        {
+          "name": "fixes",
+          "type": "folder",
+          "children": [
+            {
+              "name": "static",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "js",
+                  "type": "folder",
+                  "children": [
+                    {
+                      "name": "dashboard_fixed.js",
+                      "type": "file",
+                      "icon": "file",
+                      "path": "defi-guardian-fixes/fixes/static/js/dashboard_fixed.js",
+                      "size": 18801
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "web_portal",
+          "type": "folder",
+          "children": [
+            {
+              "name": "static",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "js",
+                  "type": "folder",
+                  "children": [
+                    {
+                      "name": "dashboard.js",
+                      "type": "file",
+                      "icon": "file",
+                      "path": "defi-guardian-fixes/web_portal/static/js/dashboard.js",
+                      "size": 10351
+                    },
+                    {
+                      "name": "dashboard_fixed.js",
+                      "type": "file",
+                      "icon": "file",
+                      "path": "defi-guardian-fixes/web_portal/static/js/dashboard_fixed.js",
+                      "size": 18801
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "templates",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "logs_modal_patch.html",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "defi-guardian-fixes/web_portal/templates/logs_modal_patch.html",
+                  "size": 11917
+                }
+              ]
+            },
+            {
+              "name": "api_v1_patch.py",
+              "type": "file",
+              "icon": "python",
+              "path": "defi-guardian-fixes/web_portal/api_v1_patch.py",
+              "size": 19134
+            }
+          ]
+        },
+        {
+          "name": "apply_fixes.py",
+          "type": "file",
+          "icon": "python",
+          "path": "defi-guardian-fixes/apply_fixes.py",
+          "size": 35041
+        },
+        {
+          "name": "README.md",
+          "type": "file",
+          "icon": "file",
+          "path": "defi-guardian-fixes/README.md",
+          "size": 4641
+        }
+      ]
+    },
+    {
+      "name": "fixes",
+      "type": "folder",
+      "children": [
+        {
+          "name": "static",
+          "type": "folder",
+          "children": [
+            {
+              "name": "js",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "dashboard_fixed.js",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "fixes/static/js/dashboard_fixed.js",
+                  "size": 18801
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1120,6 +1249,20 @@
               "icon": "file",
               "path": "generated/images/state_diagram_1779298264.png",
               "size": 452933
+            },
+            {
+              "name": "state_diagram_1779531501.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779531501.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1779532044.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1779532044.png",
+              "size": 452933
             }
           ]
         },
@@ -1262,20 +1405,20 @@
               "type": "file",
               "icon": "text",
               "path": "generated/reports/active_file.txt",
-              "size": 11
+              "size": 25
             },
             {
               "name": "audit_log.json",
               "type": "file",
               "icon": "json",
               "path": "generated/reports/audit_log.json",
-              "size": 272301
+              "size": 282403
             },
             {
-              "name": "dashboard_users.db",
+              "name": "dashboard_users.db.synced",
               "type": "file",
               "icon": "file",
-              "path": "generated/reports/dashboard_users.db",
+              "path": "generated/reports/dashboard_users.db.synced",
               "size": 24576
             },
             {
@@ -1290,7 +1433,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/state_graph.json",
-              "size": 534
+              "size": 548
             },
             {
               "name": "verification_report.pdf",
@@ -1304,7 +1447,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/verification_state.json",
-              "size": 23109
+              "size": 23129
             }
           ]
         },
@@ -1609,6 +1752,20 @@
               "icon": "log",
               "path": "logs/certora/certora_verification_20260515_194031.log",
               "size": 189
+            },
+            {
+              "name": "certora_verification_20260523_142132.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260523_142132.log",
+              "size": 208
+            },
+            {
+              "name": "certora_verification_20260525_211055.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/certora/certora_verification_20260525_211055.log",
+              "size": 216
             }
           ]
         },
@@ -2224,6 +2381,20 @@
               "icon": "log",
               "path": "logs/coq/coq_verification_20260515_194027.log",
               "size": 469
+            },
+            {
+              "name": "coq_verification_20260523_142124.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260523_142124.log",
+              "size": 479
+            },
+            {
+              "name": "coq_verification_20260525_211045.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260525_211045.log",
+              "size": 487
             }
           ]
         },
@@ -2461,6 +2632,20 @@
               "icon": "log",
               "path": "logs/lean/lean_verification_20260515_194037.log",
               "size": 2050
+            },
+            {
+              "name": "lean_verification_20260523_142139.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260523_142139.log",
+              "size": 509
+            },
+            {
+              "name": "lean_verification_20260525_211138.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260525_211138.log",
+              "size": 517
             }
           ]
         },
@@ -3672,6 +3857,20 @@
               "size": 9738
             },
             {
+              "name": "spin_verification_20260523_142112.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260523_142112.log",
+              "size": 9744
+            },
+            {
+              "name": "spin_verification_20260525_211024.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260525_211024.log",
+              "size": 9755
+            },
+            {
               "name": "translated_output.pml.trail",
               "type": "file",
               "icon": "file",
@@ -3685,7 +3884,7 @@
           "type": "file",
           "icon": "log",
           "path": "logs/portal_server.log",
-          "size": 1198
+          "size": 2539
         },
         {
           "name": "spin.log",
@@ -4061,7 +4260,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/css/style.css",
-                  "size": 48024
+                  "size": 49682
                 }
               ]
             },
@@ -4087,14 +4286,14 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/counterexample.js",
-                  "size": 23689
+                  "size": 30436
                 },
                 {
                   "name": "dashboard.js",
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/dashboard.js",
-                  "size": 10351
+                  "size": 18801
                 },
                 {
                   "name": "main.js",
@@ -4136,7 +4335,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/websocket-client.js",
-                  "size": 1055
+                  "size": 2737
                 }
               ]
             }
@@ -4165,6 +4364,13 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/active.html",
+              "size": 19115
+            },
+            {
+              "name": "active.html.bak",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/active.html.bak",
               "size": 17253
             },
             {
@@ -4179,7 +4385,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/base.html",
-              "size": 15379
+              "size": 15304
             },
             {
               "name": "benchmarks.html",
@@ -4200,7 +4406,14 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/counterexample.html",
-              "size": 20650
+              "size": 24000
+            },
+            {
+              "name": "counterexample.html.bak",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/counterexample.html.bak",
+              "size": 16582
             },
             {
               "name": "dashboard.html",
@@ -4235,6 +4448,13 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/logs.html",
+              "size": 13859
+            },
+            {
+              "name": "logs.html.bak",
+              "type": "file",
+              "icon": "file",
+              "path": "web_portal/templates/logs.html.bak",
               "size": 13850
             },
             {
@@ -4314,97 +4534,121 @@
           "type": "folder",
           "children": [
             {
-              "name": "job-125",
+              "name": "job-109",
               "type": "folder",
               "children": [
                 {
                   "name": "contract.pml",
                   "type": "file",
                   "icon": "promela",
-                  "path": "web_portal/uploads/job-125/contract.pml",
-                  "size": 56
+                  "path": "web_portal/uploads/job-109/contract.pml",
+                  "size": 2018
                 }
               ]
             },
             {
-              "name": "job-126",
+              "name": "job-110",
               "type": "folder",
               "children": [
                 {
                   "name": "contract.pml",
                   "type": "file",
                   "icon": "promela",
-                  "path": "web_portal/uploads/job-126/contract.pml",
-                  "size": 41
-                },
-                {
-                  "name": "pan.h",
-                  "type": "file",
-                  "icon": "file",
-                  "path": "web_portal/uploads/job-126/pan.h",
-                  "size": 15957
+                  "path": "web_portal/uploads/job-110/contract.pml",
+                  "size": 2018
                 }
               ]
             },
             {
-              "name": "job-127",
+              "name": "job-111",
               "type": "folder",
               "children": [
                 {
                   "name": "contract.pml",
                   "type": "file",
                   "icon": "promela",
-                  "path": "web_portal/uploads/job-127/contract.pml",
-                  "size": 41
-                },
-                {
-                  "name": "pan.h",
-                  "type": "file",
-                  "icon": "file",
-                  "path": "web_portal/uploads/job-127/pan.h",
-                  "size": 15957
+                  "path": "web_portal/uploads/job-111/contract.pml",
+                  "size": 2018
                 }
               ]
             },
             {
-              "name": "job-128",
+              "name": "job-112",
               "type": "folder",
               "children": [
                 {
                   "name": "contract.pml",
                   "type": "file",
                   "icon": "promela",
-                  "path": "web_portal/uploads/job-128/contract.pml",
-                  "size": 41
-                },
-                {
-                  "name": "pan.h",
-                  "type": "file",
-                  "icon": "file",
-                  "path": "web_portal/uploads/job-128/pan.h",
-                  "size": 15957
+                  "path": "web_portal/uploads/job-112/contract.pml",
+                  "size": 2018
                 }
               ]
             },
             {
-              "name": "job-129",
+              "name": "job-113",
               "type": "folder",
               "children": [
                 {
                   "name": "contract.pml",
                   "type": "file",
                   "icon": "promela",
-                  "path": "web_portal/uploads/job-129/contract.pml",
-                  "size": 56
+                  "path": "web_portal/uploads/job-113/contract.pml",
+                  "size": 2018
                 }
               ]
             },
             {
-              "name": "IERC3156FlashBorrower.sol",
-              "type": "file",
-              "icon": "solidity",
-              "path": "web_portal/uploads/IERC3156FlashBorrower.sol",
-              "size": 900
+              "name": "job-114",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-114/contract.pml",
+                  "size": 900
+                }
+              ]
+            },
+            {
+              "name": "job-115",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-115/contract.pml",
+                  "size": 900
+                }
+              ]
+            },
+            {
+              "name": "job-116",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-116/contract.pml",
+                  "size": 900
+                }
+              ]
+            },
+            {
+              "name": "job-117",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-117/contract.pml",
+                  "size": 900
+                }
+              ]
             }
           ]
         },
@@ -4541,14 +4785,21 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 35062
+          "size": 60188
+        },
+        {
+          "name": "api_v1.py.bak",
+          "type": "file",
+          "icon": "file",
+          "path": "web_portal/api_v1.py.bak",
+          "size": 42190
         },
         {
           "name": "app.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/app.py",
-          "size": 26550
+          "size": 27217
         },
         {
           "name": "app.py.bak",
@@ -4562,28 +4813,21 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/audit_db.py",
-          "size": 16073
+          "size": 18945
         },
         {
           "name": "config.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/config.py",
-          "size": 1996
+          "size": 2573
         },
         {
           "name": "defi_guardian.db",
           "type": "file",
           "icon": "file",
           "path": "web_portal/defi_guardian.db",
-          "size": 618496
-        },
-        {
-          "name": "defi_guardian.db-shm",
-          "type": "file",
-          "icon": "file",
-          "path": "web_portal/defi_guardian.db-shm",
-          "size": 32768
+          "size": 663552
         },
         {
           "name": "defi_guardian.db.migrated",
@@ -4611,14 +4855,14 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/tasks.py",
-          "size": 5171
+          "size": 6234
         },
         {
           "name": "trace_parsers.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/trace_parsers.py",
-          "size": 36609
+          "size": 36749
         },
         {
           "name": "utils.py",
@@ -4632,23 +4876,30 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/verification_queue.db",
-          "size": 16384
+          "size": 32768
         },
         {
           "name": "verification_server.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_server.py",
-          "size": 20968
+          "size": 22010
         },
         {
           "name": "verification_simulator.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_simulator.py",
-          "size": 30170
+          "size": 15980
         }
       ]
+    },
+    {
+      "name": "_spin_nvr.tmp",
+      "type": "file",
+      "icon": "file",
+      "path": "_spin_nvr.tmp",
+      "size": 1983
     },
     {
       "name": "aeneas_integration.py",
@@ -4670,6 +4921,13 @@
       "icon": "python",
       "path": "app.py",
       "size": 146442
+    },
+    {
+      "name": "apply_fixes.py",
+      "type": "file",
+      "icon": "python",
+      "path": "apply_fixes.py",
+      "size": 35041
     },
     {
       "name": "check_app.py",
@@ -4697,7 +4955,7 @@
       "type": "file",
       "icon": "text",
       "path": "cookies.txt",
-      "size": 233
+      "size": 309
     },
     {
       "name": "coq_verifier.py",
@@ -4816,7 +5074,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 164646
+      "size": 171527
     },
     {
       "name": "FIXES.md",
@@ -4907,7 +5165,7 @@
       "type": "file",
       "icon": "python",
       "path": "migrate_sqlite_to_postgres.py",
-      "size": 6170
+      "size": 7422
     },
     {
       "name": "my_contract.verify.yaml",
@@ -4921,28 +5179,14 @@
       "type": "file",
       "icon": "file",
       "path": "pan.b",
-      "size": 341
-    },
-    {
-      "name": "pan.c",
-      "type": "file",
-      "icon": "file",
-      "path": "pan.c",
-      "size": 329785
-    },
-    {
-      "name": "pan.h",
-      "type": "file",
-      "icon": "file",
-      "path": "pan.h",
-      "size": 16320
+      "size": 1824
     },
     {
       "name": "pan.m",
       "type": "file",
       "icon": "file",
       "path": "pan.m",
-      "size": 1216
+      "size": 27083
     },
     {
       "name": "pan.p",
@@ -4956,7 +5200,7 @@
       "type": "file",
       "icon": "file",
       "path": "pan.t",
-      "size": 18074
+      "size": 28070
     },
     {
       "name": "PROJECT_STRUCTURE.md",
@@ -4977,7 +5221,7 @@
       "type": "file",
       "icon": "file",
       "path": "README.md",
-      "size": 1286
+      "size": 1349
     },
     {
       "name": "repro_prusti.py",
@@ -5036,6 +5280,27 @@
       "size": 11324
     },
     {
+      "name": "start_defi_guardian.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "start_defi_guardian.sh",
+      "size": 10637
+    },
+    {
+      "name": "start_manual.sh",
+      "type": "file",
+      "icon": "file",
+      "path": "start_manual.sh",
+      "size": 6899
+    },
+    {
+      "name": "sync_to_remote.py",
+      "type": "file",
+      "icon": "python",
+      "path": "sync_to_remote.py",
+      "size": 3339
+    },
+    {
       "name": "test.v",
       "type": "file",
       "icon": "file",
@@ -5076,6 +5341,13 @@
       "icon": "python",
       "path": "themes.py",
       "size": 2997
+    },
+    {
+      "name": "TODO.md",
+      "type": "file",
+      "icon": "file",
+      "path": "TODO.md",
+      "size": 648
     },
     {
       "name": "TOOL_INTEGRATION_GUIDE.md",
@@ -5138,7 +5410,7 @@
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 23109
+      "size": 35246
     },
     {
       "name": "verification_worker.py",

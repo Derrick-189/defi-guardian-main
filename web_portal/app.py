@@ -91,20 +91,30 @@ from web_portal.audit_db import db, User, AuditHistory, ContactMessage, init_db,
 from utils import _load_state_graph, _parse_spin_output_to_steps, _spin_recs
 import llm_spec
 
-# ── Automatic Migration (for Render Free Tier) ───────────────────────────────
+# ── Automatic Migration (for Render Free Tier & Legacy Sync) ────────────────
 def _auto_migrate():
-    """Automatically migrate SQLite data to Postgres on startup if needed."""
+    """Automatically migrate data to the active database on startup."""
     try:
-        sqlite_path = PORTAL_DIR / "defi_guardian.db"
-        if sqlite_path.exists() and os.environ.get("DATABASE_URL"):
-            print("Detected SQLite database and DATABASE_URL. Starting auto-migration...")
-            # Import inside function to avoid circular dependency
+        # 1. Legacy Streamlit DB -> SQLite Portal DB (or Postgres if set)
+        legacy_db = PROJECT_DIR / "generated" / "reports" / "dashboard_users.db"
+        if legacy_db.exists():
+            print(f"Detected legacy Streamlit database at {legacy_db}. Syncing...")
+            from migrate_sqlite_to_postgres import migrate_legacy_sqlite
+            migrate_legacy_sqlite(legacy_db, app, db, User)
+            # Rename legacy so we don't sync every time
+            legacy_db.rename(legacy_db.with_suffix(".db.synced"))
+
+        # 2. SQLite Portal DB -> Postgres (if DATABASE_URL is set)
+        sqlite_path = Path(app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""))
+        # If we are currently using Postgres, check if there's a local SQLite file to migrate
+        if os.environ.get("DATABASE_URL") and sqlite_path.exists() and "sqlite" not in app.config["SQLALCHEMY_DATABASE_URI"]:
+            print("Detected local SQLite database and DATABASE_URL. Starting auto-migration...")
             from migrate_sqlite_to_postgres import migrate
             migrate(app=app, db=db, User=User, AuditHistory=AuditHistory, ContactMessage=ContactMessage)
-            # Rename the old DB so we don't migrate again on next restart
-            sqlite_path.rename(PORTAL_DIR / "defi_guardian.db.migrated")
+            sqlite_path.rename(sqlite_path.with_suffix(".db.migrated"))
             print("Auto-migration successful.")
     except Exception as e:
+        app.logger.error(f"Auto-migration failed: {e}")
         print(f"Auto-migration failed: {e}")
 
 with app.app_context():

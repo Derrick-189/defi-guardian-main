@@ -47,6 +47,25 @@ PROJECT_DIR = PORTAL_DIR.parent
 RESULTS_DIR = PORTAL_DIR / "verification_results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
+# Augment PATH for verification tools
+def _augment_path():
+    home = Path.home()
+    extra_paths = [
+        str(home / ".elan" / "bin"),
+        str(home / ".cargo" / "bin"),
+        str(home / ".opam" / "default" / "bin"),
+        str(home / ".local" / "bin"),
+        "/usr/local/bin",
+        "/opt/verus",
+    ]
+    current_path = os.environ.get("PATH", "")
+    for p in extra_paths:
+        if p not in current_path:
+            current_path = f"{p}{os.pathsep}{current_path}"
+    os.environ["PATH"] = current_path
+
+_augment_path()
+
 # Import trace parsers — use explicit file load to avoid the root
 # trace_parsers/ package shadowing web_portal/trace_parsers.py
 import importlib.util as _ilu
@@ -186,7 +205,8 @@ def verify():
         submit_job(
             job_id=job_id,
             tool=tool,
-            contract_path=str(contract_path),
+            # Use original source for tools that need it, otherwise translated model
+            contract_path=str(raw_contract_path if tool in ('certora', 'kani', 'verus', 'prusti', 'creusot') else contract_path),
             spec_path=str(spec_path) if spec_path else None,
             output_dir=str(job_dir)
         )
@@ -408,19 +428,24 @@ def run_spin(contract_path, spec_path, output_dir):
             timeout=300
         )
 
-        # Check for trail file
+        # Check for trail file or error indicators
         trail_path = None
         for f in os.listdir(output_dir):
             if f.endswith(".trail"):
                 trail_path = os.path.join(output_dir, f)
                 break
 
+        full_stdout = (result1.stdout or "") + (result2.stdout or "") + (result3.stdout or "")
+        full_stderr = (result1.stderr or "") + (result2.stderr or "") + (result3.stderr or "")
+        
+        has_error = "Error:" in full_stdout or "Error:" in full_stderr or result3.returncode != 0
+        
         return {
             "status": "completed",
             "tool": "spin",
-            "stdout": result3.stdout,
-            "stderr": result3.stderr,
-            "counterexample_found": trail_path is not None,
+            "stdout": full_stdout,
+            "stderr": full_stderr,
+            "counterexample_found": trail_path is not None or has_error,
             "trail_path": trail_path,
             "return_code": result3.returncode
         }

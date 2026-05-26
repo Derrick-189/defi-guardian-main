@@ -20,6 +20,6 @@
     }
   ],
   "counterexample_path": [],
-  "model_name": "Account.sol",
-  "timestamp": "2026-05-16T12:14:23.337461"
+  "model_name": "IERC3156FlashBorrower.sol",
+  "timestamp": "2026-05-25T21:10:34.195417"
 }

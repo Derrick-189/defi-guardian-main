@@ -22,21 +22,224 @@ settable(void)
 {	Trans *T;
 	Trans *settr(int, int, int, int, int, char *, int, int, int);
 
-	trans = (Trans ***) emalloc(3*sizeof(Trans **));
+	trans = (Trans ***) emalloc(11*sizeof(Trans **));
 
-	/* proctype 1: :init: */
+	/* proctype 9: reachability_liquidation */
 
-	trans[1] = (Trans **) emalloc(3*sizeof(Trans *));
+	trans[9] = (Trans **) emalloc(14*sizeof(Trans *));
 
-	trans[1][1]	= settr(2,0,2,3,3,"(run P())", 0, 2, 0);
-	trans[1][2]	= settr(3,0,0,4,4,"-end-", 0, 3500, 0);
+	trans[9][6]	= settr(117,0,5,1,0,".(goto)", 0, 2, 0);
+	T = trans[9][5] = settr(116,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(116,0,1,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(116,0,3,0,0,"DO", 0, 2, 0);
+	trans[9][1]	= settr(112,0,10,3,0,"((!(!((health_factor<100)))&&!((liquidation_executed==1))))", 1, 2, 0);
+	trans[9][2]	= settr(113,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[9][3]	= settr(114,0,5,1,0,"(1)", 0, 2, 0);
+	trans[9][4]	= settr(115,0,5,1,0,"goto T0_init", 0, 2, 0);
+	trans[9][7]	= settr(118,0,10,1,0,"break", 0, 2, 0);
+	trans[9][11]	= settr(122,0,10,1,0,".(goto)", 0, 2, 0);
+	T = trans[9][10] = settr(121,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(121,0,8,0,0,"DO", 0, 2, 0);
+	trans[9][8]	= settr(119,0,10,4,0,"(!((liquidation_executed==1)))", 1, 2, 0);
+	trans[9][9]	= settr(120,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[9][12]	= settr(123,0,13,1,0,"break", 0, 2, 0);
+	trans[9][13]	= settr(124,0,0,5,5,"-end-", 0, 3500, 0);
 
-	/* proctype 0: P */
+	/* proctype 8: fairness */
 
-	trans[0] = (Trans **) emalloc(3*sizeof(Trans *));
+	trans[8] = (Trans **) emalloc(14*sizeof(Trans *));
 
-	trans[0][1]	= settr(0,0,2,1,0,"(1)", 0, 2, 0);
-	trans[0][2]	= settr(1,0,0,5,5,"-end-", 0, 3500, 0);
+	trans[8][6]	= settr(104,0,5,1,0,".(goto)", 0, 2, 0);
+	T = trans[8][5] = settr(103,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(103,0,1,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(103,0,3,0,0,"DO", 0, 2, 0);
+	trans[8][1]	= settr(99,0,10,6,0,"(!((lock==0)))", 1, 2, 0);
+	trans[8][2]	= settr(100,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[8][3]	= settr(101,0,5,1,0,"(1)", 0, 2, 0);
+	trans[8][4]	= settr(102,0,5,1,0,"goto T0_init", 0, 2, 0);
+	trans[8][7]	= settr(105,0,10,1,0,"break", 0, 2, 0);
+	trans[8][11]	= settr(109,0,10,1,0,".(goto)", 0, 2, 0);
+	T = trans[8][10] = settr(108,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(108,0,8,0,0,"DO", 0, 2, 0);
+	trans[8][8]	= settr(106,0,10,7,0,"(!((lock==0)))", 1, 2, 0);
+	trans[8][9]	= settr(107,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[8][12]	= settr(110,0,13,1,0,"break", 0, 2, 0);
+	trans[8][13]	= settr(111,0,0,8,8,"-end-", 0, 3500, 0);
+
+	/* proctype 7: stability */
+
+	trans[7] = (Trans **) emalloc(14*sizeof(Trans *));
+
+	trans[7][6]	= settr(91,0,5,1,0,".(goto)", 0, 2, 0);
+	T = trans[7][5] = settr(90,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(90,0,1,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(90,0,3,0,0,"DO", 0, 2, 0);
+	trans[7][1]	= settr(86,0,10,9,0,"((!(!((lock==0)))&&!(((amount>0)&&(health_factor>200)))))", 1, 2, 0);
+	trans[7][2]	= settr(87,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[7][3]	= settr(88,0,5,1,0,"(1)", 0, 2, 0);
+	trans[7][4]	= settr(89,0,5,1,0,"goto T0_init", 0, 2, 0);
+	trans[7][7]	= settr(92,0,10,1,0,"break", 0, 2, 0);
+	trans[7][11]	= settr(96,0,10,1,0,".(goto)", 0, 2, 0);
+	T = trans[7][10] = settr(95,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(95,0,8,0,0,"DO", 0, 2, 0);
+	trans[7][8]	= settr(93,0,10,10,0,"(!(((amount>0)&&(health_factor>200))))", 1, 2, 0);
+	trans[7][9]	= settr(94,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[7][12]	= settr(97,0,13,1,0,"break", 0, 2, 0);
+	trans[7][13]	= settr(98,0,0,11,11,"-end-", 0, 3500, 0);
+
+	/* proctype 6: response_price_drop */
+
+	trans[6] = (Trans **) emalloc(14*sizeof(Trans *));
+
+	trans[6][6]	= settr(78,0,5,1,0,".(goto)", 0, 2, 0);
+	T = trans[6][5] = settr(77,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(77,0,1,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(77,0,3,0,0,"DO", 0, 2, 0);
+	trans[6][1]	= settr(73,0,10,12,0,"((!(!((price_eth<50)))&&!((health_factor<150))))", 1, 2, 0);
+	trans[6][2]	= settr(74,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[6][3]	= settr(75,0,5,1,0,"(1)", 0, 2, 0);
+	trans[6][4]	= settr(76,0,5,1,0,"goto T0_init", 0, 2, 0);
+	trans[6][7]	= settr(79,0,10,1,0,"break", 0, 2, 0);
+	trans[6][11]	= settr(83,0,10,1,0,".(goto)", 0, 2, 0);
+	T = trans[6][10] = settr(82,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(82,0,8,0,0,"DO", 0, 2, 0);
+	trans[6][8]	= settr(80,0,10,13,0,"(!((health_factor<150)))", 1, 2, 0);
+	trans[6][9]	= settr(81,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[6][12]	= settr(84,0,13,1,0,"break", 0, 2, 0);
+	trans[6][13]	= settr(85,0,0,14,14,"-end-", 0, 3500, 0);
+
+	/* proctype 5: invariant_collateral */
+
+	trans[5] = (Trans **) emalloc(11*sizeof(Trans *));
+
+	trans[5][7]	= settr(69,0,6,1,0,".(goto)", 0, 2, 0);
+	T = trans[5][6] = settr(68,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(68,0,3,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(68,0,4,0,0,"DO", 0, 2, 0);
+	T = trans[ 5][3] = settr(65,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(65,2,1,0,0,"ATOMIC", 1, 2, 0);
+	trans[5][1]	= settr(63,0,6,15,15,"(!((user_collateral>=user_debt)))", 1, 2, 0); /* m: 2 -> 6,0 */
+	reached5[2] = 1;
+	trans[5][2]	= settr(0,0,0,0,0,"assert(!(!((user_collateral>=user_debt))))",0,0,0);
+	trans[5][4]	= settr(66,0,6,1,0,"(1)", 0, 2, 0);
+	trans[5][5]	= settr(67,0,6,1,0,"goto T0_init", 0, 2, 0);
+	trans[5][8]	= settr(70,0,9,1,0,"break", 0, 2, 0);
+	trans[5][9]	= settr(71,0,10,1,0,"(1)", 0, 2, 0);
+	trans[5][10]	= settr(72,0,0,16,16,"-end-", 0, 3500, 0);
+
+	/* proctype 4: liveness_progress */
+
+	trans[4] = (Trans **) emalloc(7*sizeof(Trans *));
+
+	trans[4][4]	= settr(60,0,3,1,0,".(goto)", 0, 2, 0);
+	T = trans[4][3] = settr(59,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(59,0,1,0,0,"DO", 0, 2, 0);
+	trans[4][1]	= settr(57,0,3,17,0,"(!((state==2)))", 1, 2, 0);
+	trans[4][2]	= settr(58,0,3,1,0,"goto T0_init", 0, 2, 0);
+	trans[4][5]	= settr(61,0,6,1,0,"break", 0, 2, 0);
+	trans[4][6]	= settr(62,0,0,18,18,"-end-", 0, 3500, 0);
+
+	/* proctype 3: safety_reentrancy */
+
+	trans[3] = (Trans **) emalloc(11*sizeof(Trans *));
+
+	trans[3][7]	= settr(53,0,6,1,0,".(goto)", 0, 2, 0);
+	T = trans[3][6] = settr(52,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(52,0,3,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(52,0,4,0,0,"DO", 0, 2, 0);
+	T = trans[ 3][3] = settr(49,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(49,2,1,0,0,"ATOMIC", 1, 2, 0);
+	trans[3][1]	= settr(47,0,6,19,19,"(!(!((lock&&(amount>100)))))", 1, 2, 0); /* m: 2 -> 6,0 */
+	reached3[2] = 1;
+	trans[3][2]	= settr(0,0,0,0,0,"assert(!(!(!((lock&&(amount>100))))))",0,0,0);
+	trans[3][4]	= settr(50,0,6,1,0,"(1)", 0, 2, 0);
+	trans[3][5]	= settr(51,0,6,1,0,"goto T0_init", 0, 2, 0);
+	trans[3][8]	= settr(54,0,9,1,0,"break", 0, 2, 0);
+	trans[3][9]	= settr(55,0,10,1,0,"(1)", 0, 2, 0);
+	trans[3][10]	= settr(56,0,0,20,20,"-end-", 0, 3500, 0);
+
+	/* proctype 2: safety_no_overflow */
+
+	trans[2] = (Trans **) emalloc(11*sizeof(Trans *));
+
+	trans[2][7]	= settr(43,0,6,1,0,".(goto)", 0, 2, 0);
+	T = trans[2][6] = settr(42,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(42,0,3,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(42,0,4,0,0,"DO", 0, 2, 0);
+	T = trans[ 2][3] = settr(39,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(39,2,1,0,0,"ATOMIC", 1, 2, 0);
+	trans[2][1]	= settr(37,0,6,21,21,"(!(((amount>=0)&&(amount<=1000000))))", 1, 2, 0); /* m: 2 -> 6,0 */
+	reached2[2] = 1;
+	trans[2][2]	= settr(0,0,0,0,0,"assert(!(!(((amount>=0)&&(amount<=1000000)))))",0,0,0);
+	trans[2][4]	= settr(40,0,6,1,0,"(1)", 0, 2, 0);
+	trans[2][5]	= settr(41,0,6,1,0,"goto T0_init", 0, 2, 0);
+	trans[2][8]	= settr(44,0,9,1,0,"break", 0, 2, 0);
+	trans[2][9]	= settr(45,0,10,1,0,"(1)", 0, 2, 0);
+	trans[2][10]	= settr(46,0,0,22,22,"-end-", 0, 3500, 0);
+
+	/* proctype 1: never_0 */
+
+	trans[1] = (Trans **) emalloc(11*sizeof(Trans *));
+
+	trans[1][8]	= settr(34,0,7,1,0,".(goto)", 0, 2, 0);
+	T = trans[1][7] = settr(33,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(33,0,1,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(33,0,3,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(33,0,5,0,0,"DO", 0, 2, 0);
+	trans[1][1]	= settr(27,0,2,23,0,"(((state==1)&&(lock==1)))", 1, 2, 0);
+	trans[1][2]	= settr(28,0,7,1,0,"(1)", 0, 2, 0);
+	trans[1][3]	= settr(29,0,4,24,0,"((state==2))", 1, 2, 0);
+	trans[1][4]	= settr(30,0,7,1,0,"(1)", 0, 2, 0);
+	trans[1][5]	= settr(31,0,6,25,0,"((state==0))", 1, 2, 0);
+	trans[1][6]	= settr(32,0,7,1,0,"(1)", 0, 2, 0);
+	trans[1][9]	= settr(35,0,10,1,0,"break", 0, 2, 0);
+	trans[1][10]	= settr(36,0,0,26,26,"-end-", 0, 3500, 0);
+
+	/* proctype 0: Contract */
+
+	trans[0] = (Trans **) emalloc(28*sizeof(Trans *));
+
+	T = trans[ 0][3] = settr(2,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(2,2,1,0,0,"ATOMIC", 1, 2, 0);
+	trans[0][1]	= settr(0,0,24,27,27,"printf('Formal Verification: Contract Initialized\\n')", 1, 2, 0); /* m: 2 -> 0,24 */
+	reached0[2] = 1;
+	trans[0][2]	= settr(0,0,0,0,0,"state = 1",0,0,0);
+	trans[0][25]	= settr(24,0,24,1,0,".(goto)", 0, 2, 0);
+	T = trans[0][24] = settr(23,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(23,0,4,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(23,0,20,0,0,"DO", 0, 2, 0);
+	trans[0][4]	= settr(3,0,19,28,0,"((state==1))", 1, 2, 0);
+	T = trans[ 0][19] = settr(18,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(18,2,5,0,0,"ATOMIC", 1, 2, 0);
+	trans[0][5]	= settr(4,2,15,29,29,"assert((user_collateral>=0))", 1, 2, 0); /* m: 6 -> 0,15 */
+	reached0[6] = 1;
+	trans[0][6]	= settr(0,0,0,0,0,"assert((user_debt>=0))",0,0,0);
+	trans[0][7]	= settr(0,0,0,0,0,"assert((price_eth>0))",0,0,0);
+	trans[0][8]	= settr(0,0,0,0,0,"health_factor = ((user_collateral*price_eth)/user_debt)",0,0,0);
+	T = trans[0][15] = settr(14,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(14,2,9,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(14,2,13,0,0,"IF", 1, 2, 0);
+	trans[0][9]	= settr(8,0,24,30,30,"((health_factor<100))", 1, 2, 0); /* m: 10 -> 24,0 */
+	reached0[10] = 1;
+	trans[0][10]	= settr(0,0,0,0,0,"printf('Liquidation condition triggered!\\n')",0,0,0);
+	trans[0][11]	= settr(0,0,0,0,0,"liquidation_executed = 1",0,0,0);
+	trans[0][12]	= settr(0,0,0,0,0,"state = 2",0,0,0);
+	trans[0][16]	= settr(15,2,17,1,0,".(goto)", 1, 2, 0); /* m: 17 -> 0,24 */
+	reached0[17] = 1;
+	trans[0][13]	= settr(12,2,14,2,0,"else", 1, 2, 0);
+	trans[0][14]	= settr(13,0,24,31,31,"printf('Position healthy: health_factor = %d\\n',health_factor)", 1, 2, 0); /* m: 17 -> 0,24 */
+	reached0[17] = 1;
+	trans[0][17]	= settr(16,0,24,32,32,"printf('Formal Verification: Execution Completed\\n')", 1, 2, 0); /* m: 18 -> 0,24 */
+	reached0[18] = 1;
+	trans[0][18]	= settr(0,0,0,0,0,"state = 2",0,0,0);
+	trans[0][20]	= settr(19,0,23,33,0,"((state==2))", 1, 2, 0);
+	T = trans[ 0][23] = settr(22,2,0,0,0,"ATOMIC", 0, 2, 0);
+	T->nxt	= settr(22,2,21,0,0,"ATOMIC", 0, 2, 0);
+	trans[0][21]	= settr(20,4,27,34,34,"printf('Contract execution terminated.\\n')", 0, 2, 0); /* m: 22 -> 0,27 */
+	reached0[22] = 1;
+	trans[0][22]	= settr(21,0,27,1,0,"goto :b0", 0, 2, 0);
+	trans[0][26]	= settr(25,0,27,1,0,"break", 0, 2, 0);
+	trans[0][27]	= settr(26,0,0,35,35,"-end-", 0, 3500, 0);
 	/* np_ demon: */
 	trans[_NP_] = (Trans **) emalloc(3*sizeof(Trans *));
 	T = trans[_NP_][0] = settr(9997,0,1,_T5,0,"(np_)", 1,2,0);

@@ -106,7 +106,7 @@ def _load_verification_content(output_path: str, report_path: str = "", audit_id
         return content
 
     # 3. Re-anchor using known path markers (desktop path → server path)
-    for marker in ["logs/", "generated/", "uploads/", "verification/"]:
+    for marker in ["logs/", "generated/", "uploads/", "verification/", "console_exports/"]:
         if marker in output_path:
             rel_part = output_path.split(marker)[-1]
             content = _try_read(PROJECT_DIR / marker.strip("/") / rel_part)
@@ -134,31 +134,79 @@ def _load_verification_content(output_path: str, report_path: str = "", audit_id
 def api_active_current():
     """
     Return the most recent audit for the logged-in user (or any public audit),
-    merged with the global verification_state.json so the Active Run page
-    always reflects the latest actual run rather than a stale global snapshot.
+    merged with the global verification_state.json. 
+    Aggregates results for ALL tools run on the same file in the most recent batch.
     """
     u_id = current_user.get_id()
     user_id = int(u_id) if u_id else None
 
+    # 1. Get the single most recent audit to identify the current file and time
     latest = AuditHistory.query.filter(
         (AuditHistory.user_id == user_id) | (AuditHistory.user_id == None)
     ).order_by(AuditHistory.audit_date.desc()).first()
 
-    # Start from global state so tool cards still get their data
     state = load_state()
 
     if latest:
-        state["model_name"]    = latest.filename or state.get("model_name", "")
-        state["active_tool"]   = latest.tool_used or state.get("active_tool", "SPIN")
-        state["active_status"] = latest.status or state.get("active_status", "")
-        state["states_stored"] = latest.states_explored or state.get("states_stored", 0)
-        state["transitions"]   = latest.transitions    or state.get("transitions", 0)
-        state["depth"]         = latest.depth_reached  or state.get("depth", 0)
-        state["datetime"]      = (
-            latest.audit_date.strftime("%Y-%m-%d %H:%M:%S")
-            if latest.audit_date else state.get("datetime", "")
-        )
+        # 2. Find all audits for the same file within a 15-minute window of the latest audit
+        # This groups a "suite" of tools run on the same contract together.
+        from datetime import timedelta
+        start_window = latest.audit_date - timedelta(minutes=15)
+        batch_audits = AuditHistory.query.filter(
+            AuditHistory.filename == latest.filename,
+            AuditHistory.audit_date >= start_window,
+            AuditHistory.audit_date <= latest.audit_date
+        ).all()
+
+        state["model_name"]    = latest.filename
+        state["active_tool"]   = latest.tool_used
+        state["active_status"] = latest.status
+        state["states_stored"] = latest.states_explored
+        state["transitions"]   = latest.transitions
+        state["depth"]         = latest.depth_reached
+        state["datetime"]      = latest.audit_date.strftime("%Y-%m-%d %H:%M:%S")
         state["latest_audit_id"] = latest.id
+        
+        # 3. Aggregate tool results for the grid and top-level keys for JS compat
+        all_ltl_results = []
+        for audit in batch_audits:
+            t_key = audit.tool_used.lower()
+            # Determine progress based on status
+            progress = 0
+            status = (audit.status or "PENDING").upper()
+            if status in ("PASS", "FAIL", "SUCCESS", "COMPLETED"):
+                progress = 100
+                status = "PASS" if status in ("PASS", "SUCCESS") else "FAIL"
+            elif status in ("RUNNING", "PENDING"):
+                progress = 50 # Default middle progress for active runs
+                status = "RUNNING"
+            
+            # Populate state[tool] for the frontend JS to pick up
+            state[t_key] = {
+                "status": status,
+                "timestamp": audit.audit_date.isoformat() if audit.audit_date else "",
+                "progress": progress
+            }
+            
+            # Merge LTL properties from all tools in the batch
+            if audit.ltl_properties:
+                try:
+                    props = json.loads(audit.ltl_properties)
+                    if isinstance(props, list):
+                        existing_names = {p.get("name") for p in all_ltl_results}
+                        for p in props:
+                            if p.get("name") not in existing_names:
+                                all_ltl_results.append(p)
+                except Exception: pass
+
+        state["ltl_results"] = all_ltl_results
+        # Overall success: only if all tools in the batch passed
+        state["success"] = all(a.status == "PASS" for a in batch_audits)
+    else:
+        # If no audit in DB, fallback to global state fields for active status
+        state["active_status"] = state.get("active_status", "No runs yet")
+        state["success"] = state.get("success", None)
+        state["model_name"] = state.get("model_name", "No file loaded")
 
     return jsonify(state)
 
@@ -203,6 +251,24 @@ def api_state_current():
 @api_v1.route("/sync-audit", methods=["POST"])
 @login_required
 def api_sync_audit():
+    # ── Secure Sync Token Check ─────────────────────────────────────────────
+    # This allows the local desktop instance to push data to the remote portal
+    sync_token = os.environ.get("SYNC_TOKEN")
+    provided_token = request.headers.get("X-Sync-Token")
+    
+    # If a valid sync token is provided, bypass standard login check and process payload
+    if sync_token and provided_token == sync_token:
+        try:
+            payload = request.get_json()
+            if not payload or "jobs" not in payload:
+                return jsonify({"status": "error", "message": "Invalid sync payload"}), 400
+            
+            n = sync_audit_log(audit_jobs=payload["jobs"])
+            return jsonify({"status": "success", "new_records": n})
+        except Exception as e:
+            return jsonify({"status": "error", "error": str(e)}), 500
+
+    # ── Default Sync Behavior ───────────────────────────────────────────────
     # If REMOTE_AUDIT_SYNC is enabled, automatically sync from the Render instance.
     # This makes the UI sync button work for cross-instance real-time updates.
     if os.environ.get("REMOTE_AUDIT_SYNC", "").lower() in ("1", "true", "yes", "on"):
@@ -407,6 +473,7 @@ def api_job_status(job_id):
             # Map AuditHistory status to frontend-expected status
             status_map = {
                 "PENDING": "running",
+                "RUNNING": "running",
                 "PASS": "completed",
                 "FAIL": "completed",
                 "ERROR": "failed"
@@ -1190,19 +1257,41 @@ def api_dashboard_summary():
         tools_used = [t[0] for t in tools_q if t[0]]
         latest = base.order_by(AuditHistory.audit_date.desc()).first()
         ltl_pass = ltl_fail = 0
-        if latest and latest.ltl_properties:
-            try:
-                props = json.loads(latest.ltl_properties)
-                if isinstance(props, list):
-                    for p in props:
-                        if p.get("success") is True or p.get("status") == "VERIFIED": ltl_pass += 1
-                        elif p.get("success") is False or p.get("status") == "VIOLATED": ltl_fail += 1
-            except Exception: pass
+        
+        # Aggregate LTL results from the latest "batch" of audits
+        if latest:
+            from datetime import timedelta
+            batch_window = latest.audit_date - timedelta(minutes=10)
+            batch_audits = base.filter(
+                AuditHistory.filename == latest.filename,
+                AuditHistory.audit_date >= batch_window,
+                AuditHistory.audit_date <= latest.audit_date
+            ).all()
+            
+            seen_ltl = set()
+            for audit in batch_audits:
+                if audit.ltl_properties:
+                    try:
+                        props = json.loads(audit.ltl_properties)
+                        if isinstance(props, list):
+                            for p in props:
+                                name = p.get("name")
+                                if name and name not in seen_ltl:
+                                    seen_ltl.add(name)
+                                    if p.get("success") is True or p.get("status") == "VERIFIED": ltl_pass += 1
+                                    elif p.get("success") is False or p.get("status") == "VIOLATED": ltl_fail += 1
+                    except Exception: pass
+        
         web_count     = base.filter(AuditHistory.user_id.isnot(None)).count()
         desktop_count = base.filter(AuditHistory.user_id.is_(None)).count()
+
+        # Count actually available tools from the system
+        TOOLS = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS"]
+        installed_count = sum(1 for t in TOOLS if _check_tool_available(t))
+
         return jsonify({
             "total_runs": total, "pass_runs": pass_c, "fail_runs": fail_c,
-            "tools_used": tools_used, "tools_available": len(tools_used),
+            "tools_used": tools_used, "tools_available": installed_count,
             "latest_states": latest.states_explored if latest else 0,
             "latest_trans":  latest.transitions     if latest else 0,
             "latest_depth":  latest.depth_reached   if latest else 0,

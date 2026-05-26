@@ -22,6 +22,27 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
     if not audit:
         return {"error": "Audit not found"}
 
+    # Set status to RUNNING immediately
+    audit.status = "RUNNING"
+    db.session.commit()
+
+    # Notify UI that verification has started
+    try:
+        from web_portal.app import socketio
+        from web_portal.api_v1 import load_state
+        state = load_state()
+        t_low = tool.lower()
+        state[t_low] = {
+            "status": "RUNNING",
+            "filename": filename,
+            "progress": 10
+        }
+        state["active_tool"] = tool
+        state["active_status"] = "RUNNING"
+        state["model_name"] = filename
+        socketio.emit("verification_update", state)
+    except Exception: pass
+
     server_data = {
         "tool": tool.lower(),
         "contract_text": contract_text,
@@ -44,7 +65,23 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
             job_id = result.get("job_id")
             import time
             max_retries = 30 # 30 * 10s = 300s
-            for _ in range(max_retries):
+            for i in range(max_retries):
+                # Update progress while polling
+                progress = 10 + int((i / max_retries) * 80)
+                try:
+                    from web_portal.api_v1 import load_state
+                    state = load_state()
+                    t_low = tool.lower()
+                    state[t_low] = {
+                        "status": "RUNNING",
+                        "filename": filename,
+                        "progress": progress
+                    }
+                    state["active_tool"] = tool
+                    state["active_status"] = "RUNNING"
+                    socketio.emit("verification_update", state)
+                except Exception: pass
+
                 time.sleep(10)
                 job_resp = requests.get(f"{verif_url}/job/{job_id}", headers=headers, timeout=10)
                 if job_resp.ok:
@@ -75,9 +112,6 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
 
         # ── Notify UI via SocketIO ───────────────────────────────────────────
         try:
-            from web_portal.api_v1 import api_emit_event
-            # We can't call the route directly easily, but we can reuse the logic
-            # or better, just call a helper. For now, let's just emit.
             from web_portal.app import socketio
             event_data = {
                 "tool": tool,
@@ -93,13 +127,13 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
             # Trigger state update
             from web_portal.api_v1 import load_state, save_state
             state = load_state()
-            # (state update logic same as in api_emit_event)
             t_low = tool.lower()
             state[t_low] = {
                 "status": status,
                 "timestamp": audit.audit_date.isoformat() if audit.audit_date else "",
                 "model_name": filename,
-                "success": status == "PASS"
+                "success": status == "PASS",
+                "progress": 100
             }
             state["states_stored"] = audit.states_explored
             state["transitions"] = audit.transitions

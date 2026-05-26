@@ -61,6 +61,12 @@ class ContactMessage(db.Model):
 def init_db(app) -> None:
     db.init_app(app)
     with app.app_context():
+        # Ensure the directory for the database exists (especially for persistent disks)
+        db_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
+        if db_uri.startswith("sqlite:///"):
+            db_path = Path(db_uri.replace("sqlite:///", ""))
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+            
         db.create_all()
 
 def _read_log_content(log_path: str, max_bytes: int = 50000) -> str:
@@ -88,7 +94,7 @@ def _read_log_content(log_path: str, max_bytes: int = 50000) -> str:
         return content
 
     # 2. Re-anchor to PROJECT_DIR using the path segment after a known marker
-    for marker in ("logs/", "generated/", "uploads/"):
+    for marker in ("logs/", "generated/", "uploads/", "console_exports/"):
         if marker in log_path:
             rel = log_path.split(marker, 1)[-1]
             content = _try(PROJECT_DIR / marker.rstrip("/") / rel)
@@ -148,58 +154,19 @@ def sync_audit_log(audit_jobs: list | None = None) -> int:
         except ValueError:
             timestamp = datetime.utcnow()
 
-        raw    = job.get("status", "").upper()
-        status = "PASS" if raw in ("SUCCESS", "PASSED", "PASS") else "FAIL"
-
-        existing = AuditHistory.query.filter_by(
-            filename=filename,
-            tool_used=tool,
-            audit_date=timestamp
-        ).first()
-
-        if existing:
-            # ── Back-fill content for old path-only records ──────────────────
-            # If the stored value looks like a file path (no newlines, short),
-            # try to read the file and replace the path with actual content.
-            vo = existing.verification_output or ""
-            if vo and "\n" not in vo and len(vo) < 600:
-                content = _read_log_content(vo)
-                if content:
-                    existing.verification_output = content
-                else:
-                    # Log file not available - combine marker with LTL formulas from specs
-                    specs = job.get("specs", "")
-                    # Extract LTL formulas from specs
-                    ltl_formulas = []
-                    for m in re.finditer(r"ltl\s+(\w+)\s*\{([^}]+)\}", specs or ""):
-                        ltl_formulas.append(f"ltl {m.group(1)} {{ {m.group(2)} }}")
-                    
-                    # Create synthetic content that parsers can use
-                    synthetic = f"[LOG_NOT_FOUND: {vo}]\n\n"
-                    synthetic += "\n".join(ltl_formulas) + "\n"
-                    synthetic += f"\n--- LTL safety_no_overflow ---\nerrors: -1\n"
-                    existing.verification_output = synthetic
-                    
-                    # Also derive LTL results from specs for the ltl_properties field
-                    ltl_results = json.dumps(_parse_ltl_results("", specs))
-                    if ltl_results and ltl_results != "[]":
-                        existing.ltl_properties = ltl_results
-
-                # Also back-fill LTL properties from specs if missing
-                if not existing.ltl_properties or existing.ltl_properties in ("[]", ""):
-                    specs = job.get("specs", "")
-                    if specs:
-                        existing.ltl_properties = specs if isinstance(specs, str) else json.dumps(specs)
-            # Commit back-fill changes for this record
-            db.session.add(existing)
-            continue
-
         # ── Read log content eagerly so it survives ephemeral disk wipes ────
         log_path  = job.get("log_path", "")
         log_content = _read_log_content(log_path)
+        
+        # If log_path was relative to console_exports, try that too
+        if not log_content and "console_exports" in log_path:
+            rel = log_path.split("console_exports/", 1)[-1]
+            log_content = _read_log_content(str(PROJECT_DIR / "console_exports" / rel))
+            
+        specs = job.get("specs", "")
+        
         if not log_content:
             # Log file not available - create synthetic content from specs
-            specs = job.get("specs", "")
             ltl_formulas = []
             for m in re.finditer(r"ltl\s+(\w+)\s*\{([^}]+)\}", specs or ""):
                 ltl_formulas.append(f"ltl {m.group(1)} {{ {m.group(2)} }}")
@@ -212,15 +179,40 @@ def sync_audit_log(audit_jobs: list | None = None) -> int:
         trail_path = job.get("trace_path", "")
         trail_content = _read_trail_content(trail_path) if trail_path else _read_trail_content()
         if trail_content:
-            # Prepend trail content so SPIN parser can find it
             log_content = f"=== TRAIL TRACE ===\n{trail_content}\n=== LOG OUTPUT ===\n{log_content}"
 
-        # Specs field holds the raw LTL/CVL spec text
-        specs = job.get("specs", "")
-        specs_stored = specs if isinstance(specs, str) else json.dumps(specs)
+        # Parse LTL results and determine status
+        ltl_results = _parse_ltl_results(log_content, specs)
+        ltl_results_json = json.dumps(ltl_results)
+        
+        raw = job.get("status", "").upper()
+        # A run is FAIL if SPIN found errors, OR if any LTL property was violated
+        has_violations = any(r.get("status") == "VIOLATED" for r in ltl_results)
+        spin_errors = 0
+        if "errors: " in log_content:
+            try:
+                # Find the maximum error count across all LTL properties in the log
+                error_counts = [int(e) for e in re.findall(r"errors:\s*(\d+)", log_content)]
+                spin_errors = max(error_counts) if error_counts else 0
+            except Exception: pass
+            
+        status = "PASS" if (raw in ("SUCCESS", "PASSED", "PASS") and not has_violations and spin_errors == 0) else "FAIL"
 
-        # Parse LTL results from the log content when available, fallback to specs
-        ltl_results_json = json.dumps(_parse_ltl_results(log_content, specs))
+        existing = AuditHistory.query.filter_by(
+            filename=filename,
+            tool_used=tool,
+            audit_date=timestamp
+        ).first()
+
+        if existing:
+            # ── Update existing record if it only contains a path ────────────
+            vo = existing.verification_output or ""
+            if vo and "\n" not in vo and len(vo) < 600:
+                existing.verification_output = log_content
+                existing.status = status
+                existing.ltl_properties = ltl_results_json
+            db.session.add(existing)
+            continue
 
         det = job.get("details", {})
         new_audit = AuditHistory(
@@ -232,8 +224,7 @@ def sync_audit_log(audit_jobs: list | None = None) -> int:
             transitions=det.get("transitions", 0),
             depth_reached=det.get("depth", 0),
             vulnerabilities_found=det.get("error_msg", ""),
-            ltl_properties=specs_stored,
-            # Store actual content, not just the path
+            ltl_properties=ltl_results_json,
             verification_output=log_content,
             audit_date=timestamp,
             report_path=trail_path or log_path,
@@ -264,16 +255,40 @@ def _parse_ltl_results(log_content: str, specs: str) -> list[dict]:
     # Match LTL sections in SPIN output
     ltl_pattern = re.compile(
         r"---\s*LTL\s+(\w+)\s*---.*?errors:\s*(\d+)",
-        re.DOTALL,
+        re.DOTALL | re.IGNORECASE,
     )
 
     for m in ltl_pattern.finditer(log_content or ""):
         name = m.group(1)
-        errors = int(m.group(2))
+        try:
+            errors = int(m.group(2))
+        except (ValueError, TypeError):
+            errors = 0
+            
+        # If the log explicitly contains "acceptance cycle", it's a violation even if errors: 1 wasn't parsed correctly
+        status = "VIOLATED" if errors > 0 else "VERIFIED"
+        
+        # Check for acceptance cycle or error markers in the specific section
+        try:
+            # Case-insensitive search for the LTL section to be more robust
+            section_start = log_content.lower().find(f"--- ltl {name.lower()} ---")
+            if section_start != -1:
+                remaining = log_content[section_start:]
+                next_section = remaining.lower().find("--- ltl", 10)
+                if next_section != -1:
+                    section = remaining[:next_section].lower()
+                else:
+                    section = remaining.lower()
+                    
+                if "acceptance cycle" in section or "error:" in section or "violated" in section:
+                    status = "VIOLATED"
+                    errors = max(errors, 1)
+        except Exception: pass
+
         results.append({
             "name": name,
-            "status": "VERIFIED" if errors == 0 else "VIOLATED",
-            "success": errors == 0,
+            "status": status,
+            "success": status == "VERIFIED",
             "errors": errors,
             "formula": formulas.get(name, ""),
         })

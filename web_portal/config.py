@@ -13,9 +13,21 @@ class Config:
     PROJECT_DIR = Path(__file__).parent.parent
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me-in-production")
 
-    # Use the module-level _RAW_DB_URL so the value is always consistent
-    # whether config.py is imported stand-alone or via flask-sqlalchemy.
-    SQLALCHEMY_DATABASE_URI = _RAW_DB_URL or f"sqlite:///{PROJECT_DIR}/web_portal/defi_guardian.db"
+    # ── Database Configuration ──────────────────────────────────────────────
+    # 1. Prefer DATABASE_URL (Postgres)
+    # 2. Then look for a persistent volume mount point (Render/Docker)
+    # 3. Fallback to local SQLite file
+    _RENDER_DISK = Path("/var/lib/data")
+    _PERSISTENT_DB = _RENDER_DISK / "defi_guardian.db"
+    _LOCAL_DB = PROJECT_DIR / "web_portal" / "defi_guardian.db"
+    
+    # Ensure directory exists if using persistent disk
+    if _RENDER_DISK.exists() and os.access(_RENDER_DISK, os.W_OK):
+        _DEFAULT_SQLITE = f"sqlite:///{_PERSISTENT_DB}"
+    else:
+        _DEFAULT_SQLITE = f"sqlite:///{_LOCAL_DB}"
+
+    SQLALCHEMY_DATABASE_URI = _RAW_DB_URL or os.environ.get("SQLITE_URL") or _DEFAULT_SQLITE
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Celery / Redis

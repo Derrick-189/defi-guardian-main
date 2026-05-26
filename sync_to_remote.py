@@ -1,0 +1,93 @@
+import requests
+import sqlite3
+import os
+import sys
+import json
+from pathlib import Path
+from datetime import datetime
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+# Set your remote portal URL here (e.g., 'https://defi-guardian-main.onrender.com')
+REMOTE_URL = os.environ.get("REMOTE_PORTAL_URL", "http://localhost:5000")
+# Set the secret sync token (should match the one on the server)
+SYNC_TOKEN = os.environ.get("SYNC_TOKEN", "your-secure-sync-token")
+
+PROJECT_DIR = Path(__file__).parent.resolve()
+LOCAL_DB_PATH = PROJECT_DIR / "web_portal" / "defi_guardian.db"
+
+def sync_local_to_remote():
+    """
+    Push local verification runs and users to the remote PostgreSQL instance
+    via the portal's Sync API.
+    """
+    if not LOCAL_DB_PATH.exists():
+        print(f"Local database not found at {LOCAL_DB_PATH}")
+        return
+
+    print(f"Connecting to local database: {LOCAL_DB_PATH}")
+    conn = sqlite3.connect(LOCAL_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # 1. Fetch local audits that haven't been synced (or just sync all latest)
+    print("Fetching local audit records...")
+    audits = cursor.execute("SELECT * FROM audit_history ORDER BY audit_date DESC LIMIT 50").fetchall()
+    
+    sync_data = []
+    for row in audits:
+        # Convert row to dict and handle datetime
+        audit_dict = dict(row)
+        sync_data.append(audit_dict)
+
+    if not sync_data:
+        print("No local data to sync.")
+        return
+
+    # 2. Push to remote API
+    print(f"Pushing {len(sync_data)} records to {REMOTE_URL}...")
+    try:
+        endpoint = f"{REMOTE_URL.rstrip('/')}/api/v1/sync-audit"
+        headers = {
+            "Content-Type": "application/json",
+            "X-Sync-Token": SYNC_TOKEN
+        }
+        
+        # We send it in the format the API expects (the 'jobs' list)
+        payload = {
+            "jobs": [
+                {
+                    "file": a['filename'],
+                    "tool": a['tool_used'],
+                    "status": a['status'],
+                    "audit_date": a['audit_date'],
+                    "details": {
+                        "states": a.get('states_explored', 0),
+                        "transitions": a.get('transitions', 0),
+                        "depth": a.get('depth_reached', 0)
+                    },
+                    "specs": a.get('ltl_properties', ""),
+                    "log_content": a.get('verification_output', ""),
+                    "trail_path": a.get('report_path', "")
+                }
+                for a in sync_data
+            ]
+        }
+
+        response = requests.post(endpoint, json=payload, headers=headers, timeout=30)
+        
+        if response.ok:
+            print(f"Successfully synced data! Server response: {response.json().get('status')}")
+        else:
+            print(f"Sync failed with status {response.status_code}: {response.text}")
+
+    except Exception as e:
+        print(f"An error occurred during sync: {e}")
+    finally:
+        conn.close()
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        REMOTE_URL = sys.argv[1]
+    
+    print(f"Starting sync to {REMOTE_URL}...")
+    sync_local_to_remote()
