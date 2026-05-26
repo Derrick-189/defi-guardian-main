@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}User Management — DeFi Guardian{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">User Management</h1>
+            <p class="text-muted">View and manage registered accounts on the system.</p>
+        </div>
+        <div class="badge bg-primary fs-6">{{ users|length }} Total Users</div>
+    </div>
+
+    <div class="card shadow-sm border-0 bg-dark text-light">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Last Login</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr id="user-row-{{ user.id }}">
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        {{ user.username[0]|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ user.username }}</div>
+                                        <small class="text-muted">ID: #{{ user.id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <select class="form-select form-select-sm bg-dark text-light border-secondary" 
+                                        onchange="updateRole({{ user.id }}, this.value)"
+                                        {% if user.id == current_user.id %}disabled{% endif %}>
+                                    <option value="user" {% if user.role == 'user' %}selected{% endif %}>USER</option>
+                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>ADMIN</option>
+                                </select>
+                            </td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                            <td class="text-end pe-4">
+                                {% if user.id != current_user.id %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
+                                    <i class="bi bi-trash me-1"></i> Delete
+                                </button>
+                                {% else %}
+                                <span class="badge bg-success">YOU</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateRole(userId, newRole) {
+    fetch(`/admin/users/update_role/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: newRole })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            alert('Error: ' + (data.error || 'Failed to update role'));
+            location.reload(); // Revert UI
+        }
+    });
+}
+
+function deleteUser(userId, username) {
+    if (confirm(`Are you sure you want to delete user "${username}"? This will also remove all their audit history.`)) {
+        fetch(`/admin/users/delete/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById(`user-row-${userId}`).remove();
+                // Optional: show a success toast/alert
+            } else {
+                alert('Error: ' + (data.error || 'Failed to delete user'));
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

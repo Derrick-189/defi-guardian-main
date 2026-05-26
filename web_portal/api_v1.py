@@ -249,7 +249,6 @@ def api_state_current():
 
 
 @api_v1.route("/sync-audit", methods=["POST"])
-@login_required
 def api_sync_audit():
     # ── Secure Sync Token Check ─────────────────────────────────────────────
     # This allows the local desktop instance to push data to the remote portal
@@ -267,6 +266,10 @@ def api_sync_audit():
             return jsonify({"status": "success", "new_records": n})
         except Exception as e:
             return jsonify({"status": "error", "error": str(e)}), 500
+
+    # ── Manual Login Check (for UI button) ──────────────────────────────────
+    if not current_user.is_authenticated:
+        return jsonify({"error": "Unauthorized", "message": "Login required or invalid SYNC_TOKEN"}), 401
 
     # ── Default Sync Behavior ───────────────────────────────────────────────
     # If REMOTE_AUDIT_SYNC is enabled, automatically sync from the Render instance.

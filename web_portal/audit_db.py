@@ -145,23 +145,27 @@ def sync_audit_log(audit_jobs: list | None = None) -> int:
 
     new_count = 0
     for job in jobs:
-        filename  = job.get("file", "unknown")
-        tool      = job.get("tool", "unknown")
-        timestamp_str = job.get("timestamp", "")
+        filename = job.get("file", "")
+        tool     = job.get("tool", "")
+        timestamp_str = job.get("timestamp") or job.get("audit_date", "")
 
         try:
             timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
-        except ValueError:
+        except (ValueError, TypeError):
             timestamp = datetime.utcnow()
 
-        # ── Read log content eagerly so it survives ephemeral disk wipes ────
-        log_path  = job.get("log_path", "")
-        log_content = _read_log_content(log_path)
+        # ── Read log content ─────────────────────────────────────────────────
+        # Prefer inlined content from sync script if available
+        log_content = job.get("log_content")
+        log_path    = job.get("log_path", "")
         
-        # If log_path was relative to console_exports, try that too
-        if not log_content and "console_exports" in log_path:
-            rel = log_path.split("console_exports/", 1)[-1]
-            log_content = _read_log_content(str(PROJECT_DIR / "console_exports" / rel))
+        if not log_content:
+            log_content = _read_log_content(log_path)
+            
+            # If log_path was relative to console_exports, try that too
+            if not log_content and "console_exports" in log_path:
+                rel = log_path.split("console_exports/", 1)[-1]
+                log_content = _read_log_content(str(PROJECT_DIR / "console_exports" / rel))
             
         specs = job.get("specs", "")
         
@@ -176,8 +180,13 @@ def sync_audit_log(audit_jobs: list | None = None) -> int:
             log_content += f"\n--- LTL safety_no_overflow ---\nerrors: -1\n"
 
         # ── Also inline trail file content for SPIN to extract trace steps ───
-        trail_path = job.get("trace_path", "")
-        trail_content = _read_trail_content(trail_path) if trail_path else _read_trail_content()
+        trail_path = job.get("trace_path") or job.get("trail_path", "")
+        trail_content = job.get("trail_content")
+        if not trail_content and trail_path:
+            trail_content = _read_trail_content(trail_path)
+        if not trail_content:
+            trail_content = _read_trail_content()
+            
         if trail_content:
             log_content = f"=== TRAIL TRACE ===\n{trail_content}\n=== LOG OUTPUT ===\n{log_content}"
 

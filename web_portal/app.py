@@ -573,6 +573,49 @@ def api_redirect(path):
         return jsonify({"error": "Not Found"}), 404
     return redirect(f"/api/v1/{path}", code=307 if request.method == "POST" else 302)
 
+@app.route("/admin/users")
+@login_required
+def admin_users():
+    # Basic protection: only 'admin' role can view this
+    if getattr(current_user, 'role', 'user') != 'admin':
+        flash("Unauthorized access. Admin privileges required.", "danger")
+        return redirect(url_for("dashboard"))
+    
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template("admin_users.html", users=users)
+
+@app.route("/admin/users/delete/<int:user_id>", methods=["POST"])
+@login_required
+def admin_delete_user(user_id):
+    if getattr(current_user, 'role', 'admin') != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    if current_user.id == user_id:
+        return jsonify({"error": "Cannot delete yourself"}), 400
+        
+    user = User.query.get_or_404(user_id)
+    # Delete associated audits first
+    AuditHistory.query.filter_by(user_id=user_id).delete()
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"status": "success"})
+
+@app.route("/admin/users/update_role/<int:user_id>", methods=["POST"])
+@login_required
+def admin_update_role(user_id):
+    if getattr(current_user, 'role', 'admin') != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+        
+    data = request.get_json()
+    new_role = data.get("role")
+    if new_role not in ["admin", "user"]:
+        return jsonify({"error": "Invalid role"}), 400
+        
+    user = User.query.get_or_404(user_id)
+    user.role = new_role
+    db.session.commit()
+    return jsonify({"status": "success", "new_role": new_role})
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # SocketIO events
 # ═══════════════════════════════════════════════════════════════════════════════

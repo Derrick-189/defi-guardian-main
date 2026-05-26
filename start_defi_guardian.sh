@@ -22,13 +22,32 @@ echo ""
 
 # ── Pre-flight checks ───────────────────────────────────────────
 [ ! -d "$PROJECT_DIR" ] && fail "Project not found at $PROJECT_DIR"
-[ ! -f "$VENV_PYTHON" ] && fail "Venv not found — run: cd $PROJECT_DIR && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt"
+
+# Ensure venv exists and is up to date
+if [ ! -f "$VENV_PYTHON" ]; then
+  warn "Venv not found. Creating one at $PROJECT_DIR/.venv..."
+  cd "$PROJECT_DIR"
+  python3 -m venv .venv
+  .venv/bin/pip install --upgrade pip
+  .venv/bin/pip install -r requirements.txt
+fi
+
+# ── Environment Variables ──────────────────────────────────────
+# Force SYNC_TOKEN to match Render
+export SYNC_TOKEN="my_secret_123"
+# Set your Render URL for the sync script
+export REMOTE_PORTAL_URL="https://defi-guardian-main.onrender.com"
+# Optional: Set local DB to cloud for live sync (External URL)
+# export DATABASE_URL="postgresql://defi_guardian_db_user:TKJKVp2F3aGVHBZCsULxbAjPouM51wGT@dpg-d86sh6jeo5us73caqt90-a.oregon-postgres.render.com/defi_guardian_db"
 
 if [ -f "$ENV_FILE" ]; then
   source "$ENV_FILE"
   ok "Loaded .env"
 else
-  warn ".env not found — using system environment"
+  # Create a default .env if missing
+  echo "SYNC_TOKEN=$SYNC_TOKEN" > "$ENV_FILE"
+  echo "REMOTE_PORTAL_URL=$REMOTE_PORTAL_URL" >> "$ENV_FILE"
+  ok "Created default .env with sync configuration"
 fi
 
 # ── Check cloudflared ───────────────────────────────────────────

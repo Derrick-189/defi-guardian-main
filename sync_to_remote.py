@@ -8,9 +8,9 @@ from datetime import datetime
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 # Set your remote portal URL here (e.g., 'https://defi-guardian-main.onrender.com')
-REMOTE_URL = os.environ.get("REMOTE_PORTAL_URL", "http://localhost:5000")
+REMOTE_URL = os.environ.get("REMOTE_PORTAL_URL", "https://defi-guardian-main.onrender.com")
 # Set the secret sync token (should match the one on the server)
-SYNC_TOKEN = os.environ.get("SYNC_TOKEN", "your-secure-sync-token")
+SYNC_TOKEN = os.environ.get("SYNC_TOKEN", "my_secret_123")
 
 PROJECT_DIR = Path(__file__).parent.resolve()
 LOCAL_DB_PATH = PROJECT_DIR / "web_portal" / "defi_guardian.db"
@@ -73,12 +73,18 @@ def sync_local_to_remote():
             ]
         }
 
-        response = requests.post(endpoint, json=payload, headers=headers, timeout=30)
+        response = requests.post(endpoint, json=payload, headers=headers, timeout=60)
         
         if response.ok:
-            print(f"Successfully synced data! Server response: {response.json().get('status')}")
+            try:
+                print(f"Successfully synced data! Server response: {response.json().get('status')}")
+            except Exception:
+                print(f"Successfully synced data, but server returned non-JSON: {response.text[:200]}")
         else:
-            print(f"Sync failed with status {response.status_code}: {response.text}")
+            if response.status_code == 302 or "login" in response.text.lower():
+                print("Sync failed: Authentication required. Check if SYNC_TOKEN is set correctly on both local and Render.")
+            else:
+                print(f"Sync failed with status {response.status_code}: {response.text[:200]}")
 
     except Exception as e:
         print(f"An error occurred during sync: {e}")
