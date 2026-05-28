@@ -72,8 +72,11 @@ try:
 except ImportError:
     HAS_GRADIO = False
 
-# Project directory for file I/O
+# Project directory for file I/O - robust for imports
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+if not os.path.exists(os.path.join(PROJECT_DIR, "verification_state.json")):
+    # Fallback if imported from a subdirectory
+    PROJECT_DIR = os.getcwd()
 LOGS_DIR = os.path.join(PROJECT_DIR, "logs")
 SPIN_LOGS = os.path.join(LOGS_DIR, "spin")
 CERTORA_LOGS = os.path.join(LOGS_DIR, "certora")
@@ -253,284 +256,309 @@ class ResizablePanel:
 
 
 class ThemeManager:
-    """Manage color themes for the application"""
+    """Manage color themes for the application.
 
-    # Predefined themes matching the image
+    Each theme dict must contain these keys (all used by apply_theme):
+        bg, fg, accent, accent_secondary, success, error, warning,
+        editor_bg, editor_fg, terminal_bg, terminal_fg,
+        sidebar_bg, button_bg, button_hover, card_bg, border.
+
+    Optional display metadata keys (not applied to widgets):
+        _category  : "dark" | "light" | "special"
+        _desc      : short description shown in ThemeSettingsPanel
+    """
+
     THEMES = {
+        # ── DARK THEMES ────────────────────────────────────────────────
         "Dark+ (Default)": {
-            "bg": "#1e1e1e",
-            "fg": "#cccccc",
-            "accent": "#007acc",
-            "accent_secondary": "#0451a5",
-            "success": "#6a9955",
-            "error": "#f48771",
-            "warning": "#dcdcaa",
-            "editor_bg": "#1e1e1e",
-            "editor_fg": "#cccccc",
-            "terminal_bg": "#0c0c0c",
-            "terminal_fg": "#00ff00",
-            "sidebar_bg": "#252526",
-            "button_bg": "#007acc",
-            "button_hover": "#0451a5",
-            "card_bg": "#2d2d2d",
-            "border": "#3e3e42",
+            "_category": "dark",
+            "_desc": "VS Code classic dark — balanced contrast, easy on the eyes",
+            "bg": "#1e1e1e", "fg": "#d4d4d4",
+            "accent": "#007acc", "accent_secondary": "#0451a5",
+            "success": "#4ec9b0", "error": "#f44747", "warning": "#cca700",
+            "editor_bg": "#1e1e1e", "editor_fg": "#d4d4d4",
+            "terminal_bg": "#0c0c0c", "terminal_fg": "#23d18b",
+            "sidebar_bg": "#252526", "button_bg": "#007acc",
+            "button_hover": "#005a9e", "card_bg": "#2d2d2d", "border": "#3e3e42",
         },
-        "Solarized Dark": {
-            "bg": "#002b36",
-            "fg": "#839496",
-            "accent": "#268bd2",
-            "accent_secondary": "#2aa198",
-            "success": "#2aa198",
-            "error": "#dc322f",
-            "warning": "#cb4b16",
-            "editor_bg": "#073642",
-            "editor_fg": "#93a1a1",
-            "terminal_bg": "#002b36",
-            "terminal_fg": "#00ff00",
-            "sidebar_bg": "#002b36",
-            "button_bg": "#268bd2",
-            "button_hover": "#2aa198",
-            "card_bg": "#073642",
-            "border": "#586e75",
-        },
-        "Monokai": {
-            "bg": "#272822",
-            "fg": "#f8f8f2",
-            "accent": "#66d9ef",
-            "accent_secondary": "#a6e22e",
-            "success": "#a6e22e",
-            "error": "#f92672",
-            "warning": "#fd971f",
-            "editor_bg": "#272822",
-            "editor_fg": "#f8f8f2",
-            "terminal_bg": "#272822",
-            "terminal_fg": "#00ff00",
-            "sidebar_bg": "#272822",
-            "button_bg": "#66d9ef",
-            "button_hover": "#a6e22e",
-            "card_bg": "#3e3d32",
-            "border": "#49483e",
+        "One Dark Pro": {
+            "_category": "dark",
+            "_desc": "Atom's iconic dark theme — deep purple tones with vibrant syntax",
+            "bg": "#282c34", "fg": "#abb2bf",
+            "accent": "#61afef", "accent_secondary": "#c678dd",
+            "success": "#98c379", "error": "#e06c75", "warning": "#e5c07b",
+            "editor_bg": "#282c34", "editor_fg": "#abb2bf",
+            "terminal_bg": "#21252b", "terminal_fg": "#98c379",
+            "sidebar_bg": "#21252b", "button_bg": "#61afef",
+            "button_hover": "#4d9fe0", "card_bg": "#2c313a", "border": "#3b4048",
         },
         "Tokyo Night": {
-            "bg": "#1a1b26",
-            "fg": "#a9b1d6",
-            "accent": "#7aa2f7",
-            "accent_secondary": "#bb9af7",
-            "success": "#9ece6a",
-            "error": "#f7768e",
-            "warning": "#e0af68",
-            "editor_bg": "#1a1b26",
-            "editor_fg": "#a9b1d6",
-            "terminal_bg": "#1a1b26",
-            "terminal_fg": "#00ff00",
-            "sidebar_bg": "#16161e",
-            "button_bg": "#7aa2f7",
-            "button_hover": "#bb9af7",
-            "card_bg": "#24283b",
-            "border": "#414868",
+            "_category": "dark",
+            "_desc": "Deep midnight blues with neon accents — inspired by Tokyo after dark",
+            "bg": "#1a1b26", "fg": "#a9b1d6",
+            "accent": "#7aa2f7", "accent_secondary": "#bb9af7",
+            "success": "#9ece6a", "error": "#f7768e", "warning": "#e0af68",
+            "editor_bg": "#1a1b26", "editor_fg": "#a9b1d6",
+            "terminal_bg": "#16161e", "terminal_fg": "#73daca",
+            "sidebar_bg": "#16161e", "button_bg": "#7aa2f7",
+            "button_hover": "#6590e8", "card_bg": "#24283b", "border": "#414868",
         },
-        "Abyss": {
-            "bg": "#0b0c10",
-            "fg": "#c5c6c7",
-            "accent": "#45a29e",
-            "accent_secondary": "#66fcf1",
-            "success": "#66fcf1",
-            "error": "#f05454",
-            "warning": "#f2a900",
-            "editor_bg": "#0b0c10",
-            "editor_fg": "#c5c6c7",
-            "terminal_bg": "#0b0c10",
-            "terminal_fg": "#66fcf1",
-            "sidebar_bg": "#1f2833",
-            "button_bg": "#45a29e",
-            "button_hover": "#66fcf1",
-            "card_bg": "#1f2833",
-            "border": "#45a29e",
+        "Dracula": {
+            "_category": "dark",
+            "_desc": "The classic dark theme — purple background, vivid candy colours",
+            "bg": "#282a36", "fg": "#f8f8f2",
+            "accent": "#bd93f9", "accent_secondary": "#ff79c6",
+            "success": "#50fa7b", "error": "#ff5555", "warning": "#ffb86c",
+            "editor_bg": "#282a36", "editor_fg": "#f8f8f2",
+            "terminal_bg": "#21222c", "terminal_fg": "#50fa7b",
+            "sidebar_bg": "#21222c", "button_bg": "#bd93f9",
+            "button_hover": "#a67de8", "card_bg": "#313342", "border": "#44475a",
         },
-        "Quiet Light": {
-            "bg": "#f3f3f3",
-            "fg": "#333333",
-            "accent": "#0066cc",
-            "accent_secondary": "#0052a3",
-            "success": "#008000",
-            "error": "#cc0000",
-            "warning": "#e6b800",
-            "editor_bg": "#ffffff",
-            "editor_fg": "#333333",
-            "terminal_bg": "#f3f3f3",
-            "terminal_fg": "#008000",
-            "sidebar_bg": "#eaeaea",
-            "button_bg": "#0066cc",
-            "button_hover": "#0052a3",
-            "card_bg": "#ffffff",
-            "border": "#cccccc",
+        "Catppuccin Mocha": {
+            "_category": "dark",
+            "_desc": "Soothing pastel dark — warm mauve base, soft contrasts",
+            "bg": "#1e1e2e", "fg": "#cdd6f4",
+            "accent": "#89b4fa", "accent_secondary": "#cba6f7",
+            "success": "#a6e3a1", "error": "#f38ba8", "warning": "#fab387",
+            "editor_bg": "#1e1e2e", "editor_fg": "#cdd6f4",
+            "terminal_bg": "#181825", "terminal_fg": "#a6e3a1",
+            "sidebar_bg": "#181825", "button_bg": "#89b4fa",
+            "button_hover": "#74a8f8", "card_bg": "#252535", "border": "#313244",
+        },
+        "GitHub Dark": {
+            "_category": "dark",
+            "_desc": "GitHub's official dark mode — clean, familiar, readable",
+            "bg": "#0d1117", "fg": "#c9d1d9",
+            "accent": "#58a6ff", "accent_secondary": "#79c0ff",
+            "success": "#3fb950", "error": "#f85149", "warning": "#e3b341",
+            "editor_bg": "#0d1117", "editor_fg": "#c9d1d9",
+            "terminal_bg": "#010409", "terminal_fg": "#3fb950",
+            "sidebar_bg": "#161b22", "button_bg": "#238636",
+            "button_hover": "#2ea043", "card_bg": "#161b22", "border": "#30363d",
         },
         "Nord": {
-            "bg": "#2e3440",
-            "fg": "#eceff4",
-            "accent": "#88c0d0",
-            "accent_secondary": "#81a1c1",
-            "success": "#a3be8c",
-            "error": "#bf616a",
-            "warning": "#ebcb8b",
-            "editor_bg": "#3b4252",
-            "editor_fg": "#e5e9f0",
-            "terminal_bg": "#242933",
-            "terminal_fg": "#8fbcbb",
-            "sidebar_bg": "#2e3440",
-            "button_bg": "#5e81ac",
-            "button_hover": "#81a1c1",
-            "card_bg": "#3b4252",
-            "border": "#4c566a",
+            "_category": "dark",
+            "_desc": "Arctic, north-bluish colour palette — cool, icy precision",
+            "bg": "#2e3440", "fg": "#eceff4",
+            "accent": "#88c0d0", "accent_secondary": "#81a1c1",
+            "success": "#a3be8c", "error": "#bf616a", "warning": "#ebcb8b",
+            "editor_bg": "#3b4252", "editor_fg": "#e5e9f0",
+            "terminal_bg": "#242933", "terminal_fg": "#8fbcbb",
+            "sidebar_bg": "#2e3440", "button_bg": "#5e81ac",
+            "button_hover": "#81a1c1", "card_bg": "#3b4252", "border": "#4c566a",
+        },
+        "Solarized Dark": {
+            "_category": "dark",
+            "_desc": "Precision colours with unique warm-tinted dark base",
+            "bg": "#002b36", "fg": "#839496",
+            "accent": "#268bd2", "accent_secondary": "#2aa198",
+            "success": "#2aa198", "error": "#dc322f", "warning": "#cb4b16",
+            "editor_bg": "#073642", "editor_fg": "#93a1a1",
+            "terminal_bg": "#002b36", "terminal_fg": "#859900",
+            "sidebar_bg": "#002b36", "button_bg": "#268bd2",
+            "button_hover": "#2aa198", "card_bg": "#073642", "border": "#586e75",
+        },
+        "Monokai": {
+            "_category": "dark",
+            "_desc": "The beloved Sublime Text classic — warm dark with jewel-tone syntax",
+            "bg": "#272822", "fg": "#f8f8f2",
+            "accent": "#66d9ef", "accent_secondary": "#a6e22e",
+            "success": "#a6e22e", "error": "#f92672", "warning": "#fd971f",
+            "editor_bg": "#272822", "editor_fg": "#f8f8f2",
+            "terminal_bg": "#1a1a14", "terminal_fg": "#a6e22e",
+            "sidebar_bg": "#272822", "button_bg": "#66d9ef",
+            "button_hover": "#4dc4e0", "card_bg": "#3e3d32", "border": "#49483e",
+        },
+        "Abyss": {
+            "_category": "dark",
+            "_desc": "Deep space darkness — near-black with teal and electric-cyan accents",
+            "bg": "#0b0c10", "fg": "#c5c6c7",
+            "accent": "#45a29e", "accent_secondary": "#66fcf1",
+            "success": "#66fcf1", "error": "#f05454", "warning": "#f2a900",
+            "editor_bg": "#0b0c10", "editor_fg": "#c5c6c7",
+            "terminal_bg": "#060709", "terminal_fg": "#66fcf1",
+            "sidebar_bg": "#1f2833", "button_bg": "#45a29e",
+            "button_hover": "#66fcf1", "card_bg": "#1f2833", "border": "#45a29e",
+        },
+        # ── SPECIAL / BRANDED ──────────────────────────────────────────
+        "DeFi Dark": {
+            "_category": "special",
+            "_desc": "Purpose-built for DeFi Guardian — teal/violet DeFi palette",
+            "bg": "#0a0e17", "fg": "#e0e0e0",
+            "accent": "#00d4aa", "accent_secondary": "#7c3aed",
+            "success": "#10b981", "error": "#ef4444", "warning": "#f59e0b",
+            "editor_bg": "#0f141e", "editor_fg": "#e2e8f0",
+            "terminal_bg": "#070b12", "terminal_fg": "#00ffcc",
+            "sidebar_bg": "#0c111a", "button_bg": "#00d4aa",
+            "button_hover": "#00bf9a", "card_bg": "#131a26", "border": "#1e2a3a",
+        },
+        "Cyberpunk": {
+            "_category": "special",
+            "_desc": "Neon magenta and cyan on near-black — high energy, high contrast",
+            "bg": "#0d0221", "fg": "#e0d4f5",
+            "accent": "#00ffff", "accent_secondary": "#ff00ff",
+            "success": "#00ff88", "error": "#ff0055", "warning": "#ffaa00",
+            "editor_bg": "#12022b", "editor_fg": "#e0d4f5",
+            "terminal_bg": "#080014", "terminal_fg": "#00ff88",
+            "sidebar_bg": "#0f0225", "button_bg": "#ff00ff",
+            "button_hover": "#cc00cc", "card_bg": "#150530", "border": "#3d0a5c",
         },
         "Matrix": {
-            "bg": "#0a0f0a",
-            "fg": "#00ff41",
-            "accent": "#00ff41",
-            "accent_secondary": "#008f11",
-            "success": "#00ff41",
-            "error": "#ff3333",
-            "warning": "#ffff00",
-            "editor_bg": "#0d140d",
-            "editor_fg": "#00ff41",
-            "terminal_bg": "#050805",
-            "terminal_fg": "#00ff41",
-            "sidebar_bg": "#0a0f0a",
-            "button_bg": "#008f11",
-            "button_hover": "#00cc1a",
-            "card_bg": "#111a11",
-            "border": "#1a3a1a",
-        }
+            "_category": "special",
+            "_desc": "Enter the Matrix — pure phosphor green on black",
+            "bg": "#0a0f0a", "fg": "#00ff41",
+            "accent": "#00ff41", "accent_secondary": "#008f11",
+            "success": "#00ff41", "error": "#ff3333", "warning": "#ffff00",
+            "editor_bg": "#0d140d", "editor_fg": "#00cc33",
+            "terminal_bg": "#050805", "terminal_fg": "#00ff41",
+            "sidebar_bg": "#0a0f0a", "button_bg": "#008f11",
+            "button_hover": "#00cc1a", "card_bg": "#111a11", "border": "#1a3a1a",
+        },
+        # ── LIGHT THEMES ───────────────────────────────────────────────
+        "Quiet Light": {
+            "_category": "light",
+            "_desc": "Minimal and calm — warm off-white with gentle colour accents",
+            "bg": "#f3f3f3", "fg": "#333333",
+            "accent": "#0066cc", "accent_secondary": "#0052a3",
+            "success": "#008000", "error": "#cc0000", "warning": "#e6b800",
+            "editor_bg": "#ffffff", "editor_fg": "#333333",
+            "terminal_bg": "#f3f3f3", "terminal_fg": "#007700",
+            "sidebar_bg": "#eaeaea", "button_bg": "#0066cc",
+            "button_hover": "#0052a3", "card_bg": "#ffffff", "border": "#cccccc",
+        },
+        "Solarized Light": {
+            "_category": "light",
+            "_desc": "Solarized's light variant — warm base with crisp blue accents",
+            "bg": "#fdf6e3", "fg": "#657b83",
+            "accent": "#268bd2", "accent_secondary": "#2aa198",
+            "success": "#859900", "error": "#dc322f", "warning": "#cb4b16",
+            "editor_bg": "#fdf6e3", "editor_fg": "#586e75",
+            "terminal_bg": "#eee8d5", "terminal_fg": "#859900",
+            "sidebar_bg": "#eee8d5", "button_bg": "#268bd2",
+            "button_hover": "#2aa198", "card_bg": "#eee8d5", "border": "#93a1a1",
+        },
+        "GitHub Light": {
+            "_category": "light",
+            "_desc": "GitHub's clean light theme — familiar white with blue highlights",
+            "bg": "#ffffff", "fg": "#24292f",
+            "accent": "#0969da", "accent_secondary": "#218bff",
+            "success": "#1a7f37", "error": "#cf222e", "warning": "#9a6700",
+            "editor_bg": "#ffffff", "editor_fg": "#24292f",
+            "terminal_bg": "#f6f8fa", "terminal_fg": "#1a7f37",
+            "sidebar_bg": "#f6f8fa", "button_bg": "#0969da",
+            "button_hover": "#0860c5", "card_bg": "#f6f8fa", "border": "#d0d7de",
+        },
     }
+
+    # ── Theme category ordering for the settings panel picker ──────────
+    CATEGORY_ORDER = ["dark", "special", "light"]
+    CATEGORY_LABELS = {"dark": "🌙 Dark", "special": "⚡ Special", "light": "☀️ Light"}
+
+    # ── Themes that are inherently dark for ctk appearance-mode mapping ─
+    _DARK_KEYWORDS = frozenset({
+        "dark", "night", "cyber", "matrix", "abyss", "dracula",
+        "monokai", "defi", "catppuccin", "github dark", "one dark",
+        "nord", "solarized dark",
+    })
 
     def __init__(self, app):
         self.app = app
         self.current_theme = "Dark+ (Default)"
 
-    def apply_theme(self, theme_name):
+    # ── Internal helpers ───────────────────────────────────────────────
+
+    def _is_dark_theme(self, theme_name: str) -> bool:
+        """Return True if this theme should use ctk dark appearance mode."""
+        cat = self.THEMES.get(theme_name, {}).get("_category", "dark")
+        if cat == "light":
+            return False
+        name_lower = theme_name.lower()
+        return any(kw in name_lower for kw in self._DARK_KEYWORDS) or cat in ("dark", "special")
+
+    def themes_by_category(self) -> dict:
+        """Return {category: [name, …]} ordered by CATEGORY_ORDER."""
+        buckets: dict = {c: [] for c in self.CATEGORY_ORDER}
+        for name, data in self.THEMES.items():
+            cat = data.get("_category", "dark")
+            buckets.setdefault(cat, []).append(name)
+        return buckets
+
+    # ── Public API ─────────────────────────────────────────────────────
+
+    def apply_theme(self, theme_name: str):
         """Apply a named colour theme — delegates to the app's update_ui_colors."""
         if theme_name not in self.THEMES:
             return
         theme = self.THEMES[theme_name]
         self.current_theme = theme_name
-        is_dark = "Dark" in theme_name or "Night" in theme_name or "Cyber" in theme_name
-        ctk.set_appearance_mode("dark" if is_dark else "light")
 
-        # Map legacy theme dict keys onto the new theme tokens
+        ctk.set_appearance_mode("dark" if self._is_dark_theme(theme_name) else "light")
+
+        # Map theme-dict keys onto the app's DeFiDarkTheme / DeFiLightTheme tokens
         app = self.app
         if hasattr(app, 'theme'):
-            app.theme.BG          = theme.get("bg",          app.theme.BG)
-            app.theme.PANEL_BG    = theme.get("sidebar_bg",  app.theme.PANEL_BG)
-            app.theme.EDITOR_BG   = theme.get("editor_bg",   app.theme.EDITOR_BG)
-            app.theme.TERMINAL_BG = theme.get("terminal_bg", app.theme.TERMINAL_BG)
-            app.theme.TEXT_MAIN   = theme.get("editor_fg",   app.theme.TEXT_MAIN)
-            app.theme.ACCENT      = theme.get("accent",      app.theme.ACCENT)
+            t = app.theme
+            t.BG          = theme.get("bg",          t.BG)
+            t.PANEL_BG    = theme.get("sidebar_bg",  t.PANEL_BG)
+            t.EDITOR_BG   = theme.get("editor_bg",   t.EDITOR_BG)
+            t.TERMINAL_BG = theme.get("terminal_bg", t.TERMINAL_BG)
+            t.TEXT_MAIN   = theme.get("editor_fg",   t.TEXT_MAIN)
+            t.TEXT_BRIGHT = theme.get("fg",          t.TEXT_BRIGHT)
+            t.ACCENT      = theme.get("accent",      t.ACCENT)
+            t.ACCENT_DARK = theme.get("button_hover",t.ACCENT_DARK)
+            t.SECONDARY   = theme.get("accent_secondary", t.SECONDARY)
+            t.SUCCESS     = theme.get("success",     t.SUCCESS)
+            t.ERROR       = theme.get("error",       t.ERROR)
+            t.WARNING     = theme.get("warning",     t.WARNING)
+            t.BORDER      = theme.get("border",      t.BORDER)
+            t.TERMINAL_BG = theme.get("terminal_bg", t.TERMINAL_BG)
+            # Derive dim bg colours from card_bg
+            card = theme.get("card_bg", t.PANEL_BG)
+            t.HOVER   = card
+            t.ACTIVE  = card
+            t.INPUT_BG = theme.get("card_bg", t.INPUT_BG)
+            # Activity bar = slightly darker than sidebar
+            t.ACTIVITY_BG = theme.get("card_bg", t.ACTIVITY_BG)
+            t.IS_DARK = self._is_dark_theme(theme_name)
 
         if hasattr(app, 'update_ui_colors'):
             app.update_ui_colors()
 
         self.save_theme_preference(theme_name)
 
-    def save_theme_preference(self, theme_name):
-        """Save theme preference to file"""
+    def save_theme_preference(self, theme_name: str):
+        """Save theme preference to file."""
         config_file = os.path.join(PROJECT_DIR, "theme_config.json")
         try:
             with open(config_file, 'w') as f:
                 json.dump({"theme": theme_name}, f)
-        except:
+        except Exception:
             pass
 
-    def load_theme_preference(self):
-        """Load saved theme preference"""
+    def load_theme_preference(self) -> str:
+        """Load saved theme preference, falling back to default."""
         config_file = os.path.join(PROJECT_DIR, "theme_config.json")
         try:
             with open(config_file, 'r') as f:
                 config = json.load(f)
                 if "theme" in config and config["theme"] in self.THEMES:
                     return config["theme"]
-        except:
+        except Exception:
             pass
         return "Dark+ (Default)"
 
 
 class EnhancedThemeManager(ThemeManager):
-    """Extended theme manager with glassmorphism and animations"""
+    """Extended theme manager with glassmorphism and animations.
 
-    THEMES = {
-        **ThemeManager.THEMES,
-        "DeFi Dark": {
-            "bg": "#0a0e17",
-            "fg": "#e0e0e0",
-            "accent": "#00d4aa",
-            "accent_secondary": "#7c3aed",
-            "success": "#10b981",
-            "error": "#ef4444",
-            "warning": "#f59e0b",
-            "editor_bg": "#0f141e",
-            "editor_fg": "#e2e8f0",
-            "terminal_bg": "#080c14",
-            "terminal_fg": "#00ffcc",
-            "sidebar_bg": "#0c111a",
-            "button_bg": "#00d4aa",
-            "button_hover": "#00bf9a",
-            "card_bg": "#131a26",
-            "border": "#1e2a3a",
-        },
-        "Cyberpunk": {
-            "bg": "#0d0221",
-            "fg": "#ff00ff",
-            "accent": "#00ffff",
-            "accent_secondary": "#ff00ff",
-            "success": "#00ff88",
-            "error": "#ff0055",
-            "warning": "#ffaa00",
-            "editor_bg": "#12022b",
-            "editor_fg": "#00ffff",
-            "terminal_bg": "#0a001a",
-            "terminal_fg": "#00ff88",
-            "sidebar_bg": "#0f0225",
-            "button_bg": "#ff00ff",
-            "button_hover": "#cc00cc",
-            "card_bg": "#150530",
-            "border": "#3d0a5c",
-        },
-        "Nord Frost": {
-            "bg": "#2e3440",
-            "fg": "#eceff4",
-            "accent": "#88c0d0",
-            "accent_secondary": "#81a1c1",
-            "success": "#a3be8c",
-            "error": "#bf616a",
-            "warning": "#ebcb8b",
-            "editor_bg": "#3b4252",
-            "editor_fg": "#e5e9f0",
-            "terminal_bg": "#242933",
-            "terminal_fg": "#8fbcbb",
-            "sidebar_bg": "#2e3440",
-            "button_bg": "#5e81ac",
-            "button_hover": "#81a1c1",
-            "card_bg": "#3b4252",
-            "border": "#4c566a",
-        },
-        "Matrix": {
-            "bg": "#0a0f0a",
-            "fg": "#00ff41",
-            "accent": "#00ff41",
-            "accent_secondary": "#008f11",
-            "success": "#00ff41",
-            "error": "#ff3333",
-            "warning": "#ffff00",
-            "editor_bg": "#0d140d",
-            "editor_fg": "#00ff41",
-            "terminal_bg": "#050805",
-            "terminal_fg": "#00ff41",
-            "sidebar_bg": "#0a0f0a",
-            "button_bg": "#008f11",
-            "button_hover": "#00cc1a",
-            "card_bg": "#111a11",
-            "border": "#1a3a1a",
-        }
-    }
+    Inherits all themes from ThemeManager and adds no duplicates.
+    Extra themes here are kept for backward-compatibility only; the full
+    curated list lives in ThemeManager.THEMES.
+    """
+    # No extra THEMES dict — all themes are consolidated in the parent.
+    # If you need to add project-specific custom themes, add them here:
+    # THEMES = {**ThemeManager.THEMES, "My Custom Theme": {...}}
+    pass
 
 
 class StyledButton(ctk.CTkButton):
@@ -750,59 +778,165 @@ class ScrollableSidebar(ctk.CTkFrame):
         for child in widget.winfo_children():
             self.bind_mousewheel(child)
 
+    def configure_width(self, new_width):
+        """Update sidebar width dynamically"""
+        self.width = new_width
+        self.configure(width=new_width)
+        self.canvas.configure(width=new_width - 20)
+        self.canvas.itemconfig(self.canvas_window, width=new_width - 30)
+
     def get_inner_frame(self):
         """Return inner frame for adding widgets"""
         return self.inner_frame
 
 
 class ThemeSettingsPanel(ctk.CTkFrame):
-    """Theme selection and customization panel"""
+    """Theme selection and customization panel.
 
-    def __init__(self, parent, theme_manager, **kwargs):
-        super().__init__(parent, **kwargs)
+    Features:
+    - Category segmented buttons (Dark / Special / Light)
+    - Per-category dropdown of theme names
+    - Live colour swatch strip (bg, accent, success, error, warning)
+    - One-line description of the selected theme
+    - Instant apply on selection change
+    """
+
+    # Swatch colour keys shown in the preview strip (key in THEMES dict)
+    _SWATCH_KEYS = [
+        ("bg",      "BG"),
+        ("accent",  "Accent"),
+        ("success", "OK"),
+        ("warning", "Warn"),
+        ("error",   "Err"),
+    ]
+
+    def __init__(self, parent, theme_manager: "ThemeManager", **kwargs):
+        super().__init__(parent, fg_color="transparent", **kwargs)
         self.theme_manager = theme_manager
+        self._building = False  # guard against recursive callbacks
 
-        # Theme selection label
-        ctk.CTkLabel(
-            self,
-            text="",
-            font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#888888"
-        ).pack(anchor="w", pady=(10, 5))
+        self._by_category = theme_manager.themes_by_category()
 
-        # Theme dropdown
+        # ── Category selector ────────────────────────────────────────
+        seg_frame = ctk.CTkFrame(self, fg_color="transparent")
+        seg_frame.pack(fill="x", pady=(4, 0))
+
+        self._cat_var = ctk.StringVar(value="dark")
+        self._cat_buttons: dict = {}
+        for cat in theme_manager.CATEGORY_ORDER:
+            label = theme_manager.CATEGORY_LABELS.get(cat, cat.title())
+            b = ctk.CTkButton(
+                seg_frame,
+                text=label,
+                height=26,
+                corner_radius=5,
+                font=ctk.CTkFont(family="Segoe UI", size=11),
+                command=lambda c=cat: self._select_category(c),
+            )
+            b.pack(side="left", padx=(0, 4))
+            self._cat_buttons[cat] = b
+
+        # ── Theme dropdown ────────────────────────────────────────────
         self.theme_var = ctk.StringVar(value=theme_manager.current_theme)
-        self.theme_dropdown = ctk.CTkOptionMenu(
+        self._dropdown = ctk.CTkOptionMenu(
             self,
-            values=list(self.theme_manager.THEMES.keys()),
+            values=self._names_for_category("dark"),
             variable=self.theme_var,
-            command=self.on_theme_change,
+            command=self._on_theme_change,
             dynamic_resizing=False,
-            width=200
+            width=220,
+            height=28,
+            font=ctk.CTkFont(family="Segoe UI", size=11),
         )
-        self.theme_dropdown.pack(fill="x", pady=5)
+        self._dropdown.pack(fill="x", pady=(6, 4))
 
-        # Preview label
-        self.preview_label = ctk.CTkLabel(
+        # ── Colour swatch strip ───────────────────────────────────────
+        swatch_frame = ctk.CTkFrame(self, fg_color="transparent")
+        swatch_frame.pack(fill="x", pady=(0, 4))
+
+        self._swatches: list[tk.Canvas] = []
+        self._swatch_labels: list[ctk.CTkLabel] = []
+        for key, label in self._SWATCH_KEYS:
+            col_frame = ctk.CTkFrame(swatch_frame, fg_color="transparent")
+            col_frame.pack(side="left", padx=(0, 6))
+            c = tk.Canvas(col_frame, width=26, height=18, highlightthickness=1,
+                          highlightbackground="#555555", bd=0)
+            c.pack()
+            lbl = ctk.CTkLabel(col_frame, text=label,
+                               font=ctk.CTkFont(family="Segoe UI", size=9),
+                               text_color="#888888")
+            lbl.pack()
+            self._swatches.append(c)
+            self._swatch_labels.append(lbl)
+
+        # ── Description label ─────────────────────────────────────────
+        self._desc_label = ctk.CTkLabel(
             self,
             text="",
-            font=ctk.CTkFont(size=10),
-            text_color="#888888"
+            font=ctk.CTkFont(family="Segoe UI", size=10),
+            text_color="#888888",
+            wraplength=220,
+            justify="left",
+            anchor="w",
         )
-        self.preview_label.pack(anchor="w", pady=(5, 10))
+        self._desc_label.pack(fill="x", pady=(0, 6))
 
-        # Update preview on selection
-        self.update_preview()
+        # Initialise to the current theme's category
+        cur = theme_manager.current_theme
+        cur_cat = theme_manager.THEMES.get(cur, {}).get("_category", "dark")
+        self._select_category(cur_cat, initial_theme=cur)
 
-    def on_theme_change(self, choice):
-        """Handle theme change"""
+    # ── Internal helpers ───────────────────────────────────────────────
+
+    def _names_for_category(self, cat: str) -> list:
+        return self._by_category.get(cat, []) or list(self.theme_manager.THEMES.keys())
+
+    def _select_category(self, cat: str, initial_theme: str = ""):
+        """Switch the visible dropdown to the given category and refresh styling."""
+        self._building = True
+        names = self._names_for_category(cat)
+        self._cat_var.set(cat)
+
+        # Highlight the active category button
+        for c, b in self._cat_buttons.items():
+            b.configure(fg_color=("#007acc" if c == cat else "transparent"),
+                        text_color=("#ffffff" if c == cat else "#888888"),
+                        hover_color="#005a9e")
+
+        # Update dropdown choices
+        self._dropdown.configure(values=names)
+
+        # Pick which theme to show: prefer initial_theme, then current if in cat, else first
+        if initial_theme and initial_theme in names:
+            self.theme_var.set(initial_theme)
+        elif self.theme_var.get() not in names:
+            self.theme_var.set(names[0] if names else "")
+
+        self._building = False
+        self._refresh_preview(self.theme_var.get())
+
+    def _refresh_preview(self, theme_name: str):
+        """Update swatches and description for the named theme."""
+        data = self.theme_manager.THEMES.get(theme_name, {})
+        swatch_keys = [k for k, _ in self._SWATCH_KEYS]
+        for i, key in enumerate(swatch_keys):
+            colour = data.get(key, "#444444")
+            try:
+                self._swatches[i].configure(background=colour, highlightbackground=colour)
+                self._swatches[i].delete("all")
+                self._swatches[i].create_rectangle(0, 0, 26, 18, fill=colour, outline="")
+            except Exception:
+                pass
+        desc = data.get("_desc", "")
+        self._desc_label.configure(text=desc)
+
+    # ── Callbacks ──────────────────────────────────────────────────────
+
+    def _on_theme_change(self, choice: str):
+        if self._building:
+            return
         self.theme_manager.apply_theme(choice)
-        self.update_preview()
-
-    def update_preview(self):
-        """Update preview text"""
-        theme = self.theme_manager.current_theme
-        self.preview_label.configure(text=f"Current: {theme}")
+        self._refresh_preview(choice)
 
 
 def wait_for_tcp_port(
@@ -947,7 +1081,7 @@ class DeFiDarkTheme:
     BG           = "#1e1e1e"   # VS Code editor background
     PANEL_BG     = "#252526"   # VS Code sidebar background
     ACTIVITY_BG  = "#333333"   # VS Code activity bar
-    TERMINAL_BG  = "#1e1e1e"   # Integrated terminal background
+    TERMINAL_BG  = "#0c0c0c"   # Integrated terminal background (slightly darker for contrast)
     EDITOR_BG    = "#1e1e1e"   # Editor area
     INPUT_BG     = "#3c3c3c"   # Input/dropdown background
     ACCENT       = "#007acc"   # VS Code blue
@@ -956,6 +1090,7 @@ class DeFiDarkTheme:
     SECONDARY    = "#c586c0"   # VS Code purple (keywords)
     SUCCESS      = "#4ec9b0"   # VS Code teal (types)
     SUCCESS_DIM  = "#1e3a2f"   # Success background
+    SUCCESS_BRIGHT = "#23d18b" # Bright success for badges
     ERROR        = "#f44747"   # VS Code red
     ERROR_DIM    = "#3a1e1e"   # Error background
     WARNING      = "#cca700"   # VS Code yellow
@@ -965,19 +1100,26 @@ class DeFiDarkTheme:
     TEXT_BRIGHT  = "#ffffff"   # Active/selected text
     BORDER       = "#3e3e42"   # VS Code panel borders
     BORDER_FOCUS = "#007acc"   # Focused border
+    BORDER_SUBTLE = "#2d2d30"  # Very subtle separator
     SELECTION    = "#094771"   # VS Code selection blue
     HOVER        = "#2a2d2e"   # List item hover
     ACTIVE       = "#37373d"   # Active list item
     TAB_ACTIVE   = "#1e1e1e"   # Active tab background
     TAB_INACTIVE = "#2d2d2d"   # Inactive tab background
     TAB_BORDER   = "#007acc"   # Active tab top border
+    SCROLLBAR    = "#424242"   # Scrollbar thumb
+    BADGE_BG     = "#4d4d4d"   # Badge / pill background
+    SHADOW       = "#00000060" # Drop shadow (semi-transparent)
+    # Theme identity (used by ThemeSettingsPanel preview)
+    THEME_NAME   = "Dark+ (Default)"
+    IS_DARK      = True
 
 class DeFiLightTheme:
     """Design constants — VS Code Light+ / Quiet Light inspired"""
     BG           = "#f3f3f3"
     PANEL_BG     = "#f3f3f3"
     ACTIVITY_BG  = "#2c2c2c"
-    TERMINAL_BG  = "#ffffff"
+    TERMINAL_BG  = "#fafafa"
     EDITOR_BG    = "#ffffff"
     INPUT_BG     = "#ffffff"
     ACCENT       = "#007acc"
@@ -986,6 +1128,7 @@ class DeFiLightTheme:
     SECONDARY    = "#af00db"
     SUCCESS      = "#388a34"
     SUCCESS_DIM  = "#dff0d8"
+    SUCCESS_BRIGHT = "#1a8738"
     ERROR        = "#e51400"
     ERROR_DIM    = "#fde7e9"
     WARNING      = "#bf8803"
@@ -995,12 +1138,18 @@ class DeFiLightTheme:
     TEXT_BRIGHT  = "#000000"
     BORDER       = "#e5e5e5"
     BORDER_FOCUS = "#007acc"
+    BORDER_SUBTLE = "#f0f0f0"
     SELECTION    = "#add6ff"
     HOVER        = "#e8e8e8"
     ACTIVE       = "#d6ebff"
     TAB_ACTIVE   = "#ffffff"
     TAB_INACTIVE = "#ececec"
     TAB_BORDER   = "#007acc"
+    SCROLLBAR    = "#c1c1c1"
+    BADGE_BG     = "#e0e0e0"
+    SHADOW       = "#00000018"
+    THEME_NAME   = "Quiet Light"
+    IS_DARK      = False
 
 class FormalVerifierApp(ctk.CTk):
     def __init__(self):
@@ -1028,7 +1177,8 @@ class FormalVerifierApp(ctk.CTk):
         self.sidebar_collapsed_width = 80
         self.sidebar_is_expanded = True
         self.grid_columnconfigure(0, weight=0, minsize=self.sidebar_expanded_width)
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=0) # Resize handle column
+        self.grid_columnconfigure(2, weight=1) # Main content area
         self.grid_rowconfigure(0, weight=1)
 
         # Initialize variables before using them
@@ -1050,9 +1200,16 @@ class FormalVerifierApp(ctk.CTk):
         # Create sidebar
         self.create_sidebar()
 
+        # Resize handle for sidebar
+        self.sidebar_resize_handle = ctk.CTkFrame(
+            self, width=4, cursor="sb_h_double_arrow",
+            fg_color=self.theme.BORDER, corner_radius=0
+        )
+        self.sidebar_resize_handle.grid(row=0, column=1, sticky="ns")
+
         # ==================== MAIN CONTENT AREA ====================
         self.main_frame = ctk.CTkFrame(self, corner_radius=0, fg_color=self.theme.BG)
-        self.main_frame.grid(row=0, column=1, sticky="nsew")
+        self.main_frame.grid(row=0, column=2, sticky="nsew")
         self.main_frame.grid_columnconfigure(0, weight=1)
 
         # Configure main frame for vertical layout (70% top, 30% bottom)
@@ -1464,18 +1621,40 @@ class FormalVerifierApp(ctk.CTk):
             font=ctk.CTkFont(family="Segoe UI", size=12),
             text_color=t.TEXT_MAIN
         )
-        self.verbose_switch.pack(anchor="w", padx=20, pady=(2, 4))
+        self.verbose_switch.pack(anchor="w", padx=20, pady=(2, 6))
 
-        # Theme toggle
-        theme_row = ctk.CTkFrame(self.sidebar_scroll, fg_color="transparent")
-        theme_row.pack(fill="x", padx=20, pady=(2, 8))
+        # ── Colour Theme picker ───────────────────────────────────────
+        self._sidebar_section("COLOUR THEME")
+
+        # Instantiate theme manager (EnhancedThemeManager is a no-op superset)
+        self.theme_manager = EnhancedThemeManager(self)
+        saved_theme = self.theme_manager.load_theme_preference()
+
+        theme_panel_container = ctk.CTkFrame(
+            self.sidebar_scroll,
+            fg_color=t.PANEL_BG,
+            corner_radius=8,
+            border_width=1,
+            border_color=t.BORDER
+        )
+        theme_panel_container.pack(fill="x", padx=12, pady=(4, 6))
+
+        self.theme_settings = ThemeSettingsPanel(
+            theme_panel_container,
+            self.theme_manager,
+        )
+        self.theme_settings.pack(fill="x", padx=10, pady=8)
+
+        # ── Light / Dark quick toggle ─────────────────────────────────
+        toggle_row = ctk.CTkFrame(self.sidebar_scroll, fg_color="transparent")
+        toggle_row.pack(fill="x", padx=20, pady=(0, 8))
         ctk.CTkLabel(
-            theme_row, text="App Theme:",
+            toggle_row, text="Mode:",
             font=ctk.CTkFont(family="Segoe UI", size=12),
             text_color=t.TEXT_DIM
         ).pack(side="left")
         self.theme_switch = ctk.CTkSwitch(
-            theme_row, text="Dark Mode",
+            toggle_row, text="Dark Mode",
             command=self.toggle_theme,
             progress_color=t.ACCENT,
             button_color=t.TEXT_DIM,
@@ -1486,6 +1665,34 @@ class FormalVerifierApp(ctk.CTk):
         self.theme_switch.pack(side="right")
         if self.theme_mode == "dark":
             self.theme_switch.select()
+
+        # ── Font size slider ──────────────────────────────────────────
+        self._sidebar_section("EDITOR FONT SIZE")
+
+        font_row = ctk.CTkFrame(self.sidebar_scroll, fg_color="transparent")
+        font_row.pack(fill="x", padx=20, pady=(4, 2))
+
+        self._font_size_var = tk.IntVar(value=13)
+        self._font_size_label = ctk.CTkLabel(
+            font_row, text="13 px",
+            font=ctk.CTkFont(family="Fira Code", size=11),
+            text_color=t.TEXT_DIM, width=40
+        )
+        self._font_size_label.pack(side="right")
+
+        self._font_slider = ctk.CTkSlider(
+            font_row,
+            from_=9, to=20,
+            number_of_steps=11,
+            variable=self._font_size_var,
+            command=self._on_font_size_change,
+            progress_color=t.ACCENT,
+            button_color=t.ACCENT,
+            button_hover_color=t.ACCENT_DARK,
+            height=16,
+        )
+        self._font_slider.pack(side="left", fill="x", expand=True, padx=(0, 8))
+        self._font_slider.set(13)
 
         # ── CONSOLE OPERATIONS ───────────────────────────────────────
         self._sidebar_section("CONSOLE")
@@ -1699,8 +1906,7 @@ class FormalVerifierApp(ctk.CTk):
 
     def setup_resizable_panels(self):
         """Setup resizable panels with drag handles"""
-        # We already have self.sidebar_resize_handle in the sidebar container
-        # from create_sidebar, so we just need to bind it if not already done
+        # Bind sidebar resize handle
         if hasattr(self, 'sidebar_resize_handle'):
             self.sidebar_resize_handle.bind("<Button-1>", self.start_sidebar_resize)
             self.sidebar_resize_handle.bind("<B1-Motion>", self.resize_sidebar)
@@ -1713,12 +1919,12 @@ class FormalVerifierApp(ctk.CTk):
         self.main_frame.grid_rowconfigure(2, weight=3)
 
         # Move bottom_panel to row 2 (it was row 1)
-        self.bottom_panel.grid(row=2, column=0, sticky="nsew", padx=20, pady=(10, 20))
+        self.bottom_panel.grid(row=2, column=0, sticky="nsew", padx=0, pady=0)
 
         # Create the horizontal handle in row 1
         self.editor_console_handle = ctk.CTkFrame(self.main_frame, height=4, cursor="sb_v_double_arrow",
                                                    fg_color=self.theme.BORDER)
-        self.editor_console_handle.grid(row=1, column=0, sticky="ew", padx=20, pady=0)
+        self.editor_console_handle.grid(row=1, column=0, sticky="ew", padx=0, pady=0)
 
         # Bind drag events for vertical resize
         self.editor_console_handle.bind("<Button-1>", self.start_vertical_resize)
@@ -1740,27 +1946,18 @@ class FormalVerifierApp(ctk.CTk):
         self.start_sidebar_width = self.sidebar.winfo_width()
 
     def resize_sidebar(self, event):
-        """Handle sidebar resize with improved stability"""
+        """Handle sidebar resize"""
         if self.resizing_sidebar:
             delta = event.x_root - self.start_sidebar_x
-            new_width = max(250, min(800, self.start_sidebar_width + delta))
+            new_width = max(80, min(800, self.start_sidebar_width + delta))
 
-            # Use a smaller throttle for better responsiveness
-            if not hasattr(self, '_last_resize_time'):
-                self._last_resize_time = 0
-
-            current_time = time.time()
-            if current_time - self._last_resize_time > 0.008:  # ~120fps
-                # Update container and sidebar width
-                self.sidebar_container.configure(width=new_width + 15)
-                self.sidebar.configure(width=new_width)
-
-                # Update grid minsize less frequently to avoid shakiness
-                if abs(new_width - getattr(self, '_last_grid_width', 0)) > 5:
-                    self.grid_columnconfigure(0, minsize=new_width + 15)
-                    self._last_grid_width = new_width
-
-                self._last_resize_time = current_time
+            # Update sidebar width and grid column minsize
+            self.sidebar.configure(width=new_width)
+            self.grid_columnconfigure(0, minsize=new_width)
+            
+            # Update internal scrollable sidebar if it exists
+            if hasattr(self, 'sidebar_inner'):
+                self.sidebar_inner.configure_width(new_width)
 
     def stop_sidebar_resize(self, event):
         """Stop sidebar resize operation"""
@@ -1790,64 +1987,78 @@ class FormalVerifierApp(ctk.CTk):
         self.resizing_vertical = False
 
     def add_theme_settings(self):
-        """Add theme settings panel to sidebar"""
+        """Add/refresh theme settings panel in sidebar (no-op if already built in create_sidebar)."""
+        # ThemeSettingsPanel is now embedded directly in create_sidebar via the
+        # COLOUR THEME section.  This method is kept for backward-compatibility
+        # with any code that calls it; it simply ensures the manager is wired up.
+        if not hasattr(self, 'theme_manager'):
+            self.theme_manager = EnhancedThemeManager(self)
+
+        # Rebuild the custom colour-picker buttons so they reflect the current theme
         sidebar_inner = self.sidebar_inner.get_inner_frame()
+        old = getattr(self, '_custom_color_frame', None)
+        if old:
+            try:
+                old.destroy()
+            except Exception:
+                pass
 
-        # Find where to insert theme settings (after settings section)
         theme_frame = ctk.CTkFrame(sidebar_inner, fg_color="transparent")
-        theme_frame.pack(fill="x", pady=5)
+        theme_frame.pack(fill="x", pady=(4, 0))
+        self._custom_color_frame = theme_frame
 
-        # Add theme settings
-        self.theme_settings = ThemeSettingsPanel(theme_frame, self.theme_manager)
-        self.theme_settings.pack(fill="x")
-
-        # Add custom color picker for advanced customization
         ctk.CTkLabel(
             theme_frame,
-            text="",
+            text="Custom Colour Overrides",
             font=ctk.CTkFont(size=10, weight="bold"),
             text_color="#888888"
-        ).pack(anchor="w", pady=(10, 5))
+        ).pack(anchor="w", pady=(8, 4))
 
-        # Color picker buttons
         color_frame = ctk.CTkFrame(theme_frame, fg_color="transparent")
-        color_frame.pack(fill="x", pady=5)
+        color_frame.pack(fill="x", pady=(0, 4))
 
         colors = ["accent", "success", "error", "warning"]
         color_labels = ["Accent", "Success", "Error", "Warning"]
+        cur_theme = self.theme_manager.THEMES.get(self.theme_manager.current_theme, {})
 
         for color, label in zip(colors, color_labels):
+            swatch_color = cur_theme.get(color, "#555555")
             btn = ctk.CTkButton(
                 color_frame,
-                text=f"{label}",
-                width=80,
-                height=30,
+                text=label,
+                width=70, height=28,
                 font=ctk.CTkFont(size=10),
-                fg_color=self.theme_manager.THEMES[self.theme_manager.current_theme][color],
+                fg_color=swatch_color,
+                hover_color=swatch_color,
+                corner_radius=4,
                 command=lambda c=color: self.pick_custom_color(c)
             )
-            btn.pack(side="left", padx=2)
+            btn.pack(side="left", padx=(0, 4))
 
     def pick_custom_color(self, color_key):
-        """Open color picker dialog for custom color selection"""
+        """Open colour picker dialog and apply a custom override to the current theme."""
         import tkinter.colorchooser as colorchooser
 
-        color = colorchooser.askcolor(title=f"Select {color_key} color")
-        if color[1]:
-            # Update theme
-            theme = self.theme_manager.THEMES[self.theme_manager.current_theme].copy()
-            theme[color_key] = color[1]
+        cur = self.theme_manager.current_theme
+        initial = self.theme_manager.THEMES.get(cur, {}).get(color_key, "#007acc")
+        color = colorchooser.askcolor(color=initial, title=f"Select {color_key} colour")
+        if not color[1]:
+            return
 
-            # Create temporary theme
-            custom_theme_name = f"{self.theme_manager.current_theme} (Custom)"
-            self.theme_manager.THEMES[custom_theme_name] = theme
+        # Clone and mutate the current theme under a "(Custom)" suffix
+        theme = self.theme_manager.THEMES[cur].copy()
+        theme[color_key] = color[1]
+        custom_theme_name = f"{cur} (Custom)"
+        self.theme_manager.THEMES[custom_theme_name] = theme
 
-            # Apply custom theme
-            self.theme_manager.apply_theme(custom_theme_name)
+        # Apply the custom theme
+        self.theme_manager.apply_theme(custom_theme_name)
 
-            # Update dropdown
-            self.theme_settings.theme_dropdown.configure(values=list(self.theme_manager.THEMES.keys()))
-            self.theme_settings.theme_var.set(custom_theme_name)
+        # Refresh the theme settings panel if it exists
+        if hasattr(self, 'theme_settings'):
+            self.theme_settings._by_category = self.theme_manager.themes_by_category()
+            cat = theme.get("_category", "dark")
+            self.theme_settings._select_category(cat, initial_theme=custom_theme_name)
 
     def setup_keyboard_shortcuts(self):
         """Setup keyboard shortcuts for panel resizing"""
@@ -2002,6 +2213,25 @@ class FormalVerifierApp(ctk.CTk):
 
         # Re-apply theme to all components
         self.update_ui_colors()
+
+    def _on_font_size_change(self, value):
+        """Update all editor and console font sizes from the sidebar slider."""
+        size = int(value)
+        self._font_size_label.configure(text=f"{size} px")
+        font_mono = ctk.CTkFont(family="Fira Code", size=size)
+        font_ui   = ctk.CTkFont(family="Segoe UI",  size=size)
+        for widget in (
+            getattr(self, "source_editor",     None),
+            getattr(self, "spec_editor",       None),
+            getattr(self, "translated_editor", None),
+            getattr(self, "problems_text",     None),
+            getattr(self, "console_widget",    None),
+        ):
+            if widget is not None:
+                try:
+                    widget.configure(font=font_mono)
+                except Exception:
+                    pass
 
     def update_ui_colors(self):
         """Re-apply theme tokens to all major UI components."""
@@ -2424,7 +2654,8 @@ class FormalVerifierApp(ctk.CTk):
             self.sidebar_is_expanded = True
         self.sidebar.configure(width=target)
         self.grid_columnconfigure(0, minsize=target)
-        self.sidebar_inner.configure(width=max(160, target - 40))
+        if hasattr(self, 'sidebar_inner'):
+            self.sidebar_inner.configure_width(target)
         self.sidebar.update_idletasks()
 
     def set_tool_running(self, tool, running):
@@ -5881,220 +6112,25 @@ def run_nicegui_interface():
 flask_app = Flask(__name__,
     template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'web_portal', 'templates'))
 
+@flask_app.after_request
+def add_header(response):
+    """Disable caching for all responses to ensure latest UI and results"""
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+
 @flask_app.route('/')
 def desktop_home():
     """Main desktop application page"""
-    # Try to render template, fall back to inline HTML if template missing
-    template_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        'web_portal', 'templates', 'desktop_app.html'
-    )
+    return render_template('desktop_app.html', timestamp=time.time())
 
-    if not os.path.exists(template_path):
-        # Return a simple inline dashboard if template doesn't exist
-        return '''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>DeFi Guardian</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-            <style>
-                body { background: #0a0a0f; color: #e6edf3; font-family: Inter, sans-serif; }
-                .container { max-width: 1200px; margin: 2rem auto; }
-                .card { background: #131720; border: 1px solid #21262d; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-                .text-accent { color: #00ffcc; }
-                .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-                .status-dot.online { background: #238636; }
-                .status-dot.offline { background: #da3633; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h2><i class="fas fa-shield-halved text-accent"></i> DeFi Guardian</h2>
-                <p class="text-muted">Formal Verification Suite — Web Interface</p>
+@flask_app.route('/api/v1/health')
+def api_health():
+    """Health check for the integrated Flask server"""
+    return jsonify({"status": "ok", "timestamp": time.time(), "version": "2.0.0"})
 
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <h5><i class="fas fa-microchip text-accent"></i> Tool Status</h5>
-                            <div id="toolStatus">Loading...</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <h5><i class="fas fa-chart-bar text-accent"></i> Verification Stats</h5>
-                            <div id="verifStats">Loading...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-3">
-                    <h5><i class="fas fa-info-circle text-accent"></i> Quick Links</h5>
-                    <div class="mt-3">
-                        <a href="#" class="btn btn-sm btn-outline-light me-2">Open Desktop App</a>
-                        <button class="btn btn-sm btn-outline-light me-2" onclick="refreshData()">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                async function refreshData() {
-                    try {
-                        const toolResp = await fetch('/api/tools/status');
-                        const tools = await toolResp.json();
-                        document.getElementById('toolStatus').innerHTML =
-                            Object.entries(tools).map(([t, ok]) =>
-                                `<div class="mb-1"><span class="status-dot ${ok ? 'online' : 'offline'}"></span>
-                                ${t.toUpperCase()}: ${ok ? 'Available' : 'Not Found'}</div>`
-                            ).join('');
-
-                        const stateResp = await fetch('/api/state/current');
-                        const state = await stateResp.json();
-                        document.getElementById('verifStats').innerHTML =
-                            `<p>States Explored: ${state.states_stored || 0}</p>` +
-                            `<p>Depth: ${state.depth || 0}</p>` +
-                            `<p>Last Verification: ${state.datetime || 'Never'}</p>`;
-                    } catch(e) {
-                        document.getElementById('toolStatus').textContent = 'Error loading data';
-                    }
-                }
-                refreshData();
-            </script>
-        </body>
-        </html>
-        '''
-
-    return render_template('desktop_app.html')
-
-@flask_app.route('/api/file/open', methods=['POST'])
-def api_open_file():
-    """Open and read a file"""
-    data = request.json
-    file_path = data.get('path')
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        return jsonify({
-            'success': True,
-            'content': content,
-            'filename': os.path.basename(file_path),
-            'file_type': os.path.splitext(file_path)[1].lower()
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@flask_app.route('/api/translate', methods=['POST'])
-def api_translate_contract():
-    """Translate Solidity/Rust to Promela"""
-    data = request.json
-    source_code = data.get('code', '')
-    file_type = data.get('file_type', '.sol')
-
-    try:
-        from translator import DeFiTranslator, VerifiedTranslator
-
-        if file_type == '.sol':
-            translator = VerifiedTranslator()
-            translated, obligations = translator.translate_with_proof(source_code)
-        elif file_type == '.rs':
-            translated = DeFiTranslator.translate_rust(source_code)
-        else:
-            translated = source_code
-
-        # Save to disk
-        output_path = os.path.join(MODELS_DIR, "translated_output.pml")
-        with open(output_path, 'w') as f:
-            f.write(translated)
-
-        # Extract LTL properties
-        ltl_properties = []
-        ltl_pattern = r'ltl\s+(\w+)\s*\{([^}]+)\}'
-        for match in re.finditer(ltl_pattern, translated, re.DOTALL):
-            ltl_properties.append({
-                'name': match.group(1),
-                'formula': match.group(2).strip()
-            })
-
-        return jsonify({
-            'success': True,
-            'translated': translated,
-            'ltl_properties': ltl_properties,
-            'output_path': output_path
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@flask_app.route('/api/verify/spin', methods=['POST'])
-def api_verify_spin():
-    """Run SPIN verification via API"""
-    data = request.json
-    translated_code = data.get('code', '')
-
-    pml_path = os.path.join(MODELS_DIR, "temp_verify.pml")
-    with open(pml_path, 'w') as f:
-        f.write(translated_code)
-
-    try:
-        result = subprocess.run(
-            ['spin', '-a', pml_path],
-            capture_output=True, text=True, timeout=60,
-            cwd=PROJECT_DIR
-        )
-
-        spin_output = result.stdout + '\n' + result.stderr
-
-        pan_path = os.path.join(SPIN_LOGS, "pan")
-        compile_result = subprocess.run(
-            ['gcc', '-O3', '-o', pan_path, 'pan.c'],
-            capture_output=True, text=True, timeout=60,
-            cwd=PROJECT_DIR
-        )
-
-        if compile_result.returncode != 0:
-            return jsonify({
-                'success': False,
-                'error': f'Compilation failed: {compile_result.stderr}',
-                'spin_output': spin_output
-            })
-
-        verify_result = subprocess.run(
-            [pan_path, '-a'],
-            capture_output=True, text=True, timeout=120,
-            cwd=PROJECT_DIR
-        )
-
-        output = verify_result.stdout
-        has_errors = 'errors: 0' not in output or 'assertion violated' in output.lower()
-
-        # Update app state if possible
-        VerificationState.save_result(not has_errors, output, verify_result.stderr, "API_Spin")
-
-        return jsonify({
-            'success': not has_errors,
-            'output': output,
-            'has_counterexample': has_errors
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@flask_app.route('/api/tools/status')
-def api_tools_status():
-    """Check tool availability for API"""
-    tools = {}
-    for tool, cmd in [('spin', ['spin', '-V']), ('coq', ['coqc', '--version']),
-                      ('lean', ['lean', '--version']), ('prusti', ['prusti-rustc', '--version']),
-                      ('kani', ['cargo', 'kani', '--version'])]:
-        try:
-            r = subprocess.run(cmd, capture_output=True, timeout=2)
-            tools[tool] = r.returncode == 0
-        except:
-            tools[tool] = False
-    return jsonify(tools)
-
-@flask_app.route('/api/state/current')
+@flask_app.route('/api/v1/state/current')
 def api_current_state():
     """Get current verification state from unified source"""
     state_file = os.path.join(PROJECT_DIR, "verification_state.json")
@@ -6104,170 +6140,96 @@ def api_current_state():
                 return jsonify(json.load(f))
         except:
             pass
-    # Fallback to REPORTS_DIR if not in root
-    state_file_alt = os.path.join(REPORTS_DIR, "verification_state.json")
-    if os.path.exists(state_file_alt):
-        try:
-            with open(state_file_alt, 'r') as f:
-                return jsonify(json.load(f))
-        except:
-            pass
     return jsonify({})
 
-@flask_app.route('/api/activity/recent')
-def api_recent_activity():
-    """Get recent jobs from audit log, normalised for the dashboard"""
+@flask_app.route('/api/v1/tools/status')
+def api_tools_status():
+    """Check tool availability for API"""
+    tools = {}
+    # Enhanced tool check including certora and others
+    check_list = [
+        ('spin', ['spin', '-V']), 
+        ('coq', ['coqc', '--version']),
+        ('lean', ['lean', '--version']), 
+        ('prusti', ['prusti-rustc', '--version']),
+        ('kani', ['cargo', 'kani', '--version']),
+        ('certora', ['certora-cli', '--version']),
+        ('solc', ['solc', '--version'])
+    ]
+    for tool, cmd in check_list:
+        try:
+            r = subprocess.run(cmd, capture_output=True, timeout=2)
+            tools[tool] = r.returncode == 0
+        except:
+            tools[tool] = False
+    return jsonify(tools)
+
+@flask_app.route('/api/v1/desktop-runs')
+def api_desktop_runs():
+    """Get recent jobs from audit log for desktop activity feed"""
     if os.path.exists(AUDIT_LOG_FILE):
         try:
             with open(AUDIT_LOG_FILE, 'r') as f:
                 raw = json.load(f)
-            # Normalise field names so the dashboard JS can use them consistently
             result = []
+            # Sort by timestamp descending just in case
+            try:
+                raw.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+            except:
+                pass
+                
             for r in raw[:20]:
                 result.append({
-                    'datetime':   r.get('timestamp', r.get('datetime', '')),
-                    'model_name': os.path.basename(r.get('file', r.get('model_name', 'Unknown'))),
-                    'tool':       r.get('tool', ''),
-                    'status':     r.get('status', ''),
-                    'states':     r.get('details', {}).get('states', 0),
-                    'depth':      r.get('details', {}).get('depth', 0),
+                    'id': r.get('id', 'unk'),
+                    'timestamp': r.get('timestamp', ''),
+                    'file': os.path.basename(r.get('file', 'Unknown')),
+                    'tool': r.get('tool', ''),
+                    'status': r.get('status', ''),
+                    'states': r.get('details', {}).get('states', 0)
                 })
             return jsonify(result)
         except Exception:
             pass
     return jsonify([])
 
+@flask_app.route('/api/v1/portal/start')
+def api_start_portal():
+    """API endpoint to trigger portal start from web UI"""
+    # This is a bit tricky as we need to access the app instance
+    # We'll use a global or find the instance
+    try:
+        # Check if portal is already up
+        import socket
+        with socket.create_connection(("localhost", 5000), timeout=0.5):
+            return jsonify({"status": "already_running", "url": "http://localhost:5000/dashboard"})
+    except:
+        pass
+        
+    # Trigger the background launch (we can't easily call app.open_account_dashboard() 
+    # without a reference, so we'll just re-implement the launch logic briefly)
+    def _launch():
+        try:
+            web_portal_dir = os.path.join(PROJECT_DIR, 'web_portal')
+            web_app_path = os.path.join(web_portal_dir, 'app.py')
+            portal_log = os.path.join(LOGS_DIR, "portal_server.log")
+            with open(portal_log, 'w') as log_f:
+                subprocess.Popen(
+                    [sys.executable, '-u', web_app_path],
+                    cwd=web_portal_dir,
+                    stdout=log_f,
+                    stderr=log_f,
+                    env={**os.environ, 'PYTHONUNBUFFERED': '1'}
+                )
+        except:
+            pass
+            
+    threading.Thread(target=_launch, daemon=True).start()
+    return jsonify({"status": "starting", "url": "http://localhost:5000/dashboard"})
+
 @flask_app.route('/dashboard')
 def desktop_dashboard():
-    """Dashboard route — serves the same desktop_app.html template (no login required for local desktop use)"""
-    template_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        'web_portal', 'templates', 'desktop_app.html'
-    )
-    if os.path.exists(template_path):
-        return render_template('desktop_app.html')
-
-    # Inline fallback dashboard if template is missing
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>DeFi Guardian — Dashboard</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body { background: #f0f2f5; color: #1e293b; font-family: Inter, sans-serif; }
-            nav { background: #1e293b; padding: 0.85rem 2rem; display: flex; align-items: center; }
-            nav a.brand { color: #2dd4bf; font-weight: 800; font-size: 1.1rem; text-decoration: none; }
-            .nav-btn { background: #0d9488; color: #fff; border: none; border-radius: 8px;
-                       padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 600;
-                       text-decoration: none; margin-left: 0.5rem; }
-            .nav-btn.purple { background: #7c3aed; }
-            .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-            .card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px;
-                    padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-            .card h5 { color: #1e293b; font-weight: 700; margin-bottom: 1rem; }
-            .text-accent { color: #0d9488; }
-            .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-            .status-dot.online { background: #16a34a; }
-            .status-dot.offline { background: #dc2626; }
-            .text-muted { color: #64748b !important; }
-            h2 { color: #0d9488; }
-        </style>
-    </head>
-    <body>
-        <nav>
-            <a class="brand" href="/"><i class="fas fa-shield-halved"></i> DeFi Guardian</a>
-            <div class="ms-auto">
-                <a href="/dashboard" class="nav-btn"><i class="fas fa-chart-line me-1"></i> Verification Dashboard</a>
-                <a href="http://localhost:5000/dashboard" class="nav-btn purple"><i class="fas fa-user-circle me-1"></i> Account Dashboard</a>
-            </div>
-        </nav>
-        <div class="container">
-            <h2 class="mt-4"><i class="fas fa-shield-halved"></i> DeFi Guardian — Dashboard</h2>
-            <p class="text-muted mb-4">Formal Verification Suite — Local Desktop Interface</p>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <h5><i class="fas fa-microchip text-accent me-2"></i> Tool Status</h5>
-                        <div id="toolStatus">Loading...</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <h5><i class="fas fa-chart-bar text-accent me-2"></i> Verification Stats</h5>
-                        <div id="verifStats">Loading...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h5><i class="fas fa-history text-accent me-2"></i> Recent Activity</h5>
-                <div id="recentActivity">Loading...</div>
-            </div>
-        </div>
-
-        <script>
-            async function refreshData() {
-                try {
-                    const toolResp = await fetch('/api/tools/status');
-                    const tools = await toolResp.json();
-                    document.getElementById('toolStatus').innerHTML =
-                        Object.entries(tools).map(([t, ok]) =>
-                            `<div class="mb-1"><span class="status-dot ${ok ? 'online' : 'offline'}"></span>
-                            ${t.toUpperCase()}: ${ok ? 'Available' : 'Not Found'}</div>`
-                        ).join('');
-
-                    const stateResp = await fetch('/api/state/current');
-                    const state = await stateResp.json();
-                    const ltlResults = state.ltl_results || [];
-                    const passed = ltlResults.filter(r => r.success).length;
-                    const failed = ltlResults.filter(r => !r.success).length;
-                    document.getElementById('verifStats').innerHTML =
-                        `<p>States Explored: <strong>${state.states_stored || state.states || 0}</strong></p>` +
-                        `<p>Depth Reached: <strong>${state.depth || 0}</strong></p>` +
-                        `<p>Transitions: <strong>${state.transitions || 0}</strong></p>` +
-                        `<p>LTL Passed: <strong style="color:#3fb950">${passed}</strong> / Failed: <strong style="color:#f85149">${failed}</strong></p>` +
-                        `<p>Last Run: <strong>${state.datetime || 'Never'}</strong></p>` +
-                        `<p>File: <strong>${state.model_name || '—'}</strong></p>`;
-
-                    const actResp = await fetch('/api/activity/recent');
-                    const activity = await actResp.json();
-                    document.getElementById('recentActivity').innerHTML = activity.length
-                        ? `<table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-                            <thead><tr style="color:#8b949e;text-align:left;">
-                              <th style="padding:4px 8px;">Time</th>
-                              <th style="padding:4px 8px;">File</th>
-                              <th style="padding:4px 8px;">Tool</th>
-                              <th style="padding:4px 8px;">Status</th>
-                              <th style="padding:4px 8px;">States</th>
-                            </tr></thead>
-                            <tbody>${activity.map(a => `<tr style="border-top:1px solid #30363d;">
-                              <td style="padding:4px 8px;color:#8b949e;font-size:0.78rem;">${(a.datetime||'').slice(0,16)}</td>
-                              <td style="padding:4px 8px;font-family:monospace;">${a.model_name||'—'}</td>
-                              <td style="padding:4px 8px;">${a.tool||'—'}</td>
-                              <td style="padding:4px 8px;">
-                                <span style="padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:700;
-                                  background:${(a.status==='SUCCESS'||a.status==='PASS')?'rgba(63,185,80,0.15)':'rgba(248,81,73,0.15)'};
-                                  color:${(a.status==='SUCCESS'||a.status==='PASS')?'#3fb950':'#f85149'};">
-                                  ${(a.status==='SUCCESS'||a.status==='PASS')?'PASS':'FAIL'}
-                                </span>
-                              </td>
-                              <td style="padding:4px 8px;">${a.states||0}</td>
-                            </tr>`).join('')}</tbody>
-                           </table>`
-                        : '<p class="text-muted">No recent activity</p>';
-                } catch(e) {
-                    document.getElementById('toolStatus').textContent = 'Error loading data';
-                }
-            }
-            refreshData();
-            setInterval(refreshData, 10000);
-        </script>
-    </body>
-    </html>
-    '''
+    """Dashboard route — serves the same desktop_app.html template"""
+    return render_template('desktop_app.html', timestamp=time.time())
 
 # Import verification server routes for portal compatibility
 try:

@@ -216,6 +216,13 @@ def _get_verif_url():
     if env_url: return env_url
     host = request.headers.get("Host", "127.0.0.1")
     if any(local in host for local in ["localhost", "127.0.0.1"]):
+        # Try primary desktop port, then preview port
+        import socket
+        for port in [5005, 5009, 5006]:
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=0.1):
+                    return f"http://127.0.0.1:{port}"
+            except: continue
         return "http://127.0.0.1:5005"
     return os.environ.get("REMOTE_VERIFICATION_URL", "http://127.0.0.1:9005")
 

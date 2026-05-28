@@ -29,22 +29,25 @@ def sync_local_to_remote():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # 1. Fetch local audits that haven't been synced (or just sync all latest)
-    print("Fetching local audit records...")
+    # 1. Fetch local audits and users
+    print("Fetching local records...")
     audits = cursor.execute("SELECT * FROM audit_history ORDER BY audit_date DESC LIMIT 50").fetchall()
+    users = cursor.execute("SELECT * FROM user WHERE username != 'demo'").fetchall()
     
-    sync_data = []
+    sync_jobs = []
     for row in audits:
-        # Convert row to dict and handle datetime
-        audit_dict = dict(row)
-        sync_data.append(audit_dict)
+        sync_jobs.append(dict(row))
 
-    if not sync_data:
+    sync_users = []
+    for row in users:
+        sync_users.append(dict(row))
+
+    if not sync_jobs and not sync_users:
         print("No local data to sync.")
         return
 
     # 2. Push to remote API
-    print(f"Pushing {len(sync_data)} records to {REMOTE_URL}...")
+    print(f"Pushing {len(sync_jobs)} jobs and {len(sync_users)} users to {REMOTE_URL}...")
     try:
         endpoint = f"{REMOTE_URL.rstrip('/')}/api/v1/sync-audit"
         headers = {
@@ -52,7 +55,6 @@ def sync_local_to_remote():
             "X-Sync-Token": SYNC_TOKEN
         }
         
-        # We send it in the format the API expects (the 'jobs' list)
         payload = {
             "jobs": [
                 {
@@ -69,7 +71,17 @@ def sync_local_to_remote():
                     "log_content": a.get('verification_output', ""),
                     "trail_path": a.get('report_path', "")
                 }
-                for a in sync_data
+                for a in sync_jobs
+            ],
+            "users": [
+                {
+                    "username": u['username'],
+                    "email": u.get('email'),
+                    "password_hash": u.get('password_hash'),
+                    "role": u.get('role', 'user'),
+                    "organization": u.get('organization')
+                }
+                for u in sync_users
             ]
         }
 

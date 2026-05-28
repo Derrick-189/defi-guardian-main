@@ -4271,6 +4271,13 @@
               "icon": "log",
               "path": "reports/counterexamples/counterexample_20260508_131329.log",
               "size": 601
+            },
+            {
+              "name": "counterexample_20260528_143801.log",
+              "type": "file",
+              "icon": "log",
+              "path": "reports/counterexamples/counterexample_20260528_143801.log",
+              "size": 601
             }
           ]
         },
@@ -4468,7 +4475,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/counterexample.js",
-                  "size": 30436
+                  "size": 35010
                 },
                 {
                   "name": "dashboard.js",
@@ -4595,7 +4602,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/counterexample.html",
-              "size": 24000
+              "size": 26118
             },
             {
               "name": "counterexample.html.bak",
@@ -4616,7 +4623,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/desktop_app.html",
-              "size": 17617
+              "size": 19065
             },
             {
               "name": "index.html",
@@ -4665,7 +4672,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/services.html",
-              "size": 8156
+              "size": 9482
             },
             {
               "name": "settings.html",
@@ -4714,7 +4721,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/visualization.html",
-              "size": 56207
+              "size": 57236
             }
           ]
         },
@@ -4946,6 +4953,227 @@
                   "size": 17812
                 }
               ]
+            },
+            {
+              "name": "job-129",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-129/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-130",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-130/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-131",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-131/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-132",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-132/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-133",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-133/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-134",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-134/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-135",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-135/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-136",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-136/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-137",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-137/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-138",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-138/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-139",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-139/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-140",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-140/contract.pml",
+                  "size": 530
+                }
+              ]
+            },
+            {
+              "name": "job-141",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-141/contract.pml",
+                  "size": 16
+                }
+              ]
+            },
+            {
+              "name": "job-142",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-142/contract.pml",
+                  "size": 16
+                }
+              ]
+            },
+            {
+              "name": "job-143",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-143/contract.pml",
+                  "size": 19
+                }
+              ]
+            },
+            {
+              "name": "job-144",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/uploads/job-144/contract.sol",
+                  "size": 19
+                }
+              ]
+            },
+            {
+              "name": "job-145",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/uploads/job-145/contract.sol",
+                  "size": 19
+                }
+              ]
             }
           ]
         },
@@ -5082,7 +5310,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 62739
+          "size": 67323
         },
         {
           "name": "api_v1.py.bak",
@@ -5096,7 +5324,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/app.py",
-          "size": 29531
+          "size": 30643
         },
         {
           "name": "app.py.bak",
@@ -5110,7 +5338,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/audit_db.py",
-          "size": 19404
+          "size": 20593
         },
         {
           "name": "benchmarks_runner.py",
@@ -5131,7 +5359,7 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/defi_guardian.db",
-          "size": 675840
+          "size": 688128
         },
         {
           "name": "defi_guardian.db.migrated",
@@ -5145,7 +5373,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/ensure_admin.py",
-          "size": 1996
+          "size": 1855
         },
         {
           "name": "llm_spec.py",
@@ -5180,7 +5408,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/tasks.py",
-          "size": 6464
+          "size": 9810
         },
         {
           "name": "trace_parsers.py",
@@ -5194,28 +5422,28 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/utils.py",
-          "size": 7493
+          "size": 18890
         },
         {
           "name": "verification_queue.db",
           "type": "file",
           "icon": "file",
           "path": "web_portal/verification_queue.db",
-          "size": 49152
+          "size": 57344
         },
         {
           "name": "verification_server.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_server.py",
-          "size": 22010
+          "size": 23038
         },
         {
           "name": "verification_simulator.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_simulator.py",
-          "size": 15978
+          "size": 17351
         }
       ]
     },
@@ -5350,7 +5578,7 @@
       "type": "file",
       "icon": "python",
       "path": "desktop_app.py",
-      "size": 269339
+      "size": 272118
     },
     {
       "name": "desktop_bridge.py",
@@ -5399,7 +5627,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 183703
+      "size": 191069
     },
     {
       "name": "fix_admin.py",
@@ -5542,6 +5770,13 @@
       "size": 28070
     },
     {
+      "name": "preview_desktop_web.py",
+      "type": "file",
+      "icon": "python",
+      "path": "preview_desktop_web.py",
+      "size": 447
+    },
+    {
       "name": "PROJECT_STRUCTURE.md",
       "type": "file",
       "icon": "file",
@@ -5575,6 +5810,13 @@
       "icon": "text",
       "path": "requirements.txt",
       "size": 1616
+    },
+    {
+      "name": "run_buggy_test.py",
+      "type": "file",
+      "icon": "python",
+      "path": "run_buggy_test.py",
+      "size": 2231
     },
     {
       "name": "run_defi_guardian.sh",
@@ -5637,7 +5879,7 @@
       "type": "file",
       "icon": "python",
       "path": "sync_to_remote.py",
-      "size": 3737
+      "size": 4120
     },
     {
       "name": "test.v",
@@ -5679,7 +5921,7 @@
       "type": "file",
       "icon": "json",
       "path": "theme_config.json",
-      "size": 27
+      "size": 24
     },
     {
       "name": "themes.py",
@@ -5763,14 +6005,14 @@
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 1094
+      "size": 1128
     },
     {
       "name": "verification_worker.py",
       "type": "file",
       "icon": "python",
       "path": "verification_worker.py",
-      "size": 11850
+      "size": 13542
     },
     {
       "name": "verifier_plugins.py",

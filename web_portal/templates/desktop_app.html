@@ -123,13 +123,16 @@
             <i class="fas fa-shield-halved"></i> DeFi Guardian
         </a>
         <div class="ms-auto d-flex align-items-center gap-2">
-            <a href="http://localhost:5005/dashboard" class="nav-btn">
-                <i class="fas fa-chart-line me-1"></i> Verification Dashboard
+            <button onclick="location.reload()" class="nav-btn" title="Reload Dashboard">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <a href="/" class="nav-btn">
+                <i class="fas fa-chart-line me-1"></i> Dashboard
             </a>
-            <a href="http://localhost:5000/dashboard" class="nav-btn secondary">
-                <i class="fas fa-user-circle me-1"></i> Account Dashboard
-            </a>
-            <span class="ms-3" style="color:#94a3b8; font-size:0.85rem;">
+            <button onclick="startPortal()" class="nav-btn secondary" id="portalBtn">
+                <i class="fas fa-user-circle me-1"></i> Account Portal
+            </button>
+            <span class="ms-3 d-none d-md-inline" style="color:#94a3b8; font-size:0.85rem;">
                 <i class="fas fa-circle text-success me-1" style="color:#22c55e;"></i> System Online
             </span>
         </div>
@@ -139,7 +142,7 @@
         <!-- Stats Row -->
         <div class="row g-3 mb-4">
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" style="border-left: 4px solid #16a34a;">
                     <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
                         <i class="fas fa-check-circle"></i>
                     </div>
@@ -150,7 +153,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" style="border-left: 4px solid #dc2626;">
                     <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
                         <i class="fas fa-times-circle"></i>
                     </div>
@@ -161,7 +164,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" style="border-left: 4px solid #0d9488;">
                     <div class="stat-icon" style="background: #ccfbf1; color: #0d9488;">
                         <i class="fas fa-cubes"></i>
                     </div>
@@ -172,7 +175,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" style="border-left: 4px solid #ca8a04;">
                     <div class="stat-icon" style="background: #fef9c3; color: #ca8a04;">
                         <i class="fas fa-tools"></i>
                     </div>
@@ -215,21 +218,60 @@
     </div>
 
     <script>
+        async function startPortal() {
+            const btn = document.getElementById('portalBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch('/api/v1/portal/start?t=' + Date.now());
+                const data = await resp.json();
+                
+                if (data.status === 'already_running' || data.status === 'starting') {
+                    // Wait a bit if starting
+                    if (data.status === 'starting') {
+                        await new Promise(r => setTimeout(r, 2000));
+                    }
+                    window.open(data.url, '_blank');
+                }
+            } catch (err) {
+                console.error('Failed to start portal:', err);
+                alert('Failed to start account portal. Please ensure it is not already running on another port.');
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
         async function loadStatus() {
             try {
+                const t = Date.now();
                 // Load verification state and tool availability in parallel
                 const [stateResp, toolResp] = await Promise.all([
-                    fetch('/api/v1/state/current'),
-                    fetch('/api/v1/tools/status')
+                    fetch('/api/v1/state/current?t=' + t),
+                    fetch('/api/v1/tools/status?t=' + t)
                 ]);
+
+                if (!stateResp.ok || !toolResp.ok) {
+                    throw new Error(`HTTP Error: State=${stateResp.status}, Tools=${toolResp.status}`);
+                }
+
+                const stateContentType = stateResp.headers.get("content-type");
+                if (!stateContentType || !stateContentType.includes("application/json")) {
+                    const text = await stateResp.text();
+                    console.error("Expected JSON but got:", text.substring(0, 100));
+                    throw new Error("API returned non-JSON response (likely a 404 or 500 HTML page)");
+                }
+
                 const state = await stateResp.json();
                 const tools = await toolResp.json();
 
-                // ── Shared skip-key set (declared ONCE) ──────────────────
+                // ── Shared skip-key set ──────────────────────────────────
                 const SKIP_KEYS = new Set([
                     'success','datetime','states_stored','transitions','depth',
                     'specs','output','errors','model_name','verified',
-                    'ltl_results','errors_count','timestamp'
+                    'ltl_results','errors_count','timestamp', 'active_tool', 'active_status'
                 ]);
 
                 // ── Tool availability count ──────────────────────────────
@@ -238,37 +280,26 @@
                     v === true || (v && v.installed) || (v && v.status === 'available') || (v && v.status === 'degraded')
                 ).length;
                 document.getElementById('toolsAvailable').textContent =
-                    `${availableTools}/${toolEntries.length}`;
+                    availableTools > 0 ? `${availableTools}/${toolEntries.length}` : '0/' + toolEntries.length;
 
                 // ── States explored ──────────────────────────────────────
                 const statesVal = state.states_stored || state.states || 0;
-                document.getElementById('statesExplored').textContent = statesVal;
+                document.getElementById('statesExplored').textContent = statesVal.toLocaleString();
 
                 // ── Properties verified / violations ─────────────────────
-                // Strategy 1: structured ltl_results array (most accurate)
                 const ltlResults = (state.spin && state.spin.ltl_results) || state.ltl_results || [];
                 let passed = 0, failed = 0;
                 if (Array.isArray(ltlResults) && ltlResults.length > 0) {
                     ltlResults.forEach(r => {
-                        if (r.success) passed++; else failed++;
+                        if (r.success || r.status === 'PASS' || r.status === 'SUCCESS') passed++; else failed++;
                     });
                 } else {
-                    // Strategy 2: parse LTL blocks from SPIN output text
-                    const spinOutput = (state.spin && state.spin.output) || state.output || '';
-                    if (spinOutput) {
-                        spinOutput.split(/--- LTL /).slice(1).forEach(block => {
-                            const m = block.match(/errors:\s*(\d+)/);
-                            if (m) { if (parseInt(m[1]) === 0) passed++; else failed++; }
-                        });
-                    }
-                    // Strategy 3: tool-level pass/fail
-                    if (passed + failed === 0) {
-                        for (const [key, val] of Object.entries(state)) {
-                            if (SKIP_KEYS.has(key)) continue;
-                            if (val && typeof val === 'object' && 'success' in val) {
-                                if (val.success === true  || val.status === 'PASS') passed++;
-                                else if (val.success === false || val.status === 'FAIL') failed++;
-                            }
+                    // Strategy 2: tool-level pass/fail
+                    for (const [key, val] of Object.entries(state)) {
+                        if (SKIP_KEYS.has(key)) continue;
+                        if (val && typeof val === 'object' && ('success' in val || 'status' in val)) {
+                            if (val.success === true  || val.status === 'PASS' || val.status === 'SUCCESS') passed++;
+                            else if (val.success === false || val.status === 'FAIL') failed++;
                         }
                     }
                 }
@@ -279,101 +310,93 @@
                 const toolGrid = document.getElementById('toolGrid');
                 const toolNames = new Set(toolEntries.map(([t]) => t.toLowerCase()));
 
-                // Tools from /api/v1/tools/status
                 let gridHtml = toolEntries.map(([tool, v]) => {
                     const available = v === true || (v && v.installed) ||
                                       (v && (v.status === 'available' || v.status === 'degraded'));
                     const toolState = state[tool.toLowerCase()];
                     let badge = '';
-                    if (toolState && typeof toolState === 'object') {
-                        const ok      = toolState.success === true || toolState.status === 'PASS';
-                        const isInfra = toolState.status === 'INFRA_ERROR' || toolState.infra_error;
-                        const cls  = isInfra ? 'badge-warn' : (ok ? 'badge-pass' : 'badge-fail');
-                        const text = isInfra ? 'CONFIG'     : (ok ? 'PASS'       : 'FAIL');
+                    if (toolState && typeof toolState === 'object' && toolState.status) {
+                        const status = (toolState.status || '').toUpperCase();
+                        const ok      = status === 'PASS' || status === 'SUCCESS' || toolState.success === true;
+                        const running = status === 'RUNNING';
+                        const isInfra = status === 'INFRA_ERROR' || toolState.infra_error;
+                        
+                        const cls  = running ? 'bg-warning text-dark' : (isInfra ? 'badge-warn' : (ok ? 'badge-pass' : 'badge-fail'));
+                        const text = running ? 'RUNNING' : (isInfra ? 'CONFIG'     : (ok ? 'PASS'       : 'FAIL'));
                         badge = `<span class="badge ${cls} ms-1" style="font-size:0.7rem;">${text}</span>`;
                     }
                     return `
                     <div class="col-md-4 col-lg-3 mb-2">
-                        <div class="tool-status">
+                        <div class="tool-status ${available ? '' : 'opacity-50'}">
                             <span class="status-dot ${available ? 'online' : 'offline'}"></span>
                             <strong>${tool.toUpperCase()}</strong>
                             ${badge}
-                            <span class="float-end text-muted small">${available ? 'Ready' : 'Not Found'}</span>
+                            <span class="float-end text-muted small">${available ? 'Ready' : 'Missing'}</span>
                         </div>
                     </div>`;
                 }).join('');
 
-                // Extra tools that ran but aren't in tools/status (e.g. Certora)
-                for (const [key, val] of Object.entries(state)) {
-                    if (SKIP_KEYS.has(key)) continue;
-                    if (toolNames.has(key.toLowerCase())) continue;
-                    if (!val || typeof val !== 'object' || !('success' in val || 'status' in val)) continue;
-                    const ok      = val.success === true || val.status === 'PASS';
-                    const isInfra = val.status === 'INFRA_ERROR' || val.infra_error;
-                    const cls  = isInfra ? 'badge-warn' : (ok ? 'badge-pass' : 'badge-fail');
-                    const text = isInfra ? 'CONFIG'     : (ok ? 'PASS'       : 'FAIL');
-                    gridHtml += `
-                    <div class="col-md-4 col-lg-3 mb-2">
-                        <div class="tool-status">
-                            <span class="status-dot online"></span>
-                            <strong>${key.toUpperCase()}</strong>
-                            <span class="badge ${cls} ms-1" style="font-size:0.7rem;">${text}</span>
-                            <span class="float-end text-muted small">Ran</span>
-                        </div>
-                    </div>`;
-                }
                 toolGrid.innerHTML = gridHtml || '<p class="text-muted text-center">No tool data available</p>';
 
                 // ── Recent activity feed ─────────────────────────────────
                 const activityFeed = document.getElementById('activityFeed');
                 try {
-                    const runsResp = await fetch('/api/v1/desktop-runs');
+                    const runsResp = await fetch('/api/v1/desktop-runs?t=' + t);
+                    if (!runsResp.ok) throw new Error("Activity feed HTTP " + runsResp.status);
+                    
+                    const ct = runsResp.headers.get("content-type");
+                    if (!ct || !ct.includes("application/json")) throw new Error("Activity feed returned non-JSON");
+
                     const runs = await runsResp.json();
                     if (Array.isArray(runs) && runs.length > 0) {
-                        activityFeed.innerHTML = runs.slice(0, 8).map(r => {
-                            const ok = ['SUCCESS','PASS','PASSED'].includes((r.status||'').toUpperCase());
+                        activityFeed.innerHTML = runs.slice(0, 10).map(r => {
+                            const status = (r.status||'').toUpperCase();
+                            const ok = ['SUCCESS','PASS','PASSED'].includes(status);
+                            const fail = ['FAILED','FAIL','ERROR'].includes(status);
+                            const badgeCls = ok ? 'badge-pass' : (fail ? 'badge-fail' : 'badge-warn');
+                            
                             return `
                             <div style="display:flex;align-items:center;gap:0.75rem;
-                                        padding:0.6rem 0;border-bottom:1px solid var(--border);">
-                                <span class="status-dot ${ok ? 'online' : 'offline'}"
-                                      style="flex-shrink:0;"></span>
+                                        padding:0.75rem 0;border-bottom:1px solid var(--border);">
+                                <div style="width:10px; height:10px; border-radius:50%; flex-shrink:0; 
+                                            background: ${ok ? '#16a34a' : (fail ? '#dc2626' : '#ca8a04')};"></div>
                                 <div style="flex:1;min-width:0;">
-                                    <div style="font-weight:600;font-size:0.9rem;
-                                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    <div style="font-weight:600;font-size:0.95rem;
+                                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);">
                                         ${r.file}
                                     </div>
-                                    <div style="font-size:0.78rem;color:var(--dim);">
-                                        ${r.tool} · ${r.timestamp}
-                                        ${r.states ? `· ${r.states} states` : ''}
+                                    <div style="font-size:0.8rem;color:var(--dim);">
+                                        <i class="fas fa-microchip me-1"></i> ${r.tool} · <i class="far fa-clock ms-1 me-1"></i> ${r.timestamp}
+                                        ${r.states ? ` · <i class="fas fa-cubes ms-1 me-1"></i> ${r.states.toLocaleString()} states` : ''}
                                     </div>
                                 </div>
-                                <span class="badge ${ok ? 'badge-pass' : 'badge-fail'}"
-                                      style="font-size:0.72rem;padding:3px 8px;border-radius:6px;
-                                             color:#fff;flex-shrink:0;">
-                                    ${ok ? 'PASS' : 'FAIL'}
+                                <span class="badge ${badgeCls}"
+                                      style="font-size:0.72rem;padding:4px 10px;border-radius:6px;
+                                             color:#fff;flex-shrink:0; font-weight:700;">
+                                    ${status || 'UNKNOWN'}
                                 </span>
                             </div>`;
                         }).join('');
                     } else {
                         activityFeed.innerHTML = `
-                            <p class="text-muted text-center py-3">
-                                <i class="fas fa-inbox me-2"></i> No recent activity
-                            </p>`;
+                            <div class="text-center py-5">
+                                <i class="fas fa-inbox fa-3x mb-3 text-muted" style="opacity:0.3;"></i>
+                                <p class="text-muted">No recent verification activity found.</p>
+                                <p class="small text-muted">Run a verification in the desktop app to see results here.</p>
+                            </div>`;
                     }
-                } catch (_) {}
+                } catch (err) {
+                    console.error('Activity feed error:', err);
+                }
 
             } catch (err) {
                 console.error('Failed to load status:', err);
-                // Show error state in stats instead of leaving dashes
-                ['passedCount','failedCount','statesExplored','toolsAvailable'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el && el.textContent === '-') el.textContent = '—';
-                });
             }
         }
         
         loadStatus();
-        setInterval(loadStatus, 5000);
+        // Poll every 3 seconds for more "active" feel
+        setInterval(loadStatus, 3000);
     </script>
 </body>
 </html>
