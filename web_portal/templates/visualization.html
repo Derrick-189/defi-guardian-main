@@ -574,6 +574,72 @@ endblock %} {% block extra_css %}
                   '&behavioral=' + behavioral + '&step=' + activeStep +
                   '&filter=' + encodeURIComponent(filterStr);
         
+        var gvScale = 1.0;
+        var gvPanX = 0;
+        var gvPanY = 0;
+        var isPanning = false;
+        var startX = 0, startY = 0;
+
+        window.zoomGv = function(factor) {
+          var svgEl = document.querySelector('#state-diagram-svg svg');
+          if (!svgEl) return;
+          gvScale *= factor;
+          applyGvTransform();
+        };
+
+        window.resetGv = function() {
+          gvScale = 1.0;
+          gvPanX = 0;
+          gvPanY = 0;
+          applyGvTransform();
+        };
+
+        function applyGvTransform() {
+          var svgEl = document.querySelector('#state-diagram-svg svg');
+          if (!svgEl) return;
+          svgEl.style.transform = 'translate(' + gvPanX + 'px, ' + gvPanY + 'px) scale(' + gvScale + ')';
+          svgEl.style.transformOrigin = 'center';
+          svgEl.style.transition = isPanning ? 'none' : 'transform 0.2s ease-out';
+        }
+
+        function setupGvPan() {
+          var el = document.getElementById('state-diagram-svg');
+          if (!el) return;
+          
+          if (el.dataset.panSetup === 'true') return;
+          el.dataset.panSetup = 'true';
+          
+          el.style.cursor = 'grab';
+          
+          el.addEventListener('mousedown', function(e) {
+            if (e.target.tagName === 'a' || e.target.tagName === 'text') return;
+            isPanning = true;
+            el.style.cursor = 'grabbing';
+            startX = e.clientX - gvPanX;
+            startY = e.clientY - gvPanY;
+          });
+
+          window.addEventListener('mousemove', function(e) {
+            if (!isPanning) return;
+            gvPanX = e.clientX - startX;
+            gvPanY = e.clientY - startY;
+            applyGvTransform();
+          });
+
+          window.addEventListener('mouseup', function() {
+            if (!isPanning) return;
+            isPanning = false;
+            el.style.cursor = 'grab';
+            applyGvTransform();
+          });
+          
+          el.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            var factor = e.deltaY < 0 ? 1.15 : 0.85;
+            window.zoomGv(factor);
+          }, { passive: false });
+        }
+
         function insertSvg(svg) {
           container.innerHTML = svg;
           var svgEl = container.querySelector('svg');
@@ -582,8 +648,8 @@ endblock %} {% block extra_css %}
             svgEl.setAttribute('height', '100%');
             svgEl.style.maxWidth = '100%';
             svgEl.style.maxHeight = '100%';
-            svgEl.style.transition = 'transform 0.2s ease-out';
-            resetGv();
+            window.resetGv();
+            setupGvPan();
           }
         }
         

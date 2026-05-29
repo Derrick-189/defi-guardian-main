@@ -304,6 +304,33 @@ def api_audit_log_raw():
 # ── Streamlit Control ─────────────────────────────────────────────────────────
 _streamlit_proc = None
 
+def is_streamlit_port_active() -> bool:
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.3)
+            return s.connect_ex(('127.0.0.1', 8501)) == 0
+    except Exception:
+        return False
+
+def kill_stale_streamlit():
+    try:
+        import psutil
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                cmd = proc.info.get('cmdline') or []
+                if any('streamlit' in str(c).lower() for c in cmd) and any('8501' in str(c) for c in cmd):
+                    proc.terminate()
+                    proc.wait(timeout=1.0)
+            except Exception:
+                pass
+    except Exception:
+        try:
+            import subprocess
+            subprocess.run(["pkill", "-f", "streamlit.*8501"], capture_output=True, timeout=1.0)
+        except Exception:
+            pass
+
 @api_v1.route("/streamlit/start")
 @login_required
 def streamlit_start():
@@ -311,8 +338,12 @@ def streamlit_start():
     if getattr(current_user, 'role', 'user') != 'admin':
         return jsonify({"error": "Unauthorized"}), 403
     
-    if _streamlit_proc and _streamlit_proc.poll() is None:
+    # If already active, don't restart
+    if is_streamlit_port_active():
         return jsonify({"status": "already_running"})
+    
+    # Clean up stale process to free the port
+    kill_stale_streamlit()
     
     try:
         # root app.py is PROJECT_DIR / "app.py"
@@ -331,15 +362,21 @@ def streamlit_stop():
         return jsonify({"error": "Unauthorized"}), 403
     
     if _streamlit_proc:
-        _streamlit_proc.terminate()
+        try:
+            _streamlit_proc.terminate()
+            _streamlit_proc.wait(timeout=1.0)
+        except:
+            pass
         _streamlit_proc = None
+        
+    kill_stale_streamlit()
     return jsonify({"status": "stopped"})
 
 @api_v1.route("/streamlit/status")
 @login_required
 def streamlit_status():
     global _streamlit_proc
-    running = _streamlit_proc is not None and _streamlit_proc.poll() is None
+    running = is_streamlit_port_active() or (_streamlit_proc is not None and _streamlit_proc.poll() is None)
     return jsonify({"running": running})
 
 

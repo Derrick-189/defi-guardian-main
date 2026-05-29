@@ -328,6 +328,11 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 if 'theme' not in st.session_state:
     st.session_state.theme = "dark"
 
+# Dynamic theme synchronization with portal theme parameter
+theme_param = st.query_params.get("theme")
+if theme_param in ["dark", "light"] and theme_param != st.session_state.theme:
+    st.session_state.theme = theme_param
+
 # Theme Configuration Constants
 THEMES = {
     "dark": {
@@ -1344,34 +1349,55 @@ except ImportError:
             return None
 
 # Page config
+is_embedded = "embed" in st.query_params
+initial_sidebar = "collapsed" if is_embedded else "expanded"
+
 st.set_page_config( 
     page_title="DeFi Guardian", 
     page_icon="🛡️", 
     layout="wide", 
-    initial_sidebar_state="expanded" 
+    initial_sidebar_state=initial_sidebar 
 ) 
 
 # ── Remove Streamlit's default padding so the dashboard fills the iframe ──
-st.markdown("""
+embed_css = ""
+if is_embedded:
+    embed_css = """
+    /* Hide sidebar and collapsed sidebar arrow buttons completely when embedded */
+    [data-testid="stSidebar"], 
+    [data-testid="collapsedSidebarCodegen"],
+    [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+    }
+    .main .block-container {
+        margin-left: 0 !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+    """
+
+st.markdown(f"""
 <style>
     /* Kill Streamlit's default padding on the main block */
-    .main .block-container {
+    .main .block-container {{
         padding-top: 1rem !important;
         padding-bottom: 1rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
         max-width: 100% !important;
-    }
+    }}
     /* Also remove top padding from the entire main area */
-    section.main > div {
+    section.main > div {{
         padding-top: 0 !important;
-    }
+    }}
     /* Hide the Streamlit hamburger menu and footer for a cleaner embed */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+    header {{visibility: hidden;}}
+    
+    {embed_css}
 </style>
-""", unsafe_allow_html=True) 
+""", unsafe_allow_html=True)  
  
 # Modern glassmorphism styling moved to theme_toggle()
 st.markdown("""
@@ -1784,6 +1810,32 @@ def render_certora_trace_analysis(trail_data, ltl_results):
         # Get active file info
         active_file = get_active_filename()
         
+        # Fetch active file source code for AI suggestions
+        source_code = ""
+        if active_file and os.path.exists(active_file):
+            try:
+                with open(active_file, "r") as f:
+                    source_code = f.read()
+            except:
+                pass
+
+        ai_recommendations = []
+        if source_code:
+            try:
+                from llm_spec_generator import LLMSpecGenerator
+                gen = LLMSpecGenerator()
+                specs = gen.generate_specs_from_code(source_code)
+                if specs.get("requires"):
+                    ai_recommendations.append(f"Suggested require guard: <code>{specs['requires'][0]}</code>")
+                if specs.get("ensures"):
+                    valid_ens = [e for e in specs["ensures"] if not e.strip().startswith("/*")]
+                    if valid_ens:
+                        ai_recommendations.append(f"Suggested ensures invariant: <code>{valid_ens[0]}</code>")
+                if specs.get("invariants"):
+                    ai_recommendations.append(f"Suggested safety check: <code>{specs['invariants'][0]}</code>")
+            except Exception as e:
+                pass
+        
         # Header with tabs
         st.markdown(f"""
         <div class="certora-header">
@@ -1791,6 +1843,19 @@ def render_certora_trace_analysis(trail_data, ltl_results):
             <div style="font-size: 0.85rem; color: #868e96;">{os.path.basename(active_file)} • Counterexample 1 of 1</div>
         </div>
         """, unsafe_allow_html=True)
+
+        if ai_recommendations:
+            recs_html = "".join([f"<li style='margin-bottom: 0.25rem;'>{rec}</li>" for rec in ai_recommendations])
+            st.markdown(f"""
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; border-left: 4px solid #10b981;">
+                <h5 style="margin: 0 0 0.35rem 0; color: #10b981; display: flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; font-weight: 600;">
+                    <span>🤖</span> AI Security Guidance & Invariants
+                </h5>
+                <ul style="margin: 0; padding-left: 1.1rem; color: #868e96; font-size: 0.85rem;">
+                    {recs_html}
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
         
         # Three column layout: Rules | Trace | Variables
         c1, c2, c3 = st.columns([1.5, 3, 1.5])
@@ -3006,12 +3071,13 @@ with tab_dashboard:
         p_range = np.linspace(price*0.5, price*1.5, 50)
         hf_range = [p*collateral_units/debt if debt>0 else 5.0 for p in p_range]
         fig = px.line(x=p_range, y=hf_range, labels={'x':'Price', 'y':'Health Factor'})
+        fig.update_traces(line_color=t['accent'], line_width=3)
         fig.add_hline(y=1.0, line_dash="dash", line_color="red")
         
         # Use theme-aware colors
         t_mode = st.session_state.get('theme', 'dark')
         themes_config = {
-            "dark": {"text": "#e6edf3", "grid": "rgba(255, 255, 255, 0.1)"},
+            "dark": {"text": "#e6edf3", "grid": "rgba(255, 255, 255, 0.08)"},
             "light": {"text": "#333333", "grid": "#e1e4e8"}
         }
         tc = themes_config[t_mode]
@@ -3019,7 +3085,7 @@ with tab_dashboard:
         fig.update_layout(
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)', 
-            font={'color': tc['text']}, 
+            font={'family': 'Inter, -apple-system, sans-serif', 'color': tc['text']}, 
             height=350,
             xaxis=dict(gridcolor=tc['grid'], zerolinecolor=tc['grid']),
             yaxis=dict(gridcolor=tc['grid'], zerolinecolor=tc['grid'])
@@ -3031,11 +3097,12 @@ with tab_dashboard:
         np.random.seed(int(price + debt + collateral_units) % 10000)
         sims = np.random.normal(health_factor if health_factor != float('inf') else 5.0, 0.2, 1000)
         fig = px.histogram(x=sims, nbins=30, labels={'x':'Simulated HF'})
+        fig.update_traces(marker_color=t['accent'], marker_line_color=t['card_bg'], marker_line_width=0.5)
         fig.add_vline(x=1.0, line_dash="dash", line_color="red")
         fig.update_layout(
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)', 
-            font={'color': tc['text']}, 
+            font={'family': 'Inter, -apple-system, sans-serif', 'color': tc['text']}, 
             height=350,
             xaxis=dict(gridcolor=tc['grid'], zerolinecolor=tc['grid']),
             yaxis=dict(gridcolor=tc['grid'], zerolinecolor=tc['grid'])
