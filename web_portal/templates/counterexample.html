@@ -541,7 +541,8 @@
 <script>
   window.DG_AUDIT_ID = "{{ audit_id }}";
 </script>
-<script src="{{ url_for('static', filename='js/counterexample.js') }}">
+<script src="{{ url_for('static', filename='js/counterexample.js') }}"></script>
+<script>
 // ── Tooltip system ─────────────────────────────────────────────────────────
 // Term glossary — shown as tooltips on rule badges & trace steps
 var DG_TERMS = {
@@ -598,6 +599,37 @@ function buildTooltip(key, extra) {
   '</div>';
 }
 
+function buildErrorTooltip(action) {
+  var act = action.toLowerCase();
+  var title = "AI Security Guard: Invariant Violation";
+  var body = "A critical safety assertion was violated in this step during model exploration. This represents an active exploit vector.";
+  var fix = "Review the logical conditions leading to this step and strengthen validation checks.";
+
+  if (act.includes("collateral") || act.includes("debt")) {
+    title = "AI Security Guard: Insolvency Risk";
+    body = "The protocol collateralization check failed! This trace demonstrates a pathway where debt exceeds allowed collateral value, risking bad debt.";
+    fix = "Enforce health factor checks (> 1.0) on all borrowing and withdrawal actions, and optimize liquidation logic.";
+  } else if (act.includes("price") || act.includes("oracle")) {
+    title = "AI Security Guard: Oracle Risk";
+    body = "A price validation assertion failed. This could indicate susceptibility to flash loan oracle manipulation or division-by-zero errors.";
+    fix = "Integrate multi-feed price oracles (like Chainlink TWAP), sanitize inputs, and prevent atomic single-block price updates.";
+  } else if (act.includes("lock") || act.includes("reentr")) {
+    title = "AI Security Guard: Reentrancy Exploitation";
+    body = "The reentrancy lock condition failed! An external call was made that allowed the caller to re-enter before state modification was committed.";
+    fix = "Apply OpenZeppelin's nonReentrant modifier and commit state changes BEFORE making external calls.";
+  } else if (act.includes("overflow") || act.includes("amount") || act.includes("balance")) {
+    title = "AI Security Guard: Math Bounds Violation";
+    body = "Arithmetic or balance check assertion failed, indicating an unexpected zero-division, overflow, or negative state transition.";
+    fix = "Use standard SafeMath or Solidity >=0.8.0 built-in checking, and validate parameter bounds strictly.";
+  }
+
+  return '<div class="dg-tooltip">' +
+    '<div class="tt-title" style="color:var(--danger); font-weight:700;"><i class="fa-solid fa-wand-magic-sparkles"></i> ' + title + '</div>' +
+    '<div class="tt-body" style="margin-top:0.35rem;">' + body + '</div>' +
+    '<div class="tt-body" style="margin-top:0.45rem; padding-top:0.35rem; border-top:1px dashed var(--border);"><b>AI Mitigating Measure:</b> ' + fix + '</div>' +
+  '</div>';
+}
+
 function wrapTooltipHost(el, key, extra) {
   var wrapper = document.createElement("span");
   wrapper.className = "dg-tooltip-host";
@@ -624,6 +656,18 @@ function attachStepTooltips() {
     if (el.dataset.ttAttached) return;
     el.dataset.ttAttached = "1";
     var action = (el.querySelector(".step-action") || {}).textContent || "";
+    
+    // Check if this step is an error step
+    if (el.classList.contains("error")) {
+      var existingTooltip = el.querySelector(".dg-tooltip");
+      if (!existingTooltip) {
+        el.classList.add("dg-tooltip-host");
+        el.style.cursor = "help";
+        el.insertAdjacentHTML("beforeend", buildErrorTooltip(action));
+      }
+      return;
+    }
+
     var key = Object.keys(DG_TERMS).find(function(k){ return action.toLowerCase().includes(k); });
     if (key) {
       var existingTooltip = el.querySelector(".dg-tooltip");
@@ -665,6 +709,5 @@ _ttObserver.observe(document.body, { childList: true, subtree: true });
 // Initial attach
 attachRuleTooltips();
 attachStepTooltips();
-
 </script>
 {% endblock %}

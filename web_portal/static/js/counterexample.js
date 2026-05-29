@@ -920,6 +920,11 @@
         btn.classList.add("active"); btn.setAttribute("aria-selected", "true");
         var content = document.getElementById("tab-content-" + target);
         if (content) { content.classList.add("active"); content.hidden = false; }
+        
+        // Rerun Mermaid rendering once the tab becomes visible to resolve 0-dimension rendering bug
+        if (target === "state-diagram" && typeof _data !== "undefined" && _data) {
+          renderStateMachine(_data);
+        }
       });
     });
 

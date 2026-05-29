@@ -3,94 +3,140 @@
 
 {% block extra_css %}
 <style>
-/* ── Clean containment and no double-margins ── */
-.page-content {
-  padding: 0 !important;
-  max-width: 100% !important;
-}
+  /* ── Clean containment and no double-margins ── */
+  .page-content {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
 
-#st-controlbar {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-  padding: .6rem 1.5rem;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 900;
-}
+  #st-controlbar {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    padding: .6rem 1.5rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+  }
 
-.status-pill {
-  display: inline-flex; align-items: center; gap: .35rem;
-  padding: .3rem .8rem; border-radius: 20px;
-  font-size: .8rem; font-weight: 700;
-}
-.status-pill.running  { background: rgba(63,185,80,.15);  color: var(--success); border: 1px solid rgba(63,185,80,.25); }
-.status-pill.stopped  { background: rgba(248,81,73,.15);  color: var(--danger); border: 1px solid rgba(248,81,73,.25); }
-.status-pill.starting { background: rgba(210,153,34,.15); color: var(--warning); border: 1px solid rgba(210,153,34,.25); }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .8rem;
+    border-radius: 20px;
+    font-size: .8rem;
+    font-weight: 700;
+  }
 
-/* ── Full-viewport iframe shell ── */
-#iframe-shell {
-  position: relative;
-  height: calc(100vh - 56px - 48px); /* 56px navbar + 48px controlbar */
-  min-height: 500px;
-  width: 100%;
-}
+  .status-pill.running {
+    background: rgba(63, 185, 80, .15);
+    color: var(--success);
+    border: 1px solid rgba(63, 185, 80, .25);
+  }
 
-#streamlitFrame {
-  width:  100%;
-  height: 100%;
-  border: none;
-  display: block;
-  background: var(--bg);
-}
+  .status-pill.stopped {
+    background: rgba(248, 81, 73, .15);
+    color: var(--danger);
+    border: 1px solid rgba(248, 81, 73, .25);
+  }
 
-/* ── Splash overlay ── */
-#overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-#overlay.hidden { display: none; }
+  .status-pill.starting {
+    background: rgba(210, 153, 34, .15);
+    color: var(--warning);
+    border: 1px solid rgba(210, 153, 34, .25);
+  }
 
-.overlay-content {
-  text-align: center;
-  color: var(--text);
-  padding: 2rem;
-  max-width: 680px;
-}
-.overlay-content i { font-size: 2.8rem; margin-bottom: 1.2rem; display: block; }
+  /* ── Full-viewport iframe shell ── */
+  #iframe-shell {
+    position: relative;
+    height: calc(100vh - 56px - 48px);
+    /* 56px navbar + 48px controlbar */
+    min-height: 500px;
+    width: 100%;
+  }
 
-/* Premium Feature cards */
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin-top: 2rem;
-  text-align: left;
-}
-.feature-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-.feature-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-.feature-icon { font-size: 1.6rem; color: var(--accent); margin-bottom: .6rem; }
-.feature-title { font-weight: 700; font-size: 1rem; margin-bottom: .3rem; color: var(--text); }
-.feature-desc  { font-size: .82rem; color: var(--text2); line-height: 1.4; }
+  #streamlitFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: var(--bg);
+  }
+
+  /* ── Splash overlay ── */
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  #overlay.hidden {
+    display: none;
+  }
+
+  .overlay-content {
+    text-align: center;
+    color: var(--text);
+    padding: 2rem;
+    max-width: 680px;
+  }
+
+  .overlay-content i {
+    font-size: 2.8rem;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+
+  /* Premium Feature cards */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+    text-align: left;
+  }
+
+  .feature-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .feature-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .feature-icon {
+    font-size: 1.6rem;
+    color: var(--accent);
+    margin-bottom: .6rem;
+  }
+
+  .feature-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: .3rem;
+    color: var(--text);
+  }
+
+  .feature-desc {
+    font-size: .82rem;
+    color: var(--text2);
+    line-height: 1.4;
+  }
 </style>
 {% endblock %}
 
@@ -124,7 +170,8 @@
     <div class="overlay-content" id="overlayContent">
       <i class="fas fa-chart-line" style="color:var(--accent)"></i>
       <h3 style="margin-bottom: 0.5rem; font-weight: 700;">Streamlit Analytics Suite</h3>
-      <p style="color:var(--text2)">Click <strong>Start</strong> to launch the interactive formal verification dashboard.</p>
+      <p style="color:var(--text2)">Click <strong>Start</strong> to launch the interactive formal verification
+        dashboard.</p>
       <div class="feature-grid">
         <div class="feature-card">
           <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
@@ -139,7 +186,8 @@
         <div class="feature-card">
           <div class="feature-icon"><i class="fas fa-chart-area"></i></div>
           <div class="feature-title">Performance Metrics</div>
-          <div class="feature-desc">Real-time charts tracking verification speed, property states, and memory footprint.</div>
+          <div class="feature-desc">Real-time charts tracking verification speed, property states, and memory footprint.
+          </div>
         </div>
         <div class="feature-card">
           <div class="feature-icon"><i class="fas fa-bug"></i></div>
@@ -154,152 +202,152 @@
 
 {% block extra_js %}
 <script>
-const PORT = 8501;
-let polling = null;
+  const PORT = 8501;
+  let polling = null;
 
-function getStreamlitUrl() {
-  const theme = localStorage.getItem('dg-theme') || 'dark';
-  return `http://localhost:${PORT}/?embed=true&theme=${theme}`;
-}
-
-// Track active portal theme for real-time synchronization
-let lastTheme = localStorage.getItem('dg-theme') || 'dark';
-setInterval(() => {
-  const currentTheme = localStorage.getItem('dg-theme') || 'dark';
-  if (currentTheme !== lastTheme) {
-    lastTheme = currentTheme;
-    const frame = document.getElementById('streamlitFrame');
-    if (frame && !frame.src.includes('about:blank') && frame.src.includes(PORT)) {
-      frame.src = getStreamlitUrl();
-    }
+  function getStreamlitUrl() {
+    const theme = localStorage.getItem('dg-theme') || 'dark';
+    return `http://localhost:${PORT}/?embed=true&theme=${theme}`;
   }
-}, 500);
 
-function setStatus(state) {
-  const pill     = document.getElementById('statusPill');
-  const txt      = document.getElementById('statusText');
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn  = document.getElementById('stopBtn');
-  pill.className = `status-pill ${state}`;
-  txt.textContent = state.charAt(0).toUpperCase() + state.slice(1);
-  startBtn.disabled = (state !== 'stopped');
-  stopBtn.disabled  = (state === 'stopped');
-}
+  // Track active portal theme for real-time synchronization
+  let lastTheme = localStorage.getItem('dg-theme') || 'dark';
+  setInterval(() => {
+    const currentTheme = localStorage.getItem('dg-theme') || 'dark';
+    if (currentTheme !== lastTheme) {
+      lastTheme = currentTheme;
+      const frame = document.getElementById('streamlitFrame');
+      if (frame && !frame.src.includes('about:blank') && frame.src.includes(PORT)) {
+        frame.src = getStreamlitUrl();
+      }
+    }
+  }, 500);
 
-function showOverlay(html) {
-  document.getElementById('overlayContent').innerHTML = html;
-  document.getElementById('overlay').classList.remove('hidden');
-}
+  function setStatus(state) {
+    const pill = document.getElementById('statusPill');
+    const txt = document.getElementById('statusText');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    pill.className = `status-pill ${state}`;
+    txt.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+    startBtn.disabled = (state !== 'stopped');
+    stopBtn.disabled = (state === 'stopped');
+  }
 
-function hideOverlay() {
-  document.getElementById('overlay').classList.add('hidden');
-}
+  function showOverlay(html) {
+    document.getElementById('overlayContent').innerHTML = html;
+    document.getElementById('overlay').classList.remove('hidden');
+  }
 
-async function startStreamlit() {
-  setStatus('starting');
-  showOverlay(`
+  function hideOverlay() {
+    document.getElementById('overlay').classList.add('hidden');
+  }
+
+  async function startStreamlit() {
+    setStatus('starting');
+    showOverlay(`
     <div class="spinner-border mb-3" style="color:var(--accent)"></div>
     <h5>Starting Streamlit…</h5>
     <p style="color:var(--text2)">This may take 10–30 seconds on first run.</p>
   `);
-  try {
-    const r = await fetch('/api/v1/streamlit/start');
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    waitForStreamlit();
-  } catch(e) {
-    setStatus('stopped');
-    showOverlay(`
+    try {
+      const r = await fetch('/api/v1/streamlit/start');
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      waitForStreamlit();
+    } catch (e) {
+      setStatus('stopped');
+      showOverlay(`
       <i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i>
       <h5>Failed to Start</h5>
       <p style="color:var(--text2)">${e.message}</p>
       <button class="btn btn-primary mt-2" onclick="startStreamlit()">Retry</button>
     `);
+    }
   }
-}
 
-async function stopStreamlit() {
-  clearInterval(polling);
-  await fetch('/api/v1/streamlit/stop').catch(() => {});
-  document.getElementById('streamlitFrame').src = 'about:blank';
-  setStatus('stopped');
-  showOverlay(`
+  async function stopStreamlit() {
+    clearInterval(polling);
+    await fetch('/api/v1/streamlit/stop').catch(() => { });
+    document.getElementById('streamlitFrame').src = 'about:blank';
+    setStatus('stopped');
+    showOverlay(`
     <i class="fas fa-stop-circle" style="color:var(--text2)"></i>
     <h5>Dashboard Stopped</h5>
     <p style="color:var(--text2)">Click <strong>Start</strong> to resume.</p>
   `);
-}
+  }
 
-function openNewTab() {
-  window.open(`http://localhost:${PORT}`, '_blank');
-}
+  function openNewTab() {
+    window.open(`http://localhost:${PORT}`, '_blank');
+  }
 
-function waitForStreamlit() {
-  let attempts = 0;
-  const max = 60; // 30 s
-  clearInterval(polling);
-  polling = setInterval(async () => {
-    attempts++;
-    try {
-      const r = await fetch('/api/v1/streamlit/status');
-      const d = await r.json();
-      if (d.running) {
+  function waitForStreamlit() {
+    let attempts = 0;
+    const max = 60; // 30 s
+    clearInterval(polling);
+    polling = setInterval(async () => {
+      attempts++;
+      try {
+        const r = await fetch('/api/v1/streamlit/status');
+        const d = await r.json();
+        if (d.running) {
+          clearInterval(polling);
+          setStatus('running');
+          document.getElementById('streamlitFrame').src = getStreamlitUrl();
+          setTimeout(hideOverlay, 3000);
+          return;
+        }
+      } catch (_) { }
+      if (attempts >= max) {
         clearInterval(polling);
-        setStatus('running');
-        document.getElementById('streamlitFrame').src = getStreamlitUrl();
-        setTimeout(hideOverlay, 3000);
-        return;
-      }
-    } catch(_) {}
-    if (attempts >= max) {
-      clearInterval(polling);
-      setStatus('stopped');
-      showOverlay(`
+        setStatus('stopped');
+        showOverlay(`
         <i class="fas fa-clock" style="color:#d29922"></i>
         <h5>Timed Out</h5>
         <p style="color:var(--text2)">Streamlit didn't start in 30 s.</p>
         <button class="btn btn-primary mt-2" onclick="startStreamlit()">Retry</button>
         <a class="btn btn-secondary mt-2 ms-2" href="http://localhost:${PORT}" target="_blank">Try Direct Link</a>
       `);
-    }
-  }, 500);
-}
+      }
+    }, 500);
+  }
 
-// On page load — check if already running
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const r = await fetch('/api/v1/streamlit/status');
-    const d = await r.json();
-    if (d.running) {
-      setStatus('running');
-      document.getElementById('streamlitFrame').src = getStreamlitUrl();
-      setTimeout(hideOverlay, 2000);
-    }
-  } catch(_) {}
-});
-
-// Keep status in sync every 15 s
-setInterval(async () => {
-  try {
-    const r = await fetch('/api/v1/streamlit/status');
-    const d = await r.json();
-    const current = document.getElementById('statusText').textContent.toLowerCase();
-    if (d.running && current === 'stopped') {
-      setStatus('running');
-      if (document.getElementById('streamlitFrame').src.includes('blank')) {
+  // On page load — check if already running
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const r = await fetch('/api/v1/streamlit/status');
+      const d = await r.json();
+      if (d.running) {
+        setStatus('running');
         document.getElementById('streamlitFrame').src = getStreamlitUrl();
         setTimeout(hideOverlay, 2000);
       }
-    } else if (!d.running && current === 'running') {
-      setStatus('stopped');
-      document.getElementById('streamlitFrame').src = 'about:blank';
-      showOverlay(`
+    } catch (_) { }
+  });
+
+  // Keep status in sync every 15 s
+  setInterval(async () => {
+    try {
+      const r = await fetch('/api/v1/streamlit/status');
+      const d = await r.json();
+      const current = document.getElementById('statusText').textContent.toLowerCase();
+      if (d.running && current === 'stopped') {
+        setStatus('running');
+        if (document.getElementById('streamlitFrame').src.includes('blank')) {
+          document.getElementById('streamlitFrame').src = getStreamlitUrl();
+          setTimeout(hideOverlay, 2000);
+        }
+      } else if (!d.running && current === 'running') {
+        setStatus('stopped');
+        document.getElementById('streamlitFrame').src = 'about:blank';
+        showOverlay(`
         <i class="fas fa-stop-circle" style="color:var(--text2)"></i>
         <h5>Dashboard Stopped</h5>
         <p style="color:var(--text2)">Click <strong>Start</strong> to resume.</p>
       `);
-    }
-  } catch(_) {}
-}, 15000);
+      }
+    } catch (_) { }
+  }, 15000);
 </script>
 {% endblock %}
