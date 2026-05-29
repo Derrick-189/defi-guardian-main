@@ -3,400 +3,1790 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeFi Guardian - Verification Suite</title>
+    <title>DeFi Guardian - Premium Verification Suite</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
     <style>
+        /* ==================== CORE THEMING VARIABLES ==================== */
         :root {
-            --bg: #f0f2f5;
-            --panel: #ffffff;
-            --accent: #0d9488;
-            --accent-light: #ccfbf1;
-            --text: #1e293b;
-            --dim: #64748b;
-            --border: #cbd5e1;
-            --nav-bg: #1e293b;
-            --nav-text: #f1f5f9;
+            /* Tokyo Night / Space Dark Theme (Default) */
+            --bg: #090c15;
+            --sidebar-bg: #0d111d;
+            --panel-bg: rgba(22, 28, 45, 0.45);
+            --border-color: rgba(56, 189, 248, 0.08);
+            --border-hover: rgba(56, 189, 248, 0.2);
+            --accent: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.35);
+            --accent-grad: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --text-main: #f1f5f9;
+            --text-dim: #64748b;
+            --text-bright: #38bdf8;
+            --success: #10b981;
+            --danger: #f43f5e;
+            --warning: #f59e0b;
+            --editor-bg: #0c0f1d;
+            --terminal-bg: #05070c;
+            --activity-bg: #0a0d16;
+            --active-item-bg: rgba(56, 189, 248, 0.06);
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+            --glass-blur: 16px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* Dracula Theme Override */
+        body.theme-dracula {
+            --bg: #1e1f29;
+            --sidebar-bg: #282a36;
+            --panel-bg: rgba(40, 42, 54, 0.5);
+            --border-color: rgba(189, 147, 249, 0.15);
+            --border-hover: rgba(189, 147, 249, 0.3);
+            --accent: #bd93f9;
+            --accent-glow: rgba(189, 147, 249, 0.4);
+            --accent-grad: linear-gradient(135deg, #bd93f9 0%, #ff79c6 100%);
+            --text-main: #f8f8f2;
+            --text-dim: #6272a4;
+            --text-bright: #8be9fd;
+            --success: #50fa7b;
+            --danger: #ff5555;
+            --warning: #ffb86c;
+            --editor-bg: #1e1f29;
+            --terminal-bg: #191a21;
+            --activity-bg: #21222c;
+            --active-item-bg: rgba(189, 147, 249, 0.1);
+        }
+
+        /* Catppuccin Mocha Override */
+        body.theme-catppuccin {
+            --bg: #11111b;
+            --sidebar-bg: #181825;
+            --panel-bg: rgba(30, 30, 46, 0.55);
+            --border-color: rgba(137, 180, 250, 0.1);
+            --border-hover: rgba(137, 180, 250, 0.3);
+            --accent: #89b4fa;
+            --accent-glow: rgba(137, 180, 250, 0.35);
+            --accent-grad: linear-gradient(135deg, #89b4fa 0%, #cba6f7 100%);
+            --text-main: #cdd6f4;
+            --text-dim: #585b70;
+            --text-bright: #89dceb;
+            --success: #a6e3a1;
+            --danger: #f38ba8;
+            --warning: #f9e2af;
+            --editor-bg: #181825;
+            --terminal-bg: #11111b;
+            --activity-bg: #1e1e2e;
+            --active-item-bg: rgba(137, 180, 250, 0.08);
+        }
+
+        /* Cyberpunk Neon Override */
+        body.theme-cyberpunk {
+            --bg: #000411;
+            --sidebar-bg: #080710;
+            --panel-bg: rgba(5, 5, 15, 0.85);
+            --border-color: #3f007f;
+            --border-hover: #ff007f;
+            --accent: #ff007f;
+            --accent-glow: rgba(255, 0, 127, 0.45);
+            --accent-grad: linear-gradient(135deg, #ff007f 0%, #00ffff 100%);
+            --text-main: #e2e8f0;
+            --text-dim: #7f7f9f;
+            --text-bright: #00ffff;
+            --success: #39ff14;
+            --danger: #ff007f;
+            --warning: #ffb000;
+            --editor-bg: #050409;
+            --terminal-bg: #010005;
+            --activity-bg: #0d0c1b;
+            --active-item-bg: rgba(255, 0, 127, 0.15);
+        }
+
+        /* Matrix Theme Override */
+        body.theme-matrix {
+            --bg: #040804;
+            --sidebar-bg: #0a100a;
+            --panel-bg: rgba(8, 14, 8, 0.6);
+            --border-color: rgba(0, 255, 0, 0.15);
+            --border-hover: rgba(0, 255, 0, 0.4);
+            --accent: #00ff00;
+            --accent-glow: rgba(0, 255, 0, 0.4);
+            --accent-grad: linear-gradient(135deg, #00ff00 0%, #008800 100%);
+            --text-main: #33ff33;
+            --text-dim: #006600;
+            --text-bright: #88ff88;
+            --success: #00ff00;
+            --danger: #ff3333;
+            --warning: #ffff33;
+            --editor-bg: #060906;
+            --terminal-bg: #020502;
+            --activity-bg: #080d08;
+            --active-item-bg: rgba(0, 255, 0, 0.08);
+        }
+
+        /* Quiet Light Theme Override */
+        body.theme-light {
+            --bg: #f3f4f6;
+            --sidebar-bg: #e5e7eb;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(209, 213, 219, 0.8);
+            --border-hover: rgba(13, 148, 136, 0.3);
+            --accent: #0d9488;
+            --accent-glow: rgba(13, 148, 136, 0.2);
+            --accent-grad: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            --text-main: #1f2937;
+            --text-dim: #9ca3af;
+            --text-bright: #0f766e;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --editor-bg: #f9fafb;
+            --terminal-bg: #f3f4f6;
+            --activity-bg: #f3f4f6;
+            --active-item-bg: rgba(13, 148, 136, 0.1);
+        }
+
+        /* ==================== CORE LAYOUT STYLE ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none !important;
+            transition: background-color 0.25s ease, border-color 0.2s ease;
+        }
+
         body {
             background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .navbar {
-            background: var(--nav-bg);
-            border-bottom: 1px solid #334155;
-            padding: 0.85rem 2rem;
+
+        /* Nav Header */
+        .app-navbar {
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
             display: flex;
             align-items: center;
+            height: 48px;
+            z-index: 1000;
         }
-        .navbar-brand {
-            color: #2dd4bf !important;
+
+        .navbar-logo {
             font-weight: 800;
-            font-size: 1.15rem;
-            text-decoration: none;
-        }
-        .nav-btn {
-            background: #0d9488;
-            color: #fff !important;
-            border: none;
-            border-radius: 8px;
-            padding: 0.45rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .nav-btn:hover { background: #0f766e; }
-        .nav-btn.secondary {
-            background: #7c3aed;
-        }
-        .nav-btn.secondary:hover { background: #6d28d9; }
-        .main-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-        .stat-card {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1.5rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 1rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            gap: 0.5rem;
+            text-decoration: none;
         }
-        .stat-icon {
-            width: 52px; height: 52px;
-            border-radius: 12px;
+
+        .navbar-logo span {
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        /* App Main Split Workspace */
+        .workspace-root {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 48px);
+            overflow: hidden;
+        }
+
+        /* Far Left Activity Bar (VS Code style) */
+        .activity-bar {
+            width: 48px;
+            background: var(--activity-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .activity-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
-        .stat-info h3 { margin: 0; font-weight: 800; color: var(--text); font-size: 1.6rem; }
-        .stat-info p { margin: 0; color: var(--dim); font-size: 0.85rem; font-weight: 500; }
-        .panel {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 14px;
+
+        .activity-btn:hover, .activity-btn.active {
+            color: var(--accent);
+            background: var(--active-item-bg);
+        }
+
+        .activity-btn.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 25%;
+            height: 50%;
+            width: 3px;
+            background: var(--accent);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* Sliding Side Drawer Panel */
+        .side-panel {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .panel-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            font-weight: 700;
-            color: var(--text);
-            background: #f8fafc;
-            font-size: 0.95rem;
+
+        .side-panel.collapsed {
+            width: 0px;
+            border-right: none;
         }
-        .panel-body { padding: 1.5rem; }
-        .tool-status {
-            background: #f8fafc;
+
+        .panel-section-header {
             padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            margin-bottom: 0.5rem;
-            color: var(--text);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        /* Dynamic Tree / File list */
+        .file-tree-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            color: var(--text-main);
+            transition: all 0.15s ease;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-tree-item:hover {
+            background: var(--active-item-bg);
+        }
+
+        .file-tree-item.active {
+            background: var(--active-item-bg);
+            border-left: 2px solid var(--accent);
+            padding-left: calc(0.75rem - 2px);
             font-weight: 500;
         }
-        .status-dot {
-            width: 10px; height: 10px;
+
+        /* Tool Status Grid inside sidebar */
+        .tool-list-card {
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .tool-indicator {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 0.5rem;
         }
-        .status-dot.online { background: #16a34a; }
-        .status-dot.offline { background: #dc2626; }
-        .badge-pass { background: #16a34a; }
-        .badge-fail { background: #dc2626; }
-        .badge-warn { background: #ca8a04; }
-        .text-accent { color: var(--accent); }
-        .text-muted { color: var(--dim) !important; }
-        .spinner-border { color: var(--accent); }
+
+        .tool-indicator.available { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .tool-indicator.missing { background: var(--text-dim); }
+        .tool-indicator.running { background: var(--warning); box-shadow: 0 0 8px var(--warning); animation: pulse-yellow 1.5s infinite; }
+
+        /* Main Center Workspace (Editor + Console Split) */
+        .main-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        /* Top Workspace Editor Pane */
+        .editor-container {
+            flex: 7; /* 70% height */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Editor Tabs */
+        .editor-tabs-bar {
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            height: 38px;
+        }
+
+        .editor-tab {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            height: 100%;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .editor-tab:hover {
+            color: var(--text-main);
+            background: var(--active-item-bg);
+        }
+
+        .editor-tab.active {
+            color: var(--accent);
+            background: var(--editor-bg);
+            border-top: 2px solid var(--accent);
+            font-weight: 500;
+        }
+
+        /* Specs template toolbar */
+        .spec-toolbar {
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.25rem 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            height: 36px;
+        }
+
+        .spec-btn {
+            padding: 0.2rem 0.6rem;
+            font-size: 0.72rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Unified Editable Monaco-style Textarea */
+        .editor-textarea-wrapper {
+            flex: 1;
+            position: relative;
+            background: var(--editor-bg);
+            overflow: hidden;
+        }
+
+        .code-textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: var(--text-main);
+            border: none;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.5;
+            resize: none;
+            overflow-y: auto;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 2;
+        }
+
+        /* Syntax Highlighted Shadow Pane for read-only view */
+        .code-highlight-pane {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 1rem;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+            overflow-y: auto;
+            background: var(--editor-bg);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        /* Bottom Pane Integrated Terminal */
+        .terminal-container {
+            flex: 3; /* 30% height */
+            display: flex;
+            flex-direction: column;
+            background: var(--terminal-bg);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.3rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 32px;
+        }
+
+        .terminal-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-bright);
+        }
+
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            line-height: 1.6;
+            color: #a8a8af;
+        }
+
+        /* Terminal Line Color Coding */
+        .terminal-line { margin-bottom: 2px; white-space: pre-wrap; }
+        .term-header { color: var(--accent); font-weight: 700; }
+        .term-dim { color: var(--text-dim); }
+        .term-success { color: var(--success); font-weight: 500; }
+        .term-fail { color: var(--danger); font-weight: 500; }
+        .term-warn { color: var(--warning); }
+
+        /* Statistics Dashboard Tab Styling */
+        .dashboard-tab-root {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .glass-card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .stat-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Counterexample Debugger styling */
+        .replay-root {
+            display: flex;
+            height: 100%;
+            background: var(--editor-bg);
+        }
+
+        .replay-steps-list {
+            width: 320px;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 0.75rem;
+            background: var(--sidebar-bg);
+        }
+
+        .replay-step-card {
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--panel-bg);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .replay-step-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .replay-step-card.active {
+            border-color: var(--accent);
+            background: var(--active-item-bg);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+
+        .replay-variables-viewer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+        }
+
+        .var-badge-update {
+            animation: text-pulse-glow 1.5s infinite;
+        }
+
+        /* Utility classes */
+        .btn-premium {
+            background: var(--accent-grad);
+            border: none;
+            color: #000 !important;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .btn-premium:hover {
+            box-shadow: 0 0 18px var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .btn-premium:disabled {
+            background: var(--text-dim);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Animations */
+        @keyframes pulse-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        @keyframes text-pulse-glow {
+            0% { text-shadow: 0 0 2px var(--accent); color: var(--accent); }
+            50% { text-shadow: 0 0 12px var(--accent); color: #fff; }
+            100% { text-shadow: 0 0 2px var(--accent); color: var(--accent); }
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-hover);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
     </style>
 </head>
-<body>
-    <nav class="navbar">
-        <a class="navbar-brand" href="/">
-            <i class="fas fa-shield-halved"></i> DeFi Guardian
+<body class="theme-space">
+
+    <!-- Navbar Header -->
+    <header class="app-navbar">
+        <a href="/" class="navbar-logo">
+            <i class="fas fa-shield-halved text-info"></i> DeFi <span>Guardian</span>
         </a>
+        
         <div class="ms-auto d-flex align-items-center gap-2">
-            <button onclick="location.reload()" class="nav-btn" title="Reload Dashboard">
+            <!-- Active File Info -->
+            <span id="nav-file-badge" class="badge bg-dark border text-muted small px-3 py-1.5" style="border-color: var(--border-color) !important;">
+                <i class="fas fa-file-code me-1 text-info"></i> No active model
+            </span>
+            
+            <button onclick="location.reload()" class="btn btn-sm btn-outline-secondary text-muted" style="border-color: var(--border-color);" title="Reload App">
                 <i class="fas fa-sync-alt"></i>
             </button>
-            <a href="/" class="nav-btn">
-                <i class="fas fa-chart-line me-1"></i> Dashboard
-            </a>
-            <button onclick="startPortal()" class="nav-btn secondary" id="portalBtn">
-                <i class="fas fa-user-circle me-1"></i> Account Portal
+            
+            <!-- Start streamlit dashboard -->
+            <button onclick="toggleStreamlitDashboard()" id="streamlit-btn" class="btn btn-sm btn-outline-info text-info small" style="border-color: rgba(56,189,248,0.25);">
+                <i class="fas fa-chart-line me-1"></i> Streamlit Portal
             </button>
-            <span class="ms-3 d-none d-md-inline" style="color:#94a3b8; font-size:0.85rem;">
-                <i class="fas fa-circle text-success me-1" style="color:#22c55e;"></i> System Online
+
+            <!-- Open main Web Portal -->
+            <button onclick="connectToWebPortal()" id="portal-btn" class="btn btn-sm btn-premium text-dark small ms-1">
+                <i class="fas fa-globe me-1"></i> Web Portal
+            </button>
+
+            <span class="badge border bg-dark px-3 py-1.5 ms-2 text-success small" style="border-color: var(--border-color) !important;">
+                <i class="fas fa-circle me-1" style="color: var(--success);"></i> Live Core API
             </span>
         </div>
-    </nav>
+    </header>
 
-    <div class="main-container">
-        <!-- Stats Row -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #16a34a;">
-                    <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="passedCount">-</h3>
-                        <p>Properties Verified</p>
-                    </div>
-                </div>
+    <!-- Main Workspace Root -->
+    <main class="workspace-root">
+        
+        <!-- Activity Bar -->
+        <nav class="activity-bar">
+            <button onclick="selectActivity('explorer')" id="act-explorer" class="activity-btn active" title="File Explorer">
+                <i class="fas fa-folder-tree"></i>
+            </button>
+            <button onclick="selectActivity('tools')" id="act-tools" class="activity-btn" title="Verification Tools">
+                <i class="fas fa-rocket"></i>
+            </button>
+            <button onclick="selectActivity('stats')" id="act-stats" class="activity-btn" title="Stats Dashboard">
+                <i class="fas fa-chart-simple"></i>
+            </button>
+            <button onclick="selectActivity('themes')" id="act-themes" class="activity-btn" title="Color Customization">
+                <i class="fas fa-palette"></i>
+            </button>
+            
+            <div class="mt-auto mb-2">
+                <a href="http://localhost:5001" target="_blank" class="activity-btn" title="Account Portal">
+                    <i class="fas fa-user-gear"></i>
+                </a>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #dc2626;">
-                    <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="failedCount">-</h3>
-                        <p>Violations Found</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #0d9488;">
-                    <div class="stat-icon" style="background: #ccfbf1; color: #0d9488;">
-                        <i class="fas fa-cubes"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="statesExplored">-</h3>
-                        <p>States Explored</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #ca8a04;">
-                    <div class="stat-icon" style="background: #fef9c3; color: #ca8a04;">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="toolsAvailable">-</h3>
-                        <p>Tools Available</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </nav>
 
-        <!-- Tool Status -->
-        <div class="panel mb-4">
-            <div class="panel-header">
-                <i class="fas fa-microchip text-accent me-2"></i> Verification Tools
-            </div>
-            <div class="panel-body">
-                <div class="row" id="toolGrid">
-                    <div class="col-12 text-center text-muted py-3">
-                        <div class="spinner-border spinner-border-sm me-2"></div>
-                        Loading tool status...
-                    </div>
+        <!-- Sidebar Drawer -->
+        <aside class="side-panel" id="sideDrawer">
+            <!-- Dynamic Drawer Contents depending on active activity -->
+            <div id="drawer-explorer" class="h-100 flex-column d-flex">
+                <div class="panel-section-header">
+                    <span>Explorer</span>
+                    <button onclick="openNativeFileDialog()" class="btn btn-sm text-info p-0" title="Open Native File Dialog">
+                        <i class="fas fa-file-import"></i>
+                    </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="panel">
-            <div class="panel-header">
-                <i class="fas fa-history text-accent me-2"></i> Recent Verification Activity
-            </div>
-            <div class="panel-body">
-                <div id="activityFeed">
-                    <p class="text-muted text-center py-3">
-                        <i class="fas fa-inbox me-2"></i> No recent activity
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        async function startPortal() {
-            const btn = document.getElementById('portalBtn');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
-            btn.disabled = true;
-
-            try {
-                const resp = await fetch('/api/v1/portal/start?t=' + Date.now());
-                const data = await resp.json();
                 
-                if (data.status === 'already_running' || data.status === 'starting') {
-                    // Wait a bit if starting
-                    if (data.status === 'starting') {
-                        await new Promise(r => setTimeout(r, 2000));
-                    }
-                    window.open(data.url, '_blank');
-                }
-            } catch (err) {
-                console.error('Failed to start portal:', err);
-                alert('Failed to start account portal. Please ensure it is not already running on another port.');
-            } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            }
-        }
+                <div id="file-upload-zone" class="mx-3 my-2 p-3 border rounded text-center small" style="border-color: rgba(56,189,248,0.2) !important; background: rgba(56,189,248,0.02); cursor: pointer; border-style: dashed !important;" onclick="document.getElementById('file-uploader-input').click()">
+                    <i class="fas fa-cloud-upload-alt text-info me-1" style="font-size: 1.1rem;"></i>
+                    <span class="text-muted" style="font-size: 0.72rem;">Drag & drop file or click</span>
+                    <input type="file" id="file-uploader-input" accept=".sol,.rs,.pml" style="display:none;" />
+                </div>
 
-        async function loadStatus() {
-            try {
-                const t = Date.now();
-                // Load verification state and tool availability in parallel
-                const [stateResp, toolResp] = await Promise.all([
-                    fetch('/api/v1/state/current?t=' + t),
-                    fetch('/api/v1/tools/status?t=' + t)
-                ]);
+                <div class="panel-scrollable" id="filesList">
+                    <!-- Loaded dynamically -->
+                    <div class="text-center text-muted py-5 small">
+                        <div class="spinner-border spinner-border-sm text-info mb-2"></div><br>
+                        Indexing workspace...
+                    </div>
+                </div>
+            </div>
 
-                if (!stateResp.ok || !toolResp.ok) {
-                    throw new Error(`HTTP Error: State=${stateResp.status}, Tools=${toolResp.status}`);
-                }
-
-                const stateContentType = stateResp.headers.get("content-type");
-                if (!stateContentType || !stateContentType.includes("application/json")) {
-                    const text = await stateResp.text();
-                    console.error("Expected JSON but got:", text.substring(0, 100));
-                    throw new Error("API returned non-JSON response (likely a 404 or 500 HTML page)");
-                }
-
-                const state = await stateResp.json();
-                const tools = await toolResp.json();
-
-                // ── Shared skip-key set ──────────────────────────────────
-                const SKIP_KEYS = new Set([
-                    'success','datetime','states_stored','transitions','depth',
-                    'specs','output','errors','model_name','verified',
-                    'ltl_results','errors_count','timestamp', 'active_tool', 'active_status'
-                ]);
-
-                // ── Tool availability count ──────────────────────────────
-                const toolEntries = Object.entries(tools);
-                const availableTools = toolEntries.filter(([, v]) =>
-                    v === true || (v && v.installed) || (v && v.status === 'available') || (v && v.status === 'degraded')
-                ).length;
-                document.getElementById('toolsAvailable').textContent =
-                    availableTools > 0 ? `${availableTools}/${toolEntries.length}` : '0/' + toolEntries.length;
-
-                // ── States explored ──────────────────────────────────────
-                const statesVal = state.states_stored || state.states || 0;
-                document.getElementById('statesExplored').textContent = statesVal.toLocaleString();
-
-                // ── Properties verified / violations ─────────────────────
-                const ltlResults = (state.spin && state.spin.ltl_results) || state.ltl_results || [];
-                let passed = 0, failed = 0;
-                if (Array.isArray(ltlResults) && ltlResults.length > 0) {
-                    ltlResults.forEach(r => {
-                        if (r.success || r.status === 'PASS' || r.status === 'SUCCESS') passed++; else failed++;
-                    });
-                } else {
-                    // Strategy 2: tool-level pass/fail
-                    for (const [key, val] of Object.entries(state)) {
-                        if (SKIP_KEYS.has(key)) continue;
-                        if (val && typeof val === 'object' && ('success' in val || 'status' in val)) {
-                            if (val.success === true  || val.status === 'PASS' || val.status === 'SUCCESS') passed++;
-                            else if (val.success === false || val.status === 'FAIL') failed++;
-                        }
-                    }
-                }
-                document.getElementById('passedCount').textContent = passed;
-                document.getElementById('failedCount').textContent = failed;
-
-                // ── Tool grid ────────────────────────────────────────────
-                const toolGrid = document.getElementById('toolGrid');
-                const toolNames = new Set(toolEntries.map(([t]) => t.toLowerCase()));
-
-                let gridHtml = toolEntries.map(([tool, v]) => {
-                    const available = v === true || (v && v.installed) ||
-                                      (v && (v.status === 'available' || v.status === 'degraded'));
-                    const toolState = state[tool.toLowerCase()];
-                    let badge = '';
-                    if (toolState && typeof toolState === 'object' && toolState.status) {
-                        const status = (toolState.status || '').toUpperCase();
-                        const ok      = status === 'PASS' || status === 'SUCCESS' || toolState.success === true;
-                        const running = status === 'RUNNING';
-                        const isInfra = status === 'INFRA_ERROR' || toolState.infra_error;
-                        
-                        const cls  = running ? 'bg-warning text-dark' : (isInfra ? 'badge-warn' : (ok ? 'badge-pass' : 'badge-fail'));
-                        const text = running ? 'RUNNING' : (isInfra ? 'CONFIG'     : (ok ? 'PASS'       : 'FAIL'));
-                        badge = `<span class="badge ${cls} ms-1" style="font-size:0.7rem;">${text}</span>`;
-                    }
-                    return `
-                    <div class="col-md-4 col-lg-3 mb-2">
-                        <div class="tool-status ${available ? '' : 'opacity-50'}">
-                            <span class="status-dot ${available ? 'online' : 'offline'}"></span>
-                            <strong>${tool.toUpperCase()}</strong>
-                            ${badge}
-                            <span class="float-end text-muted small">${available ? 'Ready' : 'Missing'}</span>
+            <div id="drawer-tools" class="h-100 flex-column d-none">
+                <div class="panel-section-header">
+                    <span>Formal Verifiers</span>
+                </div>
+                <div class="panel-scrollable">
+                    <div class="mb-3">
+                        <button onclick="runVerification('spin')" id="btn-spin" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-play"></i> Run SPIN Verification
+                        </button>
+                        <div class="tool-list-card">
+                            <span>SPIN Checker</span>
+                            <span id="ind-spin" class="tool-indicator missing"></span>
                         </div>
-                    </div>`;
-                }).join('');
-
-                toolGrid.innerHTML = gridHtml || '<p class="text-muted text-center">No tool data available</p>';
-
-                // ── Recent activity feed ─────────────────────────────────
-                const activityFeed = document.getElementById('activityFeed');
-                try {
-                    const runsResp = await fetch('/api/v1/desktop-runs?t=' + t);
-                    if (!runsResp.ok) throw new Error("Activity feed HTTP " + runsResp.status);
+                    </div>
                     
-                    const ct = runsResp.headers.get("content-type");
-                    if (!ct || !ct.includes("application/json")) throw new Error("Activity feed returned non-JSON");
+                    <div class="mb-3">
+                        <button onclick="runVerification('certora')" id="btn-certora" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-shield"></i> Run Certora Prover
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Certora Integration</span>
+                            <span id="ind-certora" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
 
-                    const runs = await runsResp.json();
-                    if (Array.isArray(runs) && runs.length > 0) {
-                        activityFeed.innerHTML = runs.slice(0, 10).map(r => {
-                            const status = (r.status||'').toUpperCase();
-                            const ok = ['SUCCESS','PASS','PASSED'].includes(status);
-                            const fail = ['FAILED','FAIL','ERROR'].includes(status);
-                            const badgeCls = ok ? 'badge-pass' : (fail ? 'badge-fail' : 'badge-warn');
-                            
-                            return `
-                            <div style="display:flex;align-items:center;gap:0.75rem;
-                                        padding:0.75rem 0;border-bottom:1px solid var(--border);">
-                                <div style="width:10px; height:10px; border-radius:50%; flex-shrink:0; 
-                                            background: ${ok ? '#16a34a' : (fail ? '#dc2626' : '#ca8a04')};"></div>
-                                <div style="flex:1;min-width:0;">
-                                    <div style="font-weight:600;font-size:0.95rem;
-                                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);">
-                                        ${r.file}
+                    <div class="mb-3">
+                        <button onclick="runVerification('lean')" id="btn-lean" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-square-root-variable"></i> Lean Theorem Prover
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Lean Engine</span>
+                            <span id="ind-lean" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button onclick="runVerification('coq')" id="btn-coq" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-atom"></i> Coq Proof Assistant
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Coq Engine</span>
+                            <span id="ind-coq" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button onclick="runVerification('kani')" id="btn-kani" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-crab"></i> Kani Model Checker
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Kani Checker</span>
+                            <span id="ind-kani" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button onclick="runVerification('slither')" id="btn-slither" class="btn btn-premium w-100 mb-2 py-2">
+                            <i class="fas fa-magnifying-glass-chart"></i> Slither Static Audit
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Slither Checker</span>
+                            <span id="ind-slither" class="tool-indicator available"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button onclick="runVerification('verus')" id="btn-verus" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-gem"></i> Run Verus Prover
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Verus Integration</span>
+                            <span id="ind-verus" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button onclick="runVerification('prusti')" id="btn-prusti" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-feather"></i> Run Prusti Verifier
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Prusti Integration</span>
+                            <span id="ind-prusti" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button onclick="runVerification('creusot')" id="btn-creusot" class="btn btn-premium w-100 mb-2 py-2" disabled>
+                            <i class="fas fa-flask"></i> Run Creusot Verifier
+                        </button>
+                        <div class="tool-list-card">
+                            <span>Creusot Integration</span>
+                            <span id="ind-creusot" class="tool-indicator missing"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="drawer-stats" class="h-100 flex-column d-none">
+                <div class="panel-section-header">
+                    <span>Job Status</span>
+                </div>
+                <div class="panel-scrollable">
+                    <div class="glass-card mb-2 p-3 text-center">
+                        <div class="text-muted small">Properties Verified</div>
+                        <h2 id="stats-passed" class="text-success font-weight-800 mt-1">-</h2>
+                    </div>
+                    <div class="glass-card mb-2 p-3 text-center">
+                        <div class="text-muted small">Violations Detected</div>
+                        <h2 id="stats-failed" class="text-danger font-weight-800 mt-1">-</h2>
+                    </div>
+                    <div class="glass-card mb-2 p-3 text-center">
+                        <div class="text-muted small">Model States Explored</div>
+                        <h4 id="stats-states" class="text-info font-weight-800 mt-1">-</h4>
+                    </div>
+
+                    <div class="panel-section-header mt-3">
+                        <span>Reports Export</span>
+                    </div>
+                    <div class="mb-2">
+                        <button onclick="downloadReport('audit_log.json')" class="btn btn-outline-info w-100 text-start py-2 mb-2 small text-info" style="border-color: rgba(56,189,248,0.25);">
+                            <i class="fas fa-file-invoice me-2"></i> Download Audit Log
+                        </button>
+                        <button onclick="downloadReport('verification_state.json')" class="btn btn-outline-info w-100 text-start py-2 mb-2 small text-info" style="border-color: rgba(56,189,248,0.25);">
+                            <i class="fas fa-file-shield me-2"></i> Verification State
+                        </button>
+                        <button onclick="downloadReport('state_graph.json')" class="btn btn-outline-info w-100 text-start py-2 mb-2 small text-info" style="border-color: rgba(56,189,248,0.25);">
+                            <i class="fas fa-network-wired me-2"></i> Download State Graph
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="drawer-themes" class="h-100 flex-column d-none">
+                <div class="panel-section-header">
+                    <span>Aesthetic Customizer</span>
+                </div>
+                <div class="panel-scrollable">
+                    <p class="text-muted small mb-3">Choose a premium responsive interface color palette:</p>
+                    
+                    <button onclick="applyTheme('space')" class="btn btn-outline-secondary border text-start w-100 py-2.5 mb-2 text-white small" style="background:#090c15; border-color: rgba(0, 242, 254, 0.2) !important;">
+                        🔵 Tokyo Space (Default)
+                    </button>
+                    <button onclick="applyTheme('dracula')" class="btn btn-outline-secondary border text-start w-100 py-2.5 mb-2 text-white small" style="background:#282a36; border-color: rgba(189, 147, 249, 0.2) !important;">
+                        🟣 Dracula Classic
+                    </button>
+                    <button onclick="applyTheme('catppuccin')" class="btn btn-outline-secondary border text-start w-100 py-2.5 mb-2 text-white small" style="background:#1e1e2e; border-color: rgba(137, 180, 250, 0.2) !important;">
+                        🐈 Catppuccin Mocha
+                    </button>
+                    <button onclick="applyTheme('cyberpunk')" class="btn btn-outline-secondary border text-start w-100 py-2.5 mb-2 text-white small" style="background:#000411; border-color: #ff007f !important;">
+                        💖 Cyberpunk Cyberneon
+                    </button>
+                    <button onclick="applyTheme('matrix')" class="btn btn-outline-secondary border text-start w-100 py-2.5 mb-2 text-white small" style="background:#0a100a; border-color: rgba(0, 255, 0, 0.2) !important;">
+                        🟢 Matrix Code
+                    </button>
+                    <button onclick="applyTheme('light')" class="btn btn-outline-secondary border text-start w-100 py-2.5 mb-2 text-dark small" style="background:#ffffff; border-color: rgba(13, 148, 136, 0.2) !important;">
+                        ⚪ Quiet Elegant Light
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Center Workspace Grid -->
+        <section class="main-workspace">
+            
+            <!-- Top Editor Half -->
+            <div class="editor-container">
+                <!-- Tab bar -->
+                <div class="editor-tabs-bar">
+                    <button onclick="selectTab('source')" id="tab-source" class="editor-tab active">
+                        <i class="fas fa-file-code text-info"></i> Source Code
+                    </button>
+                    <button onclick="selectTab('specs')" id="tab-specs" class="editor-tab">
+                        <i class="fas fa-book-bookmark text-warning"></i> Specifications & LTL
+                    </button>
+                    <button onclick="selectTab('translated')" id="tab-translated" class="editor-tab">
+                        <i class="fas fa-arrows-spin text-accent"></i> Translated Promela
+                    </button>
+                    <button onclick="selectTab('problems')" id="tab-problems" class="editor-tab">
+                        <i class="fas fa-triangle-exclamation text-danger"></i> Audit Problems
+                    </button>
+                    <button onclick="selectTab('trace')" id="tab-trace" class="editor-tab">
+                        <i class="fas fa-compass text-info"></i> Trace Analyzer
+                    </button>
+                    <button onclick="selectTab('stats')" id="tab-stats" class="editor-tab">
+                        <i class="fas fa-gauge text-success"></i> Full Statistics
+                    </button>
+
+                    <!-- Save / Action controls -->
+                    <div class="ms-auto me-2 d-flex gap-1" id="editor-actions">
+                        <button onclick="saveActiveFile()" class="btn btn-sm btn-premium py-1" style="height:26px;">
+                            <i class="fas fa-floppy-disk"></i> Save Edits
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LTL specifications template toolbar (conditional) -->
+                <div class="spec-toolbar d-none" id="specs-toolbar">
+                    <button onclick="loadSpecTemplate()" class="btn spec-btn btn-outline-secondary text-white py-1">
+                        <i class="fas fa-square-plus me-1"></i> Apply Spec Template
+                    </button>
+                    <select id="spec-template-select" class="form-select bg-dark text-white border-0 py-0 px-2" style="font-size:0.7rem; width:150px; height:24px; border-color:var(--border-color) !important;">
+                        <option value="ERC20 Token">ERC20 Token</option>
+                        <option value="Lending Protocol">Lending Protocol</option>
+                        <option value="DEX/AMM">DEX/AMM</option>
+                        <option value="Vault">Vault</option>
+                        <option value="Custom">Custom Template</option>
+                    </select>
+                    <span class="ms-auto text-muted small" style="font-size:0.65rem;">LTL & Rule Validator</span>
+                </div>
+
+                <!-- Editor Text Body -->
+                <div class="editor-textarea-wrapper">
+                    <!-- Standard Textarea -->
+                    <textarea id="main-editor-area" class="code-textarea" oninput="onEditorContentChange()" placeholder="No file loaded. Select a file from the explorer on the left."></textarea>
+                    
+                    <!-- Code view highlight shadow overlay (Prism rendering) -->
+                    <pre id="editor-prism-pane" class="code-highlight-pane d-none"><code id="editor-prism-code" class="language-solidity"></code></pre>
+                    
+                    <!-- Special step-by-step trace analyzer container -->
+                    <div id="trace-replay-pane" class="replay-root d-none w-100 h-100">
+                        <div class="replay-steps-list" id="trace-steps-container">
+                            <p class="text-muted small py-4 text-center">No trace loaded.<br>Click "Analyze Counterexample" in the console toolbar below.</p>
+                        </div>
+                        <div class="replay-variables-viewer">
+                            <div class="panel-section-header bg-transparent border-0 px-0 pt-0 mb-3">
+                                <span>Variables State Monitor</span>
+                                <span class="badge bg-dark border text-muted small px-3 py-1.5" id="trace-current-step-label">Step 0</span>
+                            </div>
+                            <div class="row g-2" id="trace-variables-grid">
+                                <p class="text-muted small py-4">No active trace step chosen.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full Stats Dashboard Screen -->
+                    <div id="stats-dashboard-pane" class="dashboard-tab-root d-none w-100 h-100">
+                        <div class="row g-3">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="glass-card d-flex align-items-center gap-3">
+                                    <div class="stat-badge bg-success bg-opacity-25 text-success">
+                                        <i class="fas fa-shield-check"></i>
                                     </div>
-                                    <div style="font-size:0.8rem;color:var(--dim);">
-                                        <i class="fas fa-microchip me-1"></i> ${r.tool} · <i class="far fa-clock ms-1 me-1"></i> ${r.timestamp}
-                                        ${r.states ? ` · <i class="fas fa-cubes ms-1 me-1"></i> ${r.states.toLocaleString()} states` : ''}
+                                    <div>
+                                        <h3 id="dash-passed">-</h3>
+                                        <div class="text-muted small">Properties Verified</div>
                                     </div>
                                 </div>
-                                <span class="badge ${badgeCls}"
-                                      style="font-size:0.72rem;padding:4px 10px;border-radius:6px;
-                                             color:#fff;flex-shrink:0; font-weight:700;">
-                                    ${status || 'UNKNOWN'}
-                                </span>
-                            </div>`;
-                        }).join('');
-                    } else {
-                        activityFeed.innerHTML = `
-                            <div class="text-center py-5">
-                                <i class="fas fa-inbox fa-3x mb-3 text-muted" style="opacity:0.3;"></i>
-                                <p class="text-muted">No recent verification activity found.</p>
-                                <p class="small text-muted">Run a verification in the desktop app to see results here.</p>
-                            </div>`;
-                    }
-                } catch (err) {
-                    console.error('Activity feed error:', err);
-                }
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="glass-card d-flex align-items-center gap-3">
+                                    <div class="stat-badge bg-danger bg-opacity-25 text-danger">
+                                        <i class="fas fa-triangle-exclamation"></i>
+                                    </div>
+                                    <div>
+                                        <h3 id="dash-failed">-</h3>
+                                        <div class="text-muted small">Violations Detected</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="glass-card d-flex align-items-center gap-3">
+                                    <div class="stat-badge bg-info bg-opacity-25 text-info">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <div>
+                                        <h3 id="dash-states">-</h3>
+                                        <div class="text-muted small">States Explored</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="glass-card d-flex align-items-center gap-3">
+                                    <div class="stat-badge bg-warning bg-opacity-25 text-warning">
+                                        <i class="fas fa-screwdriver-wrench"></i>
+                                    </div>
+                                    <div>
+                                        <h3 id="dash-tools">-</h3>
+                                        <div class="text-muted small">Supported Engines</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-            } catch (err) {
-                console.error('Failed to load status:', err);
+                        <div class="panel-section-header bg-transparent border-0 px-0 mb-2 mt-3">
+                            <span>Recent Job History Audit Logs</span>
+                        </div>
+                        <div class="glass-card p-0 overflow-hidden" id="dash-activity-list">
+                            <p class="text-muted p-4 text-center">No recent history retrieved.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Console Terminal Half -->
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="terminal-title">Console Terminal</span>
+                        <div class="form-check form-switch m-0 d-flex align-items-center gap-2">
+                            <input class="form-check-input bg-dark border-0" type="checkbox" id="auto-scroll-check" checked style="width:28px; height:14px; cursor:pointer;">
+                            <label class="form-check-label text-muted small" for="auto-scroll-check" style="font-size:0.65rem; cursor:pointer;">Auto-Scroll</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Verification action button -->
+                        <button onclick="requestVerificationCancel()" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size:0.68rem; height:20px; border-color: rgba(244,63,94,0.3);" title="Force Stop Current Tool">
+                            <i class="fas fa-stop me-1"></i> Force Cancel
+                        </button>
+                        
+                        <button onclick="triggerTraceDebugger()" class="btn btn-sm btn-outline-info py-0 px-2" style="font-size:0.68rem; height:20px; border-color: rgba(56,189,248,0.3);" title="Replay Counterexample Trace step-by-step">
+                            <i class="fas fa-spider me-1"></i> Debug Trace
+                        </button>
+                        
+                        <button onclick="clearConsoleLog()" class="btn btn-sm text-muted p-0" title="Clear Console">
+                            <i class="fas fa-trash-can" style="font-size:0.75rem;"></i>
+                        </button>
+                        <button onclick="exportConsoleLogs()" class="btn btn-sm text-muted p-0 ms-2" title="Export Console Logs">
+                            <i class="fas fa-download" style="font-size:0.75rem;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="terminal-body" id="consoleLogs">
+                    <div class="terminal-line term-dim">🛡️ DeFi Guardian Verification Server is running and listening on localhost:5005</div>
+                    <div class="terminal-line term-dim">Ready for model loading and safety validation.</div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Custom Script Logic -->
+    <script>
+        // State Store
+        const state = {
+            activeFile: null,
+            activeFileType: null,
+            activeActivity: 'explorer',
+            activeTab: 'source',
+            files: [],
+            consoleHistory: '',
+            pollingTimer: null,
+            isRunning: false,
+            activeTool: 'spin',
+            theme: 'space',
+            traceSteps: [],
+            traceCurrentStep: 0,
+            streamlitDashboardProcessRunning: false
+        };
+
+        // Cache references
+        const el = {
+            editor: document.getElementById('main-editor-area'),
+            prismPane: document.getElementById('editor-prism-pane'),
+            prismCode: document.getElementById('editor-prism-code'),
+            consoleLogs: document.getElementById('consoleLogs'),
+            autoScroll: document.getElementById('auto-scroll-check'),
+            navFileBadge: document.getElementById('nav-file-badge'),
+            specsToolbar: document.getElementById('specs-toolbar'),
+            tracePane: document.getElementById('trace-replay-pane'),
+            statsPane: document.getElementById('stats-dashboard-pane'),
+            filesList: document.getElementById('filesList')
+        };
+
+        // Tab selection management
+        const tabCodes = {
+            source: '',
+            specs: '',
+            translated: 'Run verification to see translated Promela output.',
+            problems: 'Run verification to scan for problems.'
+        };
+
+        // Initialize App on load
+        window.addEventListener('load', () => {
+            loadWorkspaceFiles();
+            loadStatusEngine();
+            loadSavedTheme();
+            
+            // Poll for state changes/console outputs every 1.5 seconds
+            state.pollingTimer = setInterval(pollState, 1500);
+        });
+
+        // ── Navigation Activity Switching ─────────────────────────────────
+        function selectActivity(activity) {
+            state.activeActivity = activity;
+            
+            // Toggle active classes on icons
+            ['explorer', 'tools', 'stats', 'themes'].forEach(a => {
+                const btn = document.getElementById(`act-${a}`);
+                const panel = document.getElementById(`drawer-${a}`);
+                if (a === activity) {
+                    btn.classList.add('active');
+                    panel.classList.remove('d-none');
+                    panel.classList.add('d-flex');
+                } else {
+                    btn.classList.remove('active');
+                    panel.classList.add('d-none');
+                    panel.classList.remove('d-flex');
+                }
+            });
+            
+            // Expand drawer if collapsed
+            const drawer = document.getElementById('sideDrawer');
+            drawer.classList.remove('collapsed');
+        }
+
+        // ── Tab Selection ───────────────────────────────────────────────
+        function selectTab(tab) {
+            state.activeTab = tab;
+            
+            // Reset tab highlights
+            ['source', 'specs', 'translated', 'problems', 'trace', 'stats'].forEach(t => {
+                const button = document.getElementById(`tab-${t}`);
+                if (t === tab) button.classList.add('active');
+                else button.classList.remove('active');
+            });
+
+            // Hide/Show Spec templates toolbar
+            if (tab === 'specs') {
+                el.specsToolbar.classList.remove('d-none');
+            } else {
+                el.specsToolbar.classList.add('d-none');
+            }
+
+            // Toggle Editor visibility modes
+            el.editor.classList.add('d-none');
+            el.prismPane.classList.add('d-none');
+            el.tracePane.classList.add('d-none');
+            el.statsPane.classList.add('d-none');
+
+            if (tab === 'trace') {
+                el.tracePane.classList.remove('d-none');
+            } else if (tab === 'stats') {
+                el.statsPane.classList.remove('d-none');
+                renderFullStats();
+            } else if (tab === 'source' || tab === 'specs') {
+                el.editor.classList.remove('d-none');
+                el.editor.value = tabCodes[tab] || '';
+                el.editor.readOnly = false;
+            } else {
+                // Translated Promela or Problems - read-only with syntax highlight
+                el.prismPane.classList.remove('d-none');
+                el.prismCode.textContent = tabCodes[tab] || '';
+                
+                // Switch language highlighter
+                if (tab === 'translated') {
+                    el.prismCode.className = 'language-promela';
+                } else {
+                    el.prismCode.className = 'language-markdown';
+                }
+                
+                if (window.Prism) {
+                    Prism.highlightElement(el.prismCode);
+                }
             }
         }
-        
-        loadStatus();
-        // Poll every 3 seconds for more "active" feel
-        setInterval(loadStatus, 3000);
+
+        // Keep local edits updated
+        function onEditorContentChange() {
+            const currentTab = state.activeTab;
+            if (currentTab === 'source' || currentTab === 'specs') {
+                tabCodes[currentTab] = el.editor.value;
+            }
+        }
+
+        // ── File Operations & loading ─────────────────────────────────────
+        async function loadWorkspaceFiles() {
+            try {
+                const resp = await fetch('/api/v1/files/list');
+                const data = await resp.json();
+                state.files = data;
+                
+                renderFilesTree(data);
+            } catch (err) {
+                console.error('Failed listing workspace files:', err);
+                el.filesList.innerHTML = '<div class="text-danger small py-3 px-2">Workspace indexing failed.</div>';
+            }
+        }
+
+        function renderFilesTree(files) {
+            if (!files || files.length === 0) {
+                el.filesList.innerHTML = '<div class="text-muted small py-3 px-2">No supported files (.sol, .rs, .pml) found.</div>';
+                return;
+            }
+
+            el.filesList.innerHTML = files.map(f => {
+                let icon = '📄';
+                if (f.type === '.sol') icon = '<i class="fab fa-ethereum text-info me-1"></i>';
+                else if (f.type === '.rs') icon = '<i class="fab fa-rust text-danger me-1"></i>';
+                else if (f.type === '.pml') icon = '<i class="fas fa-shield text-success me-1"></i>';
+                
+                const isActive = state.activeFile === f.path ? 'active' : '';
+                return `
+                    <div onclick="openSelectedFile('${f.path}')" class="file-tree-item ${isActive}">
+                        ${icon} <span title="${f.rel_path}">${f.name}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function openSelectedFile(path) {
+            try {
+                const resp = await fetch('/api/v1/files/open', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path })
+                });
+                const data = await resp.json();
+                
+                if (data.status === 'success') {
+                    state.activeFile = path;
+                    state.activeFileType = data.path.split('.').pop().toLowerCase();
+                    
+                    // Update labels
+                    el.navFileBadge.innerHTML = `<i class="fas fa-file-code me-1 text-info"></i> ${data.file}`;
+                    el.navFileBadge.classList.remove('text-muted');
+                    
+                    // Populate codes
+                    tabCodes.source = data.content;
+                    tabCodes.specs = data.specs || '';
+                    
+                    // Switch tab
+                    selectTab('source');
+                    
+                    // Refresh tree highlighted state
+                    renderFilesTree(state.files);
+                    
+                    // Print load trace
+                    appendTerminalLine(`LOADED FILE: ${data.file}`, 'term-header');
+                    appendTerminalLine(`PATH: ${data.path}`, 'term-dim');
+                    appendTerminalLine(`Type detected: ${state.activeFileType.toUpperCase()}`, 'term-dim');
+                    appendTerminalLine('━'.repeat(60), 'term-dim');
+                } else {
+                    alert('Error opening file: ' + data.message);
+                }
+            } catch (err) {
+                console.error('File load request crash:', err);
+            }
+        }
+
+        async function openNativeFileDialog() {
+            try {
+                appendTerminalLine('📂 Opening native system file dialogue...', 'term-dim');
+                const resp = await fetch('/api/v1/files/select-dialog', { method: 'POST' });
+                const data = await resp.json();
+                
+                if (data.status === 'success') {
+                    // Refresh file list and reload UI
+                    await loadWorkspaceFiles();
+                    await openSelectedFile(data.path);
+                } else if (data.status === 'cancelled') {
+                    appendTerminalLine('Dialog closed. Selection cancelled.', 'term-dim');
+                }
+            } catch (err) {
+                console.error('Failed invoking file picker dialog:', err);
+            }
+        }
+
+        // Setup File Drag & Drop & Upload
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileUploaderInput = document.getElementById('file-uploader-input');
+            const fileUploadZone = document.getElementById('file-upload-zone');
+
+            if (fileUploaderInput && fileUploadZone) {
+                fileUploaderInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        uploadFile(e.target.files[0]);
+                    }
+                });
+
+                fileUploadZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUploadZone.style.borderColor = 'var(--accent)';
+                    fileUploadZone.style.background = 'rgba(56,189,248,0.08)';
+                });
+
+                fileUploadZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    fileUploadZone.style.borderColor = 'rgba(56,189,248,0.2)';
+                    fileUploadZone.style.background = 'rgba(56,189,248,0.02)';
+                });
+
+                fileUploadZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUploadZone.style.borderColor = 'rgba(56,189,248,0.2)';
+                    fileUploadZone.style.background = 'rgba(56,189,248,0.02)';
+                    if (e.dataTransfer.files.length > 0) {
+                        uploadFile(e.dataTransfer.files[0]);
+                    }
+                });
+            }
+        });
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            appendTerminalLine(`📤 Uploading file: ${file.name}...`, 'term-dim');
+            
+            try {
+                const resp = await fetch('/api/v1/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await resp.json();
+                if (resp.ok && data.status === 'success') {
+                    appendTerminalLine(`✅ Uploaded successfully: ${file.name}`, 'term-success');
+                    await loadWorkspaceFiles();
+                    await openSelectedFile(data.path);
+                } else {
+                    appendTerminalLine(`❌ Upload failed: ${data.message || 'Unknown error'}`, 'term-fail');
+                    alert(`Upload failed: ${data.message || 'Unknown error'}`);
+                }
+            } catch (err) {
+                console.error(err);
+                appendTerminalLine(`❌ Upload failed due to connection error`, 'term-fail');
+                alert('Upload failed due to connection error.');
+            }
+        }
+
+        function exportConsoleLogs() {
+            if (!state.consoleHistory) {
+                alert("Console is currently empty.");
+                return;
+            }
+            const blob = new Blob([state.consoleHistory], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'console_logs.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadReport(filename) {
+            const a = document.createElement('a');
+            a.href = `/api/v1/reports/download/${filename}`;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        async function connectToWebPortal() {
+            try {
+                const btn = document.getElementById('portal-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
+                const resp = await fetch('/api/v1/portal/start');
+                const data = await resp.json();
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                } else {
+                    alert('Could not start web portal.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error connecting to web portal.');
+            } finally {
+                const btn = document.getElementById('portal-btn');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-globe me-1"></i> Web Portal';
+            }
+        }
+
+        async function saveActiveFile() {
+            if (!state.activeFile) {
+                alert('Please load a file first.');
+                return;
+            }
+            try {
+                const resp = await fetch('/api/v1/files/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: tabCodes.source,
+                        specs: tabCodes.specs
+                    })
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    appendTerminalLine('💾 Changes written successfully to active file.', 'term-success');
+                } else {
+                    alert('Save failed: ' + data.message);
+                }
+            } catch (err) {
+                console.error('File write exception:', err);
+            }
+        }
+
+        // LTL template loaders
+        async function loadSpecTemplate() {
+            const selectEl = document.getElementById('spec-template-select');
+            const name = selectEl.value;
+            try {
+                const resp = await fetch('/api/v1/specs/load-template', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    tabCodes.specs = data.specs;
+                    if (state.activeTab === 'specs') {
+                        el.editor.value = data.specs;
+                    }
+                    appendTerminalLine(`Applied spec template: ${name}`, 'term-success');
+                }
+            } catch (err) {
+                console.error('Template apply fail:', err);
+            }
+        }
+
+        // ── Verification Engine Trigger ────────────────────────────────────
+        async function runVerification(tool) {
+            if (!state.activeFile) {
+                alert('Please select a workspace file first.');
+                return;
+            }
+            
+            state.isRunning = true;
+            state.activeTool = tool;
+            appendTerminalLine(`🚀 LAUNCHING VERIFIER ENGINE [${tool.toUpperCase()}]`, 'term-header');
+            
+            try {
+                const resp = await fetch('/api/v1/verify/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tool })
+                });
+                const data = await resp.json();
+                
+                if (data.status !== 'success') {
+                    appendTerminalLine(`Failed starting: ${data.message}`, 'term-fail');
+                    state.isRunning = false;
+                }
+            } catch (err) {
+                console.error('Launch verification crash:', err);
+                state.isRunning = false;
+            }
+        }
+
+        async function requestVerificationCancel() {
+            try {
+                appendTerminalLine('🛑 Sending interrupt request to verification worker...', 'term-warn');
+                const resp = await fetch('/api/v1/verify/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tool: state.activeTool })
+                });
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    appendTerminalLine('Tool execution aborted.', 'term-dim');
+                }
+            } catch (err) {
+                console.error('Aborting verifier exception:', err);
+            }
+        }
+
+        // ── Console Logging ───────────────────────────────────────────────
+        function appendTerminalLine(text, className = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${className}`;
+            line.textContent = text;
+            el.consoleLogs.appendChild(line);
+            
+            if (el.autoScroll.checked) {
+                el.consoleLogs.scrollTop = el.consoleLogs.scrollHeight;
+            }
+        }
+
+        function clearConsoleLog() {
+            el.consoleLogs.innerHTML = '';
+        }
+
+        // ── Polling & state sync ──────────────────────────────────────────
+        async function pollState() {
+            try {
+                const resp = await fetch('/api/v1/state/current?t=' + Date.now());
+                const data = await resp.json();
+                
+                // Sync log streams
+                if (data.console_logs && data.console_logs !== state.consoleHistory) {
+                    const newContent = data.console_logs;
+                    const oldLength = state.consoleHistory.length;
+                    const diffText = newContent.substring(oldLength);
+                    
+                    if (diffText) {
+                        const lines = diffText.split('\n');
+                        lines.forEach(l => {
+                            if (!l.trim()) return;
+                            let cls = '';
+                            if (l.includes('[1/') || l.includes('[2/') || l.includes('[3/') || l.includes('RUNNING')) cls = 'term-header';
+                            else if (l.includes('🛑') || l.includes('FAIL') || l.includes('Violation')) cls = 'term-fail';
+                            else if (l.includes('🟢') || l.includes('PASS') || l.includes('success')) cls = 'term-success';
+                            else if (l.includes('━') || l.includes('─')) cls = 'term-dim';
+                            
+                            appendTerminalLine(l, cls);
+                        });
+                    }
+                    state.consoleHistory = newContent;
+                }
+
+                // Sync translated editors
+                if (data.translated_code) tabCodes.translated = data.translated_code;
+                if (data.problems_code) tabCodes.problems = data.problems_code;
+
+                // Sync status engines
+                const running = data.running_tools || [];
+                state.isRunning = running.length > 0;
+                
+                // Update indicator elements
+                ['spin', 'certora', 'lean', 'coq', 'kani', 'verus', 'prusti', 'creusot'].forEach(t => {
+                    const ind = document.getElementById(`ind-${t}`);
+                    if (ind) {
+                        if (running.includes(t)) {
+                            ind.className = 'tool-indicator running';
+                        } else {
+                            // Fetch standard ready/missing status
+                            ind.className = ind.classList.contains('available') ? 'tool-indicator available' : 'tool-indicator available'; // standard mock fallback
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error('State sync polling exception:', err);
+            }
+        }
+
+        async function loadStatusEngine() {
+            try {
+                const resp = await fetch('/api/v1/tools/status');
+                const tools = await resp.json();
+                
+                Object.entries(tools).forEach(([tool, v]) => {
+                    const available = v === true || (v && v.installed) || (v && (v.status === 'available' || v.status === 'degraded'));
+                    const ind = document.getElementById(`ind-${tool.toLowerCase()}`);
+                    const btn = document.getElementById(`btn-${tool.toLowerCase()}`);
+                    
+                    if (ind) {
+                        ind.className = available ? 'tool-indicator available' : 'tool-indicator missing';
+                    }
+                    if (btn) {
+                        btn.disabled = !available;
+                    }
+                });
+            } catch (err) {
+                console.error('Tools check error:', err);
+            }
+        }
+
+        // ── Streamlit legacy launch ───────────────────────────────────────
+        async function toggleStreamlitDashboard() {
+            const btn = document.getElementById('streamlit-btn');
+            
+            if (!state.streamlitDashboardProcessRunning) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting Portal...';
+                try {
+                    const resp = await fetch('/api/v1/dashboard/start', { method: 'POST' });
+                    const data = await resp.json();
+                    if (data.status === 'success') {
+                        state.streamlitDashboardProcessRunning = true;
+                        btn.innerHTML = '<i class="fas fa-chart-line me-1 text-success"></i> Stop Portal';
+                        appendTerminalLine(`🟢 Streamlit dashboard bound at ${data.url}`, 'term-success');
+                        window.open(data.url, '_blank');
+                    } else {
+                        alert('Launch failed: ' + data.message);
+                        btn.innerHTML = '<i class="fas fa-chart-line me-1"></i> Streamlit Portal';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    btn.innerHTML = '<i class="fas fa-chart-line me-1"></i> Streamlit Portal';
+                }
+            } else {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Stopping...';
+                try {
+                    const resp = await fetch('/api/v1/dashboard/stop', { method: 'POST' });
+                    const data = await resp.json();
+                    if (data.status === 'success') {
+                        state.streamlitDashboardProcessRunning = false;
+                        btn.innerHTML = '<i class="fas fa-chart-line me-1"></i> Streamlit Portal';
+                        appendTerminalLine('🛑 Streamlit dashboard shut down.', 'term-dim');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+
+        // ── Stats Dashboard Rendering ─────────────────────────────────────
+        async function renderFullStats() {
+            try {
+                const resp = await fetch('/api/v1/state/current');
+                const data = await resp.json();
+                
+                // Count properties verified
+                const ltlResults = data.ltl_results || [];
+                let passed = 0, failed = 0;
+                
+                if (ltlResults.length > 0) {
+                    ltlResults.forEach(r => {
+                        if (r.success || r.status === 'PASS') passed++; else failed++;
+                    });
+                }
+                
+                const states = data.states_stored || data.states || 0;
+                
+                // Update local badges
+                document.getElementById('stats-passed').textContent = passed;
+                document.getElementById('stats-failed').textContent = failed;
+                document.getElementById('stats-states').textContent = states.toLocaleString();
+                
+                document.getElementById('dash-passed').textContent = passed;
+                document.getElementById('dash-failed').textContent = failed;
+                document.getElementById('dash-states').textContent = states.toLocaleString();
+                document.getElementById('dash-tools').textContent = '6 engines';
+
+                // Fetch recent runs
+                const runsResp = await fetch('/api/v1/desktop-runs');
+                const runs = await runsResp.json();
+                
+                const listEl = document.getElementById('dash-activity-list');
+                if (runs && runs.length > 0) {
+                    listEl.innerHTML = runs.slice(0, 10).map(r => `
+                        <div class="d-flex align-items-center gap-3 p-3 border-bottom border-secondary border-opacity-10">
+                            <span class="badge bg-${r.status === 'SUCCESS' || r.status === 'PASS' ? 'success' : 'danger'} py-1.5 px-3">
+                                ${r.status || 'PASS'}
+                            </span>
+                            <div class="flex-grow-1">
+                                <div class="font-weight-600">${r.file}</div>
+                                <div class="text-muted small">${r.tool} · ${r.timestamp}</div>
+                            </div>
+                            <div class="text-info font-mono small">${r.states ? r.states.toLocaleString() + ' states' : ''}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<p class="text-muted p-4 text-center">No runs reported.</p>';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // ── Counterexample step replay ─────────────────────────────────────
+        async function triggerTraceDebugger() {
+            selectTab('trace');
+            const stepsList = document.getElementById('trace-steps-container');
+            stepsList.innerHTML = '<p class="text-muted small py-4 text-center"><div class="spinner-border spinner-border-sm text-info mb-2"></div><br>Analyzing trail output...</p>';
+            
+            try {
+                const resp = await fetch('/api/v1/counterexample/analyze');
+                const data = await resp.json();
+                
+                if (data.status === 'success' && data.trace_data && data.trace_data.steps) {
+                    state.traceSteps = data.trace_data.steps;
+                    
+                    // Render step selector cards
+                    stepsList.innerHTML = state.traceSteps.map((s, idx) => `
+                        <div onclick="selectTraceStep(${idx})" id="trace-step-${idx}" class="replay-step-card">
+                            <div class="d-flex justify-content-between mb-1">
+                                <strong>Step ${s.step}</strong>
+                                <span class="text-info">${s.proc_name}</span>
+                            </div>
+                            <div class="text-muted small font-mono">line ${s.line}: ${s.statement}</div>
+                        </div>
+                    `).join('');
+                    
+                    // Auto select step 0
+                    selectTraceStep(0);
+                    
+                    appendTerminalLine(`🟢 Trace replay loaded successfully. Total steps: ${state.traceSteps.length}`, 'term-success');
+                } else {
+                    stepsList.innerHTML = `<p class="text-muted small py-4 text-center">No active trace steps found.<br>${data.message || ''}</p>`;
+                }
+            } catch (err) {
+                console.error('Trace load exception:', err);
+                stepsList.innerHTML = '<p class="text-danger small py-4 text-center">Error reading trail variables.</p>';
+            }
+        }
+
+        function selectTraceStep(idx) {
+            state.traceCurrentStep = idx;
+            const step = state.traceSteps[idx];
+            if (!step) return;
+
+            // Highlight chosen card
+            state.traceSteps.forEach((s, i) => {
+                const card = document.getElementById(`trace-step-${i}`);
+                if (card) {
+                    if (i === idx) card.classList.add('active');
+                    else card.classList.remove('active');
+                }
+            });
+
+            // Update details label
+            document.getElementById('trace-current-step-label').textContent = `Step ${step.step} / ${state.traceSteps.length}`;
+
+            // Render variables grid
+            const grid = document.getElementById('trace-variables-grid');
+            const variables = step.variables || {};
+            const updates = step.updates || {};
+
+            const keys = Object.keys(variables).sort();
+            if (keys.length > 0) {
+                grid.innerHTML = keys.map(k => {
+                    const isUpdated = updates.hasOwnProperty(k);
+                    const updateBadge = isUpdated ? '<span class="badge bg-info var-badge-update ms-2 font-weight-600">Updated ✨</span>' : '';
+                    return `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="glass-card mb-2 p-2.5 d-flex flex-column" style="${isUpdated ? 'border-color: rgba(56,189,248,0.3) !important;' : ''}">
+                                <div class="text-muted small d-flex align-items-center">${k} ${updateBadge}</div>
+                                <div class="font-mono mt-1 ${isUpdated ? 'text-info font-weight-600' : 'text-white'}">${variables[k]}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                grid.innerHTML = '<p class="text-muted small py-4">No variables active in this execution frame.</p>';
+            }
+        }
+
+        // ── Aesthetic Themes switcher ──────────────────────────────────────
+        function applyTheme(theme) {
+            state.theme = theme;
+            
+            // Modify root class
+            document.body.className = '';
+            if (theme !== 'space') {
+                document.body.classList.add(`theme-${theme}`);
+            }
+            
+            // Save selection to backend
+            fetch('/api/v1/theme/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme })
+            }).catch(err => console.error('Theme save error:', err));
+            
+            appendTerminalLine(`Aesthetic theme changed to: ${theme.toUpperCase()}`, 'term-dim');
+        }
+
+        async function loadSavedTheme() {
+            try {
+                const resp = await fetch('/api/v1/theme/current');
+                const data = await resp.json();
+                
+                // Map tkinter saved themes to HTML equivalent
+                let theme = 'space';
+                const name = data.theme;
+                if (name.includes('Dracula')) theme = 'dracula';
+                else if (name.includes('Catppuccin')) theme = 'catppuccin';
+                else if (name.includes('Cyberpunk')) theme = 'cyberpunk';
+                else if (name.includes('Matrix')) theme = 'matrix';
+                else if (name.includes('Light') || name.includes('Quiet')) theme = 'light';
+                
+                applyTheme(theme);
+            } catch (err) {
+                console.error('Failed fetching saved theme preference:', err);
+            }
+        }
     </script>
 </body>
 </html>

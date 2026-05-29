@@ -1445,6 +1445,20 @@
               "icon": "file",
               "path": "generated/images/state_diagram_1779813479.png",
               "size": 452933
+            },
+            {
+              "name": "state_diagram_1780065104.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780065104.png",
+              "size": 448107
+            },
+            {
+              "name": "state_diagram_1780065120.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780065120.png",
+              "size": 448107
             }
           ]
         },
@@ -1587,14 +1601,14 @@
               "type": "file",
               "icon": "text",
               "path": "generated/reports/active_file.txt",
-              "size": 25
+              "size": 22
             },
             {
               "name": "audit_log.json",
               "type": "file",
               "icon": "json",
               "path": "generated/reports/audit_log.json",
-              "size": 282403
+              "size": 288553
             },
             {
               "name": "dashboard_users.db.synced",
@@ -1615,7 +1629,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/state_graph.json",
-              "size": 548
+              "size": 545
             },
             {
               "name": "verification_report.pdf",
@@ -1629,7 +1643,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/verification_state.json",
-              "size": 23129
+              "size": 23272
             }
           ]
         },
@@ -2577,6 +2591,13 @@
               "icon": "log",
               "path": "logs/coq/coq_verification_20260525_211045.log",
               "size": 487
+            },
+            {
+              "name": "coq_verification_20260529_181656.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260529_181656.log",
+              "size": 489
             }
           ]
         },
@@ -2828,6 +2849,13 @@
               "icon": "log",
               "path": "logs/lean/lean_verification_20260525_211138.log",
               "size": 517
+            },
+            {
+              "name": "lean_verification_20260529_181543.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260529_181543.log",
+              "size": 519
             }
           ]
         },
@@ -4053,6 +4081,20 @@
               "size": 9755
             },
             {
+              "name": "spin_verification_20260529_172445.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260529_172445.log",
+              "size": 9770
+            },
+            {
+              "name": "spin_verification_20260529_181535.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260529_181535.log",
+              "size": 9828
+            },
+            {
               "name": "translated_output.pml.trail",
               "type": "file",
               "icon": "file",
@@ -4066,7 +4108,7 @@
           "type": "file",
           "icon": "log",
           "path": "logs/portal_server.log",
-          "size": 2539
+          "size": 2625
         },
         {
           "name": "spin.log",
@@ -4623,7 +4665,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/desktop_app.html",
-              "size": 19065
+              "size": 78856
             },
             {
               "name": "index.html",
@@ -5310,7 +5352,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 67323
+          "size": 67356
         },
         {
           "name": "api_v1.py.bak",
@@ -5494,7 +5536,7 @@
       "type": "file",
       "icon": "python",
       "path": "check_tools.py",
-      "size": 7607
+      "size": 7759
     },
     {
       "name": "check_tools.sh",
@@ -5578,7 +5620,7 @@
       "type": "file",
       "icon": "python",
       "path": "desktop_app.py",
-      "size": 272118
+      "size": 301239
     },
     {
       "name": "desktop_bridge.py",
@@ -5627,7 +5669,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 191069
+      "size": 192715
     },
     {
       "name": "fix_admin.py",
@@ -5879,7 +5921,7 @@
       "type": "file",
       "icon": "python",
       "path": "sync_to_remote.py",
-      "size": 4120
+      "size": 4121
     },
     {
       "name": "test.v",
@@ -5921,7 +5963,7 @@
       "type": "file",
       "icon": "json",
       "path": "theme_config.json",
-      "size": 24
+      "size": 18
     },
     {
       "name": "themes.py",
@@ -6005,7 +6047,7 @@
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 1128
+      "size": 31502
     },
     {
       "name": "verification_worker.py",
@@ -6055,6 +6097,13 @@
       "icon": "python",
       "path": "verus_integration.py",
       "size": 2307
+    },
+    {
+      "name": "VestingWalletCliff.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "VestingWalletCliff.sol",
+      "size": 2018
     },
     {
       "name": "websocket_server.py",

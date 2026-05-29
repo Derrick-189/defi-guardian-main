@@ -34,6 +34,13 @@ TOOLS = {
     # Graphviz
     "Graphviz": "dot -V",
     
+    # SPIN Extensions
+    "SpinSpider": "spinspider -V",
+    "iDot": "idot -V",
+    
+    # Alternative Model Checkers
+    "Erigone": "erigone -V",
+    
     # Elan (Lean version manager)
     "Elan": "elan --version",
 }

@@ -32,7 +32,7 @@ def sync_local_to_remote():
     # 1. Fetch local audits and users
     print("Fetching local records...")
     audits = cursor.execute("SELECT * FROM audit_history ORDER BY audit_date DESC LIMIT 50").fetchall()
-    users = cursor.execute("SELECT * FROM user WHERE username != 'demo'").fetchall()
+    users = cursor.execute("SELECT * FROM users WHERE username != 'demo'").fetchall()
     
     sync_jobs = []
     for row in audits:

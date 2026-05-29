@@ -1124,7 +1124,7 @@ def _check_tool_available(tool: str) -> bool:
 def api_tools_status():
     """Per-tool status merged from PATH check + DB last-known status."""
     state = load_state()
-    TOOLS = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS"]
+    TOOLS = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS", "ERIGONE", "SPINSPIDER", "IDOT"]
     try:
         from web_portal.verification_simulator import simulate as _sim  # noqa
         has_simulator = True

@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-PORTAL_URL = os.environ.get("DG_PORTAL_URL", "http://localhost:5000")
+PORTAL_URL = os.environ.get("DG_PORTAL_URL", "http://localhost:5001")
 PROJECT_DIR = Path(__file__).parent
 VERIFICATION_STATE = PROJECT_DIR / "verification_state.json"
 AUDIT_LOG = PROJECT_DIR / "generated" / "reports" / "audit_log.json"

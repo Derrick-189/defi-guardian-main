@@ -3,7 +3,7 @@
 # Usage: ./launch_portal.sh [port]
 set -e
 
-PORT=${1:-5000}
+PORT=${1:-5001}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Kill anything already on the port

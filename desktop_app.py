@@ -4,10 +4,156 @@ Formal Verification Suite with SPIN Model Checker
 Full Translation Support for Solidity/Rust
 """
 
+import sys
+import os
+
+# Check if running in premium webview mode or legacy CustomTkinter mode
+FORCE_TK = "--tk" in sys.argv
+RUN_WEBVIEW = not FORCE_TK
+
+if RUN_WEBVIEW:
+    try:
+        import webview
+    except ImportError:
+        print("⚠️ webview module not found. Falling back to CustomTkinter GUI.")
+        RUN_WEBVIEW = False
+
+if RUN_WEBVIEW:
+    print("🚀 DeFi Guardian: Starting in Premium Webview Mode")
+    from types import ModuleType
+    
+    class MockCTk:
+        def __init__(self, *args, **kwargs):
+            self.theme_mode = "dark"
+            self.theme = None
+        def withdraw(self): pass
+        def deiconify(self): pass
+        def title(self, *args, **kwargs): pass
+        def geometry(self, *args, **kwargs): pass
+        def configure(self, *args, **kwargs): pass
+        def grid_columnconfigure(self, *args, **kwargs): pass
+        def grid_rowconfigure(self, *args, **kwargs): pass
+        def mainloop(self): pass
+        def after(self, ms, func, *args):
+            import threading
+            if ms == 0:
+                try: func(*args)
+                except: pass
+            else:
+                t = threading.Timer(ms / 1000.0, func, args)
+                t.daemon = True
+                t.start()
+        def update_idletasks(self): pass
+        def bind(self, *args, **kwargs): pass
+        def focus(self): pass
+        def destroy(self): pass
+
+    class MockWidget:
+        def __init__(self, *args, **kwargs):
+            self.text = ""
+            self.state = "normal"
+            self.val = ""
+            self._textbox = self
+            self.configure_kwargs = {}
+        def get(self, *args):
+            return self.text
+        def delete(self, *args):
+            self.text = ""
+        def insert(self, index, text, *args):
+            if index == "end":
+                self.text += str(text)
+            elif index == "1.0":
+                self.text = str(text) + self.text
+            else:
+                self.text += str(text)
+        def see(self, *args): pass
+        def configure(self, *args, **kwargs):
+            self.configure_kwargs.update(kwargs)
+            if "text" in kwargs:
+                self.text = kwargs["text"]
+            if "state" in kwargs:
+                self.state = kwargs["state"]
+        def pack(self, *args, **kwargs): pass
+        def grid(self, *args, **kwargs): pass
+        def bind(self, *args, **kwargs): pass
+        def tab(self, *args): return self
+        def add(self, *args): pass
+        def set(self, *args): pass
+        def get_inner_frame(self): return self
+        def configure_width(self, *args): pass
+        def show_welcome(self): pass
+        def select_category(self, *args): pass
+        def cget(self, name):
+            if name == "fg_color": return "#000"
+            if name == "bg_color": return "#000"
+            if name == "hover_color": return "#000"
+            return ""
+        def grid_propagate(self, *args, **kwargs): pass
+        def pack_propagate(self, *args, **kwargs): pass
+        def winfo_width(self, *args, **kwargs): return 100
+        def winfo_height(self, *args, **kwargs): return 100
+        def winfo_id(self, *args, **kwargs): return 1
+        def winfo_children(self, *args, **kwargs): return []
+        def unbind(self, *args, **kwargs): pass
+        def __getattr__(self, name):
+            def dummy(*args, **kwargs):
+                return self
+            return dummy
+
+    class MockVar:
+        def __init__(self, value=None):
+            self.value = value
+        def get(self): return self.value
+        def set(self, val): self.value = val
+
+    class MockModule(ModuleType):
+        def __init__(self, name):
+            super().__init__(name)
+            self.__dict__['CTk'] = MockCTk
+            self.__dict__['CTkToplevel'] = MockCTk
+            self.__dict__['Tk'] = MockCTk
+            self.__dict__['StringVar'] = lambda *args, **kwargs: MockVar("")
+            self.__dict__['BooleanVar'] = lambda *args, **kwargs: MockVar(False)
+            self.__dict__['DoubleVar'] = lambda *args, **kwargs: MockVar(0.0)
+            self.__dict__['IntVar'] = lambda *args, **kwargs: MockVar(0)
+            self.__dict__['CTkFont'] = lambda *args, **kwargs: None
+            self.__dict__['get_appearance_mode'] = lambda *args, **kwargs: "Dark"
+            self.__dict__['set_appearance_mode'] = lambda *args, **kwargs: None
+            self.__dict__['set_default_color_theme'] = lambda *args, **kwargs: None
+            self.__dict__['END'] = "end"
+            
+        def __getattr__(self, name):
+            if name[0].isupper():
+                return MockWidget
+            def dummy(*args, **kwargs):
+                return None
+            return dummy
+
+    ctk_mock = MockModule('customtkinter')
+    tk_mock = MockModule('tkinter')
+    tk_mock.filedialog = ModuleType('filedialog')
+    tk_mock.messagebox = ModuleType('messagebox')
+    
+    # Dialog functions
+    def webview_askopenfilename(*args, **kwargs):
+        return ""
+    
+    tk_mock.filedialog.askopenfilename = webview_askopenfilename
+    tk_mock.filedialog.asksaveasfilename = lambda *args, **kwargs: ""
+    tk_mock.messagebox.showwarning = lambda *args, **kwargs: None
+    tk_mock.messagebox.showinfo = lambda *args, **kwargs: None
+    tk_mock.messagebox.showerror = lambda *args, **kwargs: None
+    tk_mock.messagebox.askokcancel = lambda *args, **kwargs: True
+
+    sys.modules['customtkinter'] = ctk_mock
+    sys.modules['tkinter'] = tk_mock
+    sys.modules['tkinter.filedialog'] = tk_mock.filedialog
+    sys.modules['tkinter.messagebox'] = tk_mock.messagebox
+    sys.modules['tkinter.colorchooser'] = ModuleType('colorchooser')
+
 import webview
 import threading
 import os
-import sys
 import json
 import sqlite3
 import subprocess
@@ -1530,6 +1676,12 @@ class FormalVerifierApp(ctk.CTk):
         )
         self.stop_spin_btn = self._sidebar_stop_button("spin")
 
+        self.erigone_btn = self._sidebar_item_button(
+            "Run Erigone", self.verify_with_erigone,
+            icon="⬡", tag="erigone", state="disabled"
+        )
+        self.stop_erigone_btn = self._sidebar_stop_button("erigone")
+
         self.verify_with_certora_btn = self._sidebar_item_button(
             "Verify with Certora", self.verify_with_certora, icon="⬡", tag="certora"
         )
@@ -1568,6 +1720,12 @@ class FormalVerifierApp(ctk.CTk):
 
         self.dash_btn = self._sidebar_item_button(
             "Open Dashboard", self.open_dashboard, icon="⬡"
+        )
+        self.spinspider_btn = self._sidebar_item_button(
+            "SpinSpider Graph", self.run_spinspider, icon="🕸️"
+        )
+        self.idot_btn = self._sidebar_item_button(
+            "iDot Visualizer", self.run_idot, icon="👁️"
         )
         self._sidebar_item_button(
             "Account Dashboard", self.open_account_dashboard, icon="👤"
@@ -2162,6 +2320,8 @@ class FormalVerifierApp(ctk.CTk):
                 self.file_info.configure(text=f"  {filename}", text_color=self.theme.ACCENT)
 
             self.verify_btn.configure(state="normal")
+            if hasattr(self, 'erigone_btn'):
+                self.erigone_btn.configure(state="normal")
             self.status_label.configure(text=f"Loaded: {filename}")
 
     def load_file_to_editor(self, file_path):
@@ -3651,7 +3811,7 @@ Ready for verification!
                     # Fallback to API if DB direct access fails
                     try:
                         import requests
-                        requests.post('http://localhost:5000/api/v1/events/emit', 
+                        requests.post('http://localhost:5001/api/v1/events/emit', 
                                      json={"type": "sync", "job_id": job_entry.get('id')},
                                      timeout=2)
                     except: pass
@@ -3786,7 +3946,7 @@ Ready for verification!
 
             # Send to web portal
             # Use v1 API
-            requests.post('http://localhost:5000/api/v1/events/emit',
+            requests.post('http://localhost:5001/api/v1/events/emit',
                          json=json.loads(event.to_json()),
                          timeout=2)
         except Exception:
@@ -4418,6 +4578,109 @@ Ready for verification!
                 self.after(0, lambda: self.set_tool_running("creusot", False))
 
         threading.Thread(target=run_creusot, daemon=True).start()
+
+    def verify_with_erigone(self):
+        """Run Erigone Model Checker on the current file"""
+        if not self.current_file:
+            messagebox.showwarning("No File", "Please load a file first.")
+            return
+
+        def run():
+            self.erigone_btn.configure(state="disabled", text="RUNNING...")
+            self.set_tool_running("erigone", True)
+            self.console.insert("end", "\nRUNNING ERIGONE VERIFICATION\n", "header")
+            self.console.insert("end", f"File: {os.path.basename(self.current_file)}\n", "dim")
+            self.console.insert("end", "─"*60 + "\n\n", "dim")
+
+            # Erigone typically takes Promela or its own subset
+            # For now, we assume it can take the translated Promela
+            base_name = os.path.splitext(os.path.basename(self.current_file))[0]
+            verify_file = os.path.join(MODELS_DIR, "translated_output.pml")
+            if not os.path.exists(verify_file):
+                verify_file = self.current_file
+
+            cmd = ["erigone", verify_file]
+            result = self.run_cancellable_command("erigone", cmd)
+
+            self.console.insert("end", result.get('stdout', ''))
+            if result.get('stderr'):
+                self.console.insert("end", result['stderr'], "error")
+
+            if result.get('returncode') == 0:
+                self.console.insert("end", "\n✅ Erigone verification complete.\n", "pass")
+            elif result.get('cancelled'):
+                self.console.insert("end", "\n🛑 Erigone verification stopped by user.\n", "warning")
+            else:
+                self.console.insert("end", f"\n❌ Erigone failed with exit code {result.get('returncode')}\n", "error")
+
+            self.after(0, lambda: self.erigone_btn.configure(state="normal", text="Run Erigone"))
+            self.set_tool_running("erigone", False)
+
+        threading.Thread(target=run, daemon=True).start()
+
+    def run_spinspider(self):
+        """Generate state space graph using SpinSpider"""
+        if not self.current_file:
+            messagebox.showwarning("No File", "Please load a file first.")
+            return
+
+        def run():
+            self.console.insert("end", "\nGENERATING STATE SPACE WITH SPINSPIDER\n", "header")
+            verify_file = os.path.join(MODELS_DIR, "translated_output.pml")
+            if not os.path.exists(verify_file):
+                verify_file = self.current_file
+
+            # 1. Generate pan.c with -DDUMP
+            self.console.insert("end", "   Step 1: Generating pan.c with -DDUMP...\n")
+            subprocess.run(["spin", "-a", "-DDUMP", verify_file], cwd=MODELS_DIR)
+
+            # 2. Compile pan.c
+            self.console.insert("end", "   Step 2: Compiling pan.c...\n")
+            subprocess.run(["gcc", "-o", "pan", "pan.c"], cwd=MODELS_DIR)
+
+            # 3. Run pan to get dump
+            self.console.insert("end", "   Step 3: Running pan to dump state space...\n")
+            with open(os.path.join(MODELS_DIR, "pan.dump"), "w") as f:
+                subprocess.run(["./pan"], cwd=MODELS_DIR, stdout=f)
+
+            # 4. Run SpinSpider
+            self.console.insert("end", "   Step 4: Running SpinSpider...\n")
+            graph_file = os.path.join(IMAGES_DIR, "state_space.dot")
+            with open(graph_file, "w") as f:
+                subprocess.run(["spinspider", "pan.dump"], cwd=MODELS_DIR, stdout=f)
+
+            # 5. Convert DOT to PNG if graphviz is available
+            self.console.insert("end", "   Step 5: Converting to image...\n")
+            png_file = os.path.join(IMAGES_DIR, "state_space.png")
+            subprocess.run(["dot", "-Tpng", graph_file, "-o", png_file])
+
+            if os.path.exists(png_file):
+                self.console.insert("end", f"\n✅ State space graph generated: {png_file}\n", "pass")
+                self.after(0, lambda: webbrowser.open(f"file://{png_file}"))
+            else:
+                self.console.insert("end", "\n❌ Failed to generate state space image.\n", "error")
+
+        threading.Thread(target=run, daemon=True).start()
+
+    def run_idot(self):
+        """Visualize state space using iDot"""
+        if not self.current_file:
+            messagebox.showwarning("No File", "Please load a file first.")
+            return
+
+        def run():
+            self.console.insert("end", "\nVISUALIZING WITH IDOT\n", "header")
+            verify_file = os.path.join(MODELS_DIR, "translated_output.pml")
+            if not os.path.exists(verify_file):
+                verify_file = self.current_file
+
+            # iDot typically runs on a SPIN trail or directly on a model
+            cmd = ["idot", verify_file]
+            self.console.insert("end", f"   Running: {' '.join(cmd)}\n")
+            subprocess.Popen(cmd, cwd=PROJECT_DIR)
+            self.console.insert("end", "✅ iDot visualizer launched.\n", "pass")
+
+        threading.Thread(target=run, daemon=True).start()
 
     def verify_with_certora(self):
          """Run Certora Prover on the active Solidity contract"""
@@ -5896,14 +6159,14 @@ methods {
 
     def open_account_dashboard(self):
         """Start the web portal if needed, then open the account dashboard in the browser"""
-        portal_url = "http://localhost:5000/dashboard"
+        portal_url = "http://localhost:5001/dashboard"
 
         def _launch():
             import socket, time, subprocess, sys, os
 
             def is_up():
                 try:
-                    with socket.create_connection(("localhost", 5000), timeout=1.0):
+                    with socket.create_connection(("localhost", 5001), timeout=1.0):
                         return True
                 except OSError:
                     return False
@@ -5914,7 +6177,7 @@ methods {
                 self.status_label.configure(text="Account dashboard opened")
                 return
 
-            self.console.insert("end", "\n🚀 Starting account portal on port 5000...\n", "accent")
+            self.console.insert("end", "\n🚀 Starting account portal on port 5001...\n", "accent")
             try:
                 web_portal_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'web_portal')
                 web_app_path = os.path.join(web_portal_dir, 'app.py')
@@ -5969,7 +6232,7 @@ methods {
 
         def is_up():
             try:
-                with socket.create_connection(("localhost", 5000), timeout=1.0):
+                with socket.create_connection(("localhost", 5001), timeout=1.0):
                     return True
             except OSError:
                 return False
@@ -6132,15 +6395,397 @@ def api_health():
 
 @flask_app.route('/api/v1/state/current')
 def api_current_state():
-    """Get current verification state from unified source"""
+    """Get current verification state from unified source, augmented with active app state"""
+    state = {}
     state_file = os.path.join(PROJECT_DIR, "verification_state.json")
     if os.path.exists(state_file):
         try:
             with open(state_file, 'r') as f:
-                return jsonify(json.load(f))
+                state = json.load(f)
         except:
             pass
-    return jsonify({})
+            
+    # Augment with current editor fields if running with app
+    if 'app' in globals() or 'app' in locals() or (sys.modules.get('__main__') and hasattr(sys.modules['__main__'], 'app')):
+        main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+        if main_app:
+            state['source_code'] = main_app.source_editor.get()
+            state['specs_code'] = main_app.spec_editor.get()
+            state['translated_code'] = main_app.translated_editor.get()
+            state['problems_code'] = main_app.problems_text.get()
+            state['console_logs'] = main_app.console.get()
+            state['current_file'] = main_app.current_file
+            state['file_type'] = main_app.file_type
+            
+            # Find running processes
+            running_tools = []
+            for t, p in main_app.tool_processes.items():
+                if p and p.poll() is None:
+                    running_tools.append(t)
+            state['running_tools'] = running_tools
+            
+    return jsonify(state)
+
+@flask_app.route('/api/v1/files/list')
+def api_list_files():
+    """List supported project workspace files"""
+    supported_exts = ('.sol', '.rs', '.pml')
+    files = []
+    try:
+        for root, dirs, filenames in os.walk(PROJECT_DIR):
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ('node_modules', '.venv', 'generated', 'console_exports', 'logs')]
+            for f in filenames:
+                if f.endswith(supported_exts):
+                    full_path = os.path.join(root, f)
+                    rel_path = os.path.relpath(full_path, PROJECT_DIR)
+                    files.append({
+                        'name': f,
+                        'path': full_path,
+                        'rel_path': rel_path,
+                        'type': os.path.splitext(f)[1].lower()
+                    })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    return jsonify(files)
+
+@flask_app.route('/api/v1/files/open', methods=['POST'])
+def api_open_file():
+    """Open selected file and load it into the application editors"""
+    data = request.json or {}
+    file_path = data.get('path')
+    if not file_path:
+        return jsonify({'status': 'error', 'message': 'No path provided'}), 400
+    try:
+        main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+        if main_app:
+            main_app.load_file_to_editor(file_path)
+            # Save for dashboard/other modules
+            with open(os.path.join(REPORTS_DIR, "active_file.txt"), "w") as f:
+                f.write(file_path)
+            return jsonify({
+                'status': 'success',
+                'file': os.path.basename(file_path),
+                'path': file_path,
+                'content': main_app.source_editor.get(),
+                'specs': main_app.spec_editor.get()
+            })
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/files/select-dialog', methods=['POST'])
+def api_select_dialog():
+    """Open a native Tkinter open file dialog from Flask thread"""
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+        root = tk.Tk()
+        root.withdraw()
+        file_path = filedialog.askopenfilename(
+            title="Open Source File",
+            filetypes=[
+                ("All Supported", "*.sol *.pml *.rs"),
+                ("Solidity", "*.sol"),
+                ("Promela", "*.pml"),
+                ("Rust", "*.rs")
+            ]
+        )
+        root.destroy()
+        if file_path:
+            main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+            if main_app:
+                main_app.load_file_to_editor(file_path)
+                with open(os.path.join(REPORTS_DIR, "active_file.txt"), "w") as f:
+                    f.write(file_path)
+                return jsonify({
+                    'status': 'success',
+                    'path': file_path,
+                    'content': main_app.source_editor.get()
+                })
+        return jsonify({'status': 'cancelled'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/files/save', methods=['POST'])
+def api_save_file():
+    """Save editor text content back to the current active file"""
+    data = request.json or {}
+    content = data.get('content')
+    specs = data.get('specs')
+    
+    main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+    if not main_app:
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    if not main_app.current_file:
+        return jsonify({'status': 'error', 'message': 'No file loaded'}), 400
+        
+    try:
+        if content is not None:
+            with open(main_app.current_file, 'w', encoding='utf-8') as f:
+                f.write(content)
+            main_app.source_editor.delete("1.0", "end")
+            main_app.source_editor.insert("1.0", content)
+            
+        if specs is not None:
+            main_app.spec_editor.delete("1.0", "end")
+            main_app.spec_editor.insert("1.0", specs)
+            
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/files/upload', methods=['POST'])
+def api_upload_file():
+    """Upload a source file from the web UI to the workspace"""
+    if 'file' not in request.files:
+        return jsonify({'status': 'error', 'message': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'status': 'error', 'message': 'No selected file'}), 400
+    
+    if file and file.filename.endswith(('.sol', '.rs', '.pml')):
+        from werkzeug.utils import secure_filename
+        filename = secure_filename(file.filename)
+        dest_path = os.path.join(PROJECT_DIR, filename)
+        file.save(dest_path)
+        
+        main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+        if main_app:
+            main_app.load_file_to_editor(dest_path)
+            with open(os.path.join(REPORTS_DIR, "active_file.txt"), "w") as f:
+                f.write(dest_path)
+            return jsonify({
+                'status': 'success',
+                'path': dest_path,
+                'file': filename,
+                'content': main_app.source_editor.get()
+            })
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    return jsonify({'status': 'error', 'message': 'Invalid file type. Only .sol, .rs, and .pml are supported'}), 400
+
+@flask_app.route('/api/v1/reports/download/<filename>')
+def api_download_report(filename):
+    """Download verification reports"""
+    if filename not in ('audit_log.json', 'verification_state.json', 'state_graph.json'):
+        return jsonify({'status': 'error', 'message': 'Invalid report filename'}), 400
+    
+    file_path = os.path.join(REPORTS_DIR, filename)
+    if not os.path.exists(file_path):
+        return jsonify({'status': 'error', 'message': 'Report not found'}), 404
+    
+    return send_file(file_path, as_attachment=True)
+
+@flask_app.route('/api/v1/specs/load-template', methods=['POST'])
+def api_load_template():
+    """Load LTL template specs into editor"""
+    data = request.json or {}
+    template_name = data.get('name', 'Custom')
+    main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+    if not main_app:
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    try:
+        main_app._spec_load_template(template_name)
+        return jsonify({
+            'status': 'success',
+            'specs': main_app.spec_editor.get()
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/verify/run', methods=['POST'])
+def api_run_verification():
+    """Trigger background verification runner for selected tool"""
+    data = request.json or {}
+    tool = data.get('tool', 'spin')
+    
+    main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+    if not main_app:
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    if not main_app.current_file:
+        return jsonify({'status': 'error', 'message': 'Please load a file first'}), 400
+        
+    def run_in_bg():
+        try:
+            if tool == 'spin':
+                main_app.run_verification()
+            elif tool == 'erigone':
+                main_app.verify_with_erigone()
+            elif tool == 'certora':
+                main_app.verify_with_certora()
+            elif tool == 'coq':
+                main_app.verify_with_coq()
+            elif tool == 'lean':
+                main_app.run_lean_verification()
+            elif tool == 'kani':
+                main_app.verify_with_kani()
+            elif tool == 'prusti':
+                main_app.verify_with_prusti()
+            elif tool == 'creusot':
+                main_app.verify_with_creusot()
+            elif tool == 'spinspider':
+                main_app.run_spinspider()
+            elif tool == 'idot':
+                main_app.run_idot()
+            elif tool == 'slither':
+                main_app.run_slither_analysis()
+            elif tool == 'slither_certora':
+                main_app.run_slither_certora()
+            else:
+                main_app.console.insert("end", f"Unknown tool: {tool}\n")
+        except Exception as e:
+            main_app.console.insert("end", f"Error launching verification: {str(e)}\n")
+            
+    threading.Thread(target=run_in_bg, daemon=True).start()
+    return jsonify({'status': 'success', 'message': f'Started verification using {tool}'})
+
+@flask_app.route('/api/v1/verify/stop', methods=['POST'])
+def api_stop_verification():
+    """Trigger cancellation request for currently executing verification tool"""
+    data = request.json or {}
+    tool = data.get('tool', 'spin')
+    main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+    if not main_app:
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    try:
+        main_app.request_stop_tool(tool)
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/counterexample/analyze')
+def api_analyze_counterexample():
+    """Perform and stream counterexample structure trace"""
+    try:
+        from counterexample_analyzer import CounterexampleAnalyzer
+        analyzer = CounterexampleAnalyzer(PROJECT_DIR)
+        
+        trail_file = os.path.join(SPIN_LOGS, "translated_output.pml.trail")
+        pml_file = os.path.join(MODELS_DIR, "translated_output.pml")
+        
+        if not os.path.exists(trail_file):
+            for f in os.listdir(SPIN_LOGS):
+                if f.endswith('.trail'):
+                    trail_file = os.path.join(SPIN_LOGS, f)
+                    break
+            if not os.path.exists(trail_file):
+                for f in os.listdir(PROJECT_DIR):
+                    if f.endswith('.trail'):
+                        trail_file = os.path.join(PROJECT_DIR, f)
+                        break
+                        
+        if not os.path.exists(trail_file):
+            return jsonify({'status': 'no_trail', 'message': 'No counterexample trail found. Run a verification with violations first.'})
+            
+        trace_data = analyzer.get_structured_trace(pml_file if os.path.exists(pml_file) else None)
+        
+        if not trace_data.get("steps") and os.path.exists(TRACES_DIR):
+            import glob
+            trace_files = sorted(
+                glob.glob(os.path.join(TRACES_DIR, "trace_*.json")),
+                key=os.path.getmtime, reverse=True
+            )
+            for tf in trace_files[:1]:
+                try:
+                    with open(tf, 'r') as f:
+                        saved = json.load(f)
+                    if saved.get("node_details") and not saved.get("steps"):
+                        steps = []
+                        for i, nd in enumerate(saved["node_details"]):
+                            steps.append({
+                                "step": i + 1,
+                                "proc_name": nd.get("process", "unknown"),
+                                "line": nd.get("line", 0),
+                                "statement": nd.get("action", ""),
+                                "variables": nd.get("variables", {}),
+                                "updates": nd.get("changed_variables", {})
+                            })
+                        saved["steps"] = steps
+                    trace_data = saved
+                    break
+                except:
+                    pass
+                    
+        return jsonify({
+            'status': 'success',
+            'trace_data': trace_data,
+            'report': analyzer.generate_report(pml_file if os.path.exists(pml_file) else None)
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/dashboard/start', methods=['POST'])
+def api_start_dashboard():
+    """Trigger background start for streamlit legacy dashboard"""
+    try:
+        dashboard_path = os.path.join(PROJECT_DIR, "app.py")
+        cmd = [
+            sys.executable, "-m", "streamlit", "run", dashboard_path,
+            "--server.port", "8501",
+            "--server.address", "localhost",
+            "--server.headless", "true",
+            "--browser.gatherUsageStats", "false"
+        ]
+        main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+        if main_app:
+            if main_app.dashboard_process is None or main_app.dashboard_process.poll() is not None:
+                main_app.dashboard_process = subprocess.Popen(cmd, cwd=PROJECT_DIR)
+                main_app.console.insert("end", "🟢 Streamlit dashboard started on http://localhost:8501\n")
+            return jsonify({'status': 'success', 'url': 'http://localhost:8501'})
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/dashboard/stop', methods=['POST'])
+def api_stop_dashboard():
+    """Trigger stop for streamlit legacy dashboard"""
+    main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+    if not main_app:
+        return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
+    try:
+        if main_app.dashboard_process and main_app.dashboard_process.poll() is None:
+            main_app.dashboard_process.terminate()
+            main_app.dashboard_process.wait(timeout=2)
+            main_app.console.insert("end", "🛑 Streamlit dashboard stopped.\n")
+        try:
+            subprocess.run(["pkill", "-f", "streamlit"], stderr=subprocess.DEVNULL)
+        except:
+            pass
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@flask_app.route('/api/v1/theme/save', methods=['POST'])
+def api_save_theme():
+    """Save persistent theme configuration choice"""
+    data = request.json or {}
+    theme = data.get('theme')
+    if theme:
+        main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
+        if main_app and hasattr(main_app, 'theme_manager'):
+            main_app.theme_manager.save_theme_preference(theme)
+        else:
+            config_file = os.path.join(PROJECT_DIR, "theme_config.json")
+            try:
+                with open(config_file, 'w') as f:
+                    json.dump({"theme": theme}, f)
+            except:
+                pass
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'error', 'message': 'No theme specified'}), 400
+
+@flask_app.route('/api/v1/theme/current')
+def api_get_theme():
+    """Retrieve persistent theme configuration choice"""
+    config_file = os.path.join(PROJECT_DIR, "theme_config.json")
+    theme = "Dark+ (Default)"
+    try:
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            theme = config.get("theme", theme)
+    except:
+        pass
+    return jsonify({'theme': theme})
+
 
 @flask_app.route('/api/v1/tools/status')
 def api_tools_status():
@@ -6153,8 +6798,10 @@ def api_tools_status():
         ('lean', ['lean', '--version']), 
         ('prusti', ['prusti-rustc', '--version']),
         ('kani', ['cargo', 'kani', '--version']),
-        ('certora', ['certora-cli', '--version']),
-        ('solc', ['solc', '--version'])
+        ('certora', ['certoraRun', '--version']),
+        ('solc', ['solc', '--version']),
+        ('verus', ['verus', '--version']),
+        ('creusot', ['cargo', 'creusot', '--help'])
     ]
     for tool, cmd in check_list:
         try:
@@ -6163,6 +6810,7 @@ def api_tools_status():
         except:
             tools[tool] = False
     return jsonify(tools)
+
 
 @flask_app.route('/api/v1/desktop-runs')
 def api_desktop_runs():
@@ -6200,8 +6848,8 @@ def api_start_portal():
     try:
         # Check if portal is already up
         import socket
-        with socket.create_connection(("localhost", 5000), timeout=0.5):
-            return jsonify({"status": "already_running", "url": "http://localhost:5000/dashboard"})
+        with socket.create_connection(("localhost", 5001), timeout=0.5):
+            return jsonify({"status": "already_running", "url": "http://localhost:5001/dashboard"})
     except:
         pass
         
@@ -6224,7 +6872,7 @@ def api_start_portal():
             pass
             
     threading.Thread(target=_launch, daemon=True).start()
-    return jsonify({"status": "starting", "url": "http://localhost:5000/dashboard"})
+    return jsonify({"status": "starting", "url": "http://localhost:5001/dashboard"})
 
 @flask_app.route('/dashboard')
 def desktop_dashboard():
@@ -6253,12 +6901,42 @@ def start_flask():
 
 
 if __name__ == "__main__":
-    # Start Flask background thread for potential web-based components
+    app = FormalVerifierApp()
+    globals()['app'] = app
+    
+    # Start Flask background thread
     flask_thread = threading.Thread(target=start_flask, daemon=True)
     flask_thread.start()
 
-    app = FormalVerifierApp()
-    try:
-        app.mainloop()
-    except KeyboardInterrupt:
-        print("\n👋 DeFi Guardian closed safely.")
+    if RUN_WEBVIEW:
+        print("🟢 Booting DeFi Guardian dynamic dashboard...")
+        time.sleep(0.5)  # Wait for Flask to start
+        
+        try:
+            window = webview.create_window(
+                "DeFi Guardian - Formal Verification Suite",
+                "http://localhost:5005/",
+                width=1550,
+                height=960,
+                min_size=(1024, 768),
+                background_color='#090d16'
+            )
+            webview.start()
+            print("\n👋 DeFi Guardian closed safely.")
+        except Exception as e:
+            print(f"⚠️ Webview launch failed: {e}")
+            print("🔗 Access the DeFi Guardian dashboard directly in your browser at:")
+            print("   👉 http://localhost:5005/")
+            
+            # Keep Flask thread alive for browser use
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\n👋 DeFi Guardian closed safely.")
+    else:
+        print("🚀 Starting legacy CustomTkinter interface...")
+        try:
+            app.mainloop()
+        except KeyboardInterrupt:
+            print("\n👋 DeFi Guardian closed safely.")
