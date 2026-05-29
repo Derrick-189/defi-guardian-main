@@ -538,16 +538,18 @@
     
     section.hidden = false;
     content.innerHTML =
-      '<ul class="diagnostic-list">' +
+      '<ul class="diagnostic-list" style="display:flex;flex-direction:column;gap:0.6rem;">' +
       recommendations
         .map(function (rec) {
+          var isAi = rec.startsWith("🤖");
+          var displayRec = isAi ? rec.replace(/^🤖\s*/, "") : rec;
+          var icon = isAi ? '<i class="fa-solid fa-robot" style="color: var(--success); text-shadow: 0 0 6px rgba(86,211,100,0.4); font-size: 0.95rem;"></i>' : '<i class="fa-solid fa-arrow-right" style="color: var(--accent);"></i>';
+          var style = isAi ? ' style="background: rgba(86,211,100,0.06); border-left: 3px solid var(--success); padding: 0.5rem 0.75rem; border-radius: 6px; display:flex; align-items:flex-start; gap:0.6rem;"' : ' style="display:flex; align-items:flex-start; gap:0.6rem; padding: 0.2rem 0;"';
           return (
-            '<li class="diagnostic-item rec-item">' +
-            '<i class="fa-solid fa-arrow-right"></i>' +
-            "<span>" +
-            escapeHtml(rec) +
-            "</span>" +
-            "</li>"
+            '<li class="diagnostic-item rec-item"' + style + '>' +
+            icon +
+            '<span style="flex:1; line-height: 1.45;">' + escapeHtml(displayRec) + '</span>' +
+            '</li>'
           );
         })
         .join("") +

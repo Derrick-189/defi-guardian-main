@@ -477,6 +477,7 @@ endblock %} {% block extra_css %}
 {% endblock %} {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm@2.23.0/dist/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -573,24 +574,47 @@ endblock %} {% block extra_css %}
                   '&behavioral=' + behavioral + '&step=' + activeStep +
                   '&filter=' + encodeURIComponent(filterStr);
         
+        function insertSvg(svg) {
+          container.innerHTML = svg;
+          var svgEl = container.querySelector('svg');
+          if (svgEl) {
+            svgEl.setAttribute('width', '100%');
+            svgEl.setAttribute('height', '100%');
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.maxHeight = '100%';
+            svgEl.style.transition = 'transform 0.2s ease-out';
+            resetGv();
+          }
+        }
+        
         fetch(url, { credentials: 'same-origin' })
-          .then(function(r) { return r.ok ? r.text() : null; })
-          .then(function(svg) {
-            if (svg) {
-              container.innerHTML = svg;
-              // Ensure SVG fits container and is interactive
-              var svgEl = container.querySelector('svg');
-              if (svgEl) {
-                svgEl.setAttribute('width', '100%');
-                svgEl.setAttribute('height', '100%');
-                svgEl.style.maxWidth = '100%';
-                svgEl.style.maxHeight = '100%';
-                svgEl.style.transition = 'transform 0.2s ease-out';
-                resetGv();
-              }
-            } else {
+          .then(function(r) { return r.text(); })
+          .then(function(resText) {
+            if (!resText) {
               container.innerHTML = '<p class="text-muted">Could not generate improved diagram.</p>';
+              return;
             }
+            if (resText.trim().startsWith('{')) {
+              try {
+                var data = JSON.parse(resText);
+                if (data.status === 'fallback' && data.dot) {
+                  if (window.hpccWasm) {
+                    window.hpccWasm.graphviz.layout(data.dot, "svg", "dot").then(function(svg) {
+                      insertSvg(svg);
+                    }).catch(function(e) {
+                      console.error("Client-side render failed:", e);
+                      container.innerHTML = '<p class="text-muted">Error rendering diagram.</p>';
+                    });
+                  } else {
+                    container.innerHTML = '<p class="text-muted">Graphviz not installed on server, and client-side renderer is loading...</p>';
+                  }
+                  return;
+                }
+              } catch(e) {
+                console.error("JSON parse error:", e);
+              }
+            }
+            insertSvg(resText);
           })
           .catch(function(err) {
             console.error('Failed to load improved state diagram:', err);
@@ -1114,7 +1138,7 @@ endblock %} {% block extra_css %}
           ['Outgoing', outgoing],
           ['Incoming', incoming]
         ];
-        if (d.data) {
+        if (d.data && typeof d.data === 'object') {
           Object.entries(d.data).forEach(function (e) {
             if (!['id','type','depth','label'].includes(e[0]) && typeof e[1] !== 'object')
               rows.push([e[0], String(e[1])]);

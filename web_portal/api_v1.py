@@ -861,6 +861,28 @@ def _build_counterexample_payload(row, audit_id_label):
                 "Consider adding stronger preconditions or fixing the contract logic.",
             ]
 
+    # Append real-time AI specification/preconditions/postconditions recommendations
+    if row and row.source_code:
+        try:
+            import sys
+            from pathlib import Path
+            root_dir = Path(__file__).parent.parent
+            if str(root_dir) not in sys.path:
+                sys.path.insert(0, str(root_dir))
+            from llm_spec_generator import LLMSpecGenerator
+            gen = LLMSpecGenerator()
+            specs = gen.generate_specs_from_code(row.source_code)
+            if specs.get("requires"):
+                recs.append(f"🤖 [AI Spec Precondition] Suggested require guard: {specs['requires'][0]}")
+            if specs.get("ensures"):
+                valid_ens = [e for e in specs["ensures"] if not e.strip().startswith("/*")]
+                if valid_ens:
+                    recs.append(f"🤖 [AI Spec Postcondition] Suggested ensures invariant: {valid_ens[0]}")
+            if specs.get("invariants"):
+                recs.append(f"🤖 [AI Security Invariant] Suggested safety check: {specs['invariants'][0]}")
+        except Exception as e:
+            print(f"DEBUG: AI Spec Recommendation failed: {e}")
+
     # ── 9. Assemble response ──────────────────────────────────────────────
     return {
         "audit_id": audit_id_label,
@@ -1093,6 +1115,8 @@ def _check_tool_available(tool: str) -> bool:
         "PRUSTI":  ["prusti-rustc", "cargo-prusti"],
         "CREUSOT": ["cargo-creusot", "creusot"],
         "VERUS":   ["verus"],
+        "ERIGONE": ["erigone"],
+        "SPINSPIDER": ["spinspider"],
     }
     # Fallback subprocess probes (used when shutil.which misses cargo sub-cmds)
     PROBE_CMDS = {
@@ -1124,7 +1148,9 @@ def _check_tool_available(tool: str) -> bool:
 def api_tools_status():
     """Per-tool status merged from PATH check + DB last-known status."""
     state = load_state()
-    TOOLS = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS", "ERIGONE", "SPINSPIDER", "IDOT"]
+    all_tools = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS", "ERIGONE", "SPINSPIDER", "IDOT"]
+    core_tools = {"SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS"}
+    TOOLS = [t for t in all_tools if t in core_tools or _check_tool_available(t)]
     try:
         from web_portal.verification_simulator import simulate as _sim  # noqa
         has_simulator = True
@@ -1584,7 +1610,11 @@ def api_visualization_state_diagram():
         svg_content = generate_state_diagram_svg(dot_content)
         
         if not svg_content:
-            return jsonify({"dot": dot_content, "error": "SVG generation failed"}), 500
+            return jsonify({
+                "status": "fallback",
+                "dot": dot_content,
+                "message": "Graphviz not installed on server, using client-side fallback rendering."
+            })
             
         return Response(svg_content, mimetype="image/svg+xml")
     except Exception as e:
