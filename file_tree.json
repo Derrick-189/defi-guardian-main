@@ -1459,6 +1459,48 @@
               "icon": "file",
               "path": "generated/images/state_diagram_1780065120.png",
               "size": 448107
+            },
+            {
+              "name": "state_diagram_1780075062.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780075062.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1780076457.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780076457.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1780076499.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780076499.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1780077421.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780077421.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1780078306.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780078306.png",
+              "size": 452933
+            },
+            {
+              "name": "state_diagram_1780078628.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780078628.png",
+              "size": 452933
             }
           ]
         },
@@ -4108,7 +4150,7 @@
           "type": "file",
           "icon": "log",
           "path": "logs/portal_server.log",
-          "size": 2625
+          "size": 4330
         },
         {
           "name": "spin.log",
@@ -4517,7 +4559,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/counterexample.js",
-                  "size": 35010
+                  "size": 35938
                 },
                 {
                   "name": "dashboard.js",
@@ -4644,7 +4686,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/counterexample.html",
-              "size": 26118
+              "size": 28875
             },
             {
               "name": "counterexample.html.bak",
@@ -4735,7 +4777,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/streamlit.html",
-              "size": 9431
+              "size": 10821
             },
             {
               "name": "terms.html",
@@ -4763,7 +4805,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/visualization.html",
-              "size": 57236
+              "size": 60402
             }
           ]
         },
@@ -5216,6 +5258,378 @@
                   "size": 19
                 }
               ]
+            },
+            {
+              "name": "job-150",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-150/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-150/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-150/pan.h",
+                  "size": 17812
+                }
+              ]
+            },
+            {
+              "name": "job-151",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-151/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan",
+                  "size": 108312
+                },
+                {
+                  "name": "pan.b",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan.b",
+                  "size": 1115
+                },
+                {
+                  "name": "pan.c",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan.c",
+                  "size": 334042
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan.h",
+                  "size": 17812
+                },
+                {
+                  "name": "pan.m",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan.m",
+                  "size": 7983
+                },
+                {
+                  "name": "pan.p",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan.p",
+                  "size": 56174
+                },
+                {
+                  "name": "pan.t",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-151/pan.t",
+                  "size": 21033
+                }
+              ]
+            },
+            {
+              "name": "job-152",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-152/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan",
+                  "size": 108312
+                },
+                {
+                  "name": "pan.b",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan.b",
+                  "size": 1115
+                },
+                {
+                  "name": "pan.c",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan.c",
+                  "size": 334042
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan.h",
+                  "size": 17812
+                },
+                {
+                  "name": "pan.m",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan.m",
+                  "size": 7983
+                },
+                {
+                  "name": "pan.p",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan.p",
+                  "size": 56174
+                },
+                {
+                  "name": "pan.t",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-152/pan.t",
+                  "size": 21033
+                }
+              ]
+            },
+            {
+              "name": "job-153",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-153/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan",
+                  "size": 108312
+                },
+                {
+                  "name": "pan.b",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan.b",
+                  "size": 1115
+                },
+                {
+                  "name": "pan.c",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan.c",
+                  "size": 334042
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan.h",
+                  "size": 17812
+                },
+                {
+                  "name": "pan.m",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan.m",
+                  "size": 7983
+                },
+                {
+                  "name": "pan.p",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan.p",
+                  "size": 56174
+                },
+                {
+                  "name": "pan.t",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-153/pan.t",
+                  "size": 21033
+                }
+              ]
+            },
+            {
+              "name": "job-154",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-154/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan",
+                  "size": 108312
+                },
+                {
+                  "name": "pan.b",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan.b",
+                  "size": 1115
+                },
+                {
+                  "name": "pan.c",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan.c",
+                  "size": 334042
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan.h",
+                  "size": 17812
+                },
+                {
+                  "name": "pan.m",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan.m",
+                  "size": 7983
+                },
+                {
+                  "name": "pan.p",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan.p",
+                  "size": 56174
+                },
+                {
+                  "name": "pan.t",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-154/pan.t",
+                  "size": 21033
+                }
+              ]
+            },
+            {
+              "name": "job-155",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-155/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan",
+                  "size": 108312
+                },
+                {
+                  "name": "pan.b",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan.b",
+                  "size": 1115
+                },
+                {
+                  "name": "pan.c",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan.c",
+                  "size": 334042
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan.h",
+                  "size": 17812
+                },
+                {
+                  "name": "pan.m",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan.m",
+                  "size": 7983
+                },
+                {
+                  "name": "pan.p",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan.p",
+                  "size": 56174
+                },
+                {
+                  "name": "pan.t",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-155/pan.t",
+                  "size": 21033
+                }
+              ]
             }
           ]
         },
@@ -5352,7 +5766,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 67356
+          "size": 70061
         },
         {
           "name": "api_v1.py.bak",
@@ -5401,7 +5815,7 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/defi_guardian.db",
-          "size": 688128
+          "size": 716800
         },
         {
           "name": "defi_guardian.db.migrated",
@@ -5471,7 +5885,7 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/verification_queue.db",
-          "size": 57344
+          "size": 61440
         },
         {
           "name": "verification_server.py",
@@ -5515,7 +5929,7 @@
       "type": "file",
       "icon": "python",
       "path": "app.py",
-      "size": 146442
+      "size": 149566
     },
     {
       "name": "apply_fixes.py",
@@ -6047,7 +6461,7 @@
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 31502
+      "size": 30907
     },
     {
       "name": "verification_worker.py",
