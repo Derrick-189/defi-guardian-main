@@ -320,16 +320,32 @@
     if (graph.nodes && graph.nodes.length > 0) {
       const nodeIds = new Set();
       graph.nodes.forEach(n => {
-        const id = String(n.id).replace(/[^a-zA-Z0-9_]/g, '');
+        let nodeObj = {};
+        if (typeof n === 'string') {
+          nodeObj = { id: n, label: n };
+        } else if (n && typeof n === 'object') {
+          nodeObj = {
+            id: n.id !== undefined ? n.id : n.label,
+            label: n.label !== undefined ? n.label : n.id,
+            type: n.type
+          };
+        }
+        
+        if (!nodeObj.id) return;
+        
+        const id = String(nodeObj.id).replace(/[^a-zA-Z0-9_]/g, '');
         nodeIds.add(id);
-        lines.push(`    state "${n.label || n.id}" as ${id}`);
-        if (n.type === 'initial') lines.push(`    [*] --> ${id}`);
-        if (n.type === 'error') lines.push(`    class ${id} failedState`);
+        lines.push(`    state "${nodeObj.label || nodeObj.id}" as ${id}`);
+        if (nodeObj.type === 'initial') lines.push(`    [*] --> ${id}`);
+        if (nodeObj.type === 'error') lines.push(`    class ${id} failedState`);
       });
       
       (graph.edges || graph.links || []).forEach(e => {
-        const sid = String(e.source || e.from).replace(/[^a-zA-Z0-9_]/g, '');
-        const tid = String(e.target || e.to).replace(/[^a-zA-Z0-9_]/g, '');
+        const sourceVal = e.source !== undefined ? e.source : e.from;
+        const targetVal = e.target !== undefined ? e.target : e.to;
+        if (sourceVal === undefined || targetVal === undefined) return;
+        const sid = String(sourceVal).replace(/[^a-zA-Z0-9_]/g, '');
+        const tid = String(targetVal).replace(/[^a-zA-Z0-9_]/g, '');
         if (nodeIds.has(sid) && nodeIds.has(tid)) {
           lines.push(`    ${sid} --> ${tid}${e.label ? ' : ' + e.label : ''}`);
         }
@@ -825,6 +841,10 @@
 
     window._ceLoadData = loadData;
 
+    // Initialize layout resizers
+    initResizablePanels();
+    initVerticalResizer();
+
     // ── Run selector ────────────────────────────────────────────────────
     var selector = document.getElementById("run-selector");
 
@@ -950,6 +970,86 @@
       if (window.DG_AUDIT_ID === "latest") { loadData("latest"); }
     });
   });
+
+  // ── Drag & Resize Panel Helpers ──────────────────────────────────────────
+  function initResizablePanels() {
+    const layout = document.getElementById("report-layout");
+    const resizerLeft = document.getElementById("resizer-left");
+    const resizerRight = document.getElementById("resizer-right");
+    
+    if (!layout || !resizerLeft || !resizerRight) return;
+    
+    let leftWidth = 260;
+    let rightWidth = 280;
+    
+    // Left resizer
+    resizerLeft.addEventListener("mousedown", function(e) {
+      e.preventDefault();
+      resizerLeft.classList.add("dragging");
+      document.addEventListener("mousemove", resizeLeft);
+      document.addEventListener("mouseup", stopResizeLeft);
+    });
+    
+    function resizeLeft(e) {
+      const rect = layout.getBoundingClientRect();
+      leftWidth = Math.max(150, Math.min(450, e.clientX - rect.left));
+      layout.style.gridTemplateColumns = `${leftWidth}px 4px 1fr 4px ${rightWidth}px`;
+    }
+    
+    function stopResizeLeft() {
+      resizerLeft.classList.remove("dragging");
+      document.removeEventListener("mousemove", resizeLeft);
+      document.removeEventListener("mouseup", stopResizeLeft);
+      window.dispatchEvent(new Event('resize'));
+    }
+    
+    // Right resizer
+    resizerRight.addEventListener("mousedown", function(e) {
+      e.preventDefault();
+      resizerRight.classList.add("dragging");
+      document.addEventListener("mousemove", resizeRight);
+      document.addEventListener("mouseup", stopResizeRight);
+    });
+    
+    function resizeRight(e) {
+      const rect = layout.getBoundingClientRect();
+      rightWidth = Math.max(150, Math.min(450, rect.right - e.clientX));
+      layout.style.gridTemplateColumns = `${leftWidth}px 4px 1fr 4px ${rightWidth}px`;
+    }
+    
+    function stopResizeRight() {
+      resizerRight.classList.remove("dragging");
+      document.removeEventListener("mousemove", resizeRight);
+      document.removeEventListener("mouseup", stopResizeRight);
+      window.dispatchEvent(new Event('resize'));
+    }
+  }
+
+  function initVerticalResizer() {
+    const wrapper = document.getElementById("panels-wrapper");
+    const resizer = document.getElementById("panels-y-resizer");
+    if (!wrapper || !resizer) return;
+    
+    resizer.addEventListener("mousedown", function(e) {
+      e.preventDefault();
+      resizer.classList.add("dragging");
+      document.addEventListener("mousemove", resizeY);
+      document.addEventListener("mouseup", stopResizeY);
+    });
+    
+    function resizeY(e) {
+      const rect = wrapper.getBoundingClientRect();
+      const newHeight = Math.max(300, Math.min(window.innerHeight - 200, e.clientY - rect.top));
+      wrapper.style.height = `${newHeight}px`;
+    }
+    
+    function stopResizeY() {
+      resizer.classList.remove("dragging");
+      document.removeEventListener("mousemove", resizeY);
+      document.removeEventListener("mouseup", stopResizeY);
+      window.dispatchEvent(new Event('resize'));
+    }
+  }
 
   // Expose for _updateHeader to call after data loads
   window._ceUpdateSpinBanner = _updateSpinBanner;

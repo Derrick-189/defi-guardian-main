@@ -45,18 +45,39 @@
   /* ── Three-panel layout ── */
   .report-layout {
     display: grid;
-    grid-template-columns: 260px 1fr 280px;
+    grid-template-columns: 260px 4px 1fr 4px 280px;
     height: 100%;
     overflow: hidden;
   }
   .report-panel {
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--border);
     overflow: hidden;
     min-height: 0;
   }
-  .report-panel:last-child { border-right: none; }
+  .panel-resizer {
+    width: 4px;
+    cursor: col-resize;
+    background: var(--border);
+    transition: background 0.2s;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .panel-resizer:hover, .panel-resizer.dragging {
+    background: var(--accent);
+  }
+
+  .panels-y-resizer {
+    height: 4px;
+    cursor: row-resize;
+    background: var(--border);
+    transition: background 0.2s;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .panels-y-resizer:hover, .panels-y-resizer.dragging {
+    background: var(--accent);
+  }
 
   /* ── Main Scrollable Area ── */
   .report-scroll-container {
@@ -418,7 +439,7 @@
 <!-- ── Main Scrollable Area ── -->
 <div class="report-scroll-container">
   
-  <div class="panels-wrapper">
+  <div class="panels-wrapper" id="panels-wrapper">
     <!-- ── Three-Panel Layout ── -->
     <div class="report-layout" id="report-layout">
 
@@ -434,6 +455,9 @@
           </p>
         </div>
       </div>
+      
+      <!-- Left resizer -->
+      <div class="panel-resizer" id="resizer-left"></div>
 
       <!-- Panel 2: Call Trace -->
       <div class="report-panel report-panel-main" id="panel-trace">
@@ -488,6 +512,9 @@
         </div>
       </div>
 
+      <!-- Right resizer -->
+      <div class="panel-resizer" id="resizer-right"></div>
+
       <!-- Panel 3: Variables -->
       <div class="report-panel" id="panel-vars">
         <div class="panel-header" style="justify-content: space-between;">
@@ -511,6 +538,8 @@
 
     </div>
   </div>
+  <!-- Vertical resizer -->
+  <div class="panels-y-resizer" id="panels-y-resizer"></div>
 
   <!-- ── Diagnostics Area ── -->
   <div class="diagnostics-area">
