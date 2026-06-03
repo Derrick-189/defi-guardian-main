@@ -20,50 +20,8 @@ https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
   import eventlet
 1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
  * Debugger is active!
- * Debugger PIN: 125-928-251
-(46146) wsgi starting up on http://0.0.0.0:5001
-(46146) accepted ('127.0.0.1', 44660)
-(46146) accepted ('127.0.0.1', 44676)
-127.0.0.1 - - [29/May/2026 18:29:53] "GET / HTTP/1.1" 200 17739 1.593358
-(46146) accepted ('127.0.0.1', 44688)
-(46146) accepted ('127.0.0.1', 44702)
-127.0.0.1 - - [29/May/2026 18:29:53] "GET /static/css/style.css HTTP/1.1" 200 49983 0.004714
-127.0.0.1 - - [29/May/2026 18:29:53] "GET /static/css/components.css HTTP/1.1" 200 10851 0.001282
-127.0.0.1 - - [29/May/2026 18:29:53] "GET /static/js/main.js HTTP/1.1" 200 2372 0.001128
-127.0.0.1 - - [29/May/2026 18:29:53] "GET /static/js/theme.js HTTP/1.1" 200 4782 0.000952
-127.0.0.1 - - [29/May/2026 18:29:55] "GET /favicon.ico HTTP/1.1" 404 8624 0.005901
- * Detected change in '/home/slade/defi-guardian-main/desktop_app.py', reloading
- * Restarting with watchdog (inotify)
-/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
-Eventlet is deprecated. It is currently being maintained in bugfix mode, and
-we strongly recommend against using it for new projects.
-
-If you are already using Eventlet, we recommend migrating to a different
-framework.  For more detail see
-https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
-
-  import eventlet
-1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
- * Debugger is active!
- * Debugger PIN: 125-928-251
-(54964) wsgi starting up on http://0.0.0.0:5001
- * Detected change in '/home/slade/defi-guardian-main/desktop_bridge.py', reloading
- * Restarting with watchdog (inotify)
-/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
-Eventlet is deprecated. It is currently being maintained in bugfix mode, and
-we strongly recommend against using it for new projects.
-
-If you are already using Eventlet, we recommend migrating to a different
-framework.  For more detail see
-https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
-
-  import eventlet
-1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
- * Debugger is active!
- * Debugger PIN: 125-928-251
-(58925) wsgi starting up on http://0.0.0.0:5001
-(58925) accepted ('127.0.0.1', 47780)
-127.0.0.1 - - [29/May/2026 19:17:42] "GET / HTTP/1.1" 200 17715 1.120195
+ * Debugger PIN: 457-663-341
+(15521) wsgi starting up on http://0.0.0.0:5001
  * Detected change in '/home/slade/defi-guardian-main/web_portal/api_v1.py', reloading
  * Detected change in '/home/slade/defi-guardian-main/web_portal/api_v1.py', reloading
  * Restarting with watchdog (inotify)
@@ -77,6 +35,3 @@ https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
 
   import eventlet
 1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
- * Debugger is active!
- * Debugger PIN: 125-928-251
-(82172) wsgi starting up on http://0.0.0.0:5001

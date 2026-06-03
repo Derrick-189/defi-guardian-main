@@ -1680,7 +1680,13 @@ def api_visualization_state_diagram_download():
             pml_content = row.source_code
             model_name = row.filename or "Model"
         else:
-            return jsonify({"error": "No source code available"}), 404
+            # Try loading SimpleLending.sol as fallback if no audit exists
+            sol_path = PROJECT_DIR / "SimpleLending.sol"
+            if sol_path.exists():
+                pml_content = sol_path.read_text(encoding="utf-8")
+                model_name = "SimpleLending"
+            else:
+                return jsonify({"error": "No source code available"}), 404
 
         dot_content = create_custom_state_diagram(pml_content, model_name, theme=theme)
         pdf_bytes = generate_state_diagram_output(dot_content, "pdf")

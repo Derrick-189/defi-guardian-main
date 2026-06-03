@@ -1501,6 +1501,13 @@
               "icon": "file",
               "path": "generated/images/state_diagram_1780078628.png",
               "size": 452933
+            },
+            {
+              "name": "state_diagram_1780222182.png",
+              "type": "file",
+              "icon": "file",
+              "path": "generated/images/state_diagram_1780222182.png",
+              "size": 452933
             }
           ]
         },
@@ -1643,7 +1650,7 @@
               "type": "file",
               "icon": "text",
               "path": "generated/reports/active_file.txt",
-              "size": 22
+              "size": 48
             },
             {
               "name": "audit_log.json",
@@ -4559,7 +4566,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/counterexample.js",
-                  "size": 35938
+                  "size": 39696
                 },
                 {
                   "name": "dashboard.js",
@@ -4686,7 +4693,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/counterexample.html",
-              "size": 28875
+              "size": 29589
             },
             {
               "name": "counterexample.html.bak",
@@ -6002,13 +6009,6 @@
       "size": 47886
     },
     {
-      "name": "DeFi Guardian final report draft 1.docx",
-      "type": "file",
-      "icon": "file",
-      "path": "DeFi Guardian final report draft 1.docx",
-      "size": 3631094
-    },
-    {
       "name": "defi-guardian.desktop",
       "type": "file",
       "icon": "file",
@@ -6083,7 +6083,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 192715
+      "size": 206582
     },
     {
       "name": "fix_admin.py",
@@ -6511,6 +6511,13 @@
       "icon": "python",
       "path": "verus_integration.py",
       "size": 2307
+    },
+    {
+      "name": "VestingWallet.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "VestingWallet.sol",
+      "size": 6057
     },
     {
       "name": "VestingWalletCliff.sol",
