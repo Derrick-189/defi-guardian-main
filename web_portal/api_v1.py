@@ -1066,32 +1066,32 @@ def api_trace(audit_id):
 
 @api_v1.route("/state-graph/<audit_id>")
 def api_state_graph(audit_id):
+    audit_row = None
     # "latest" → resolve to the most recent audit for the current user
     if audit_id == "latest":
         try:
             u_id = current_user.get_id() if current_user.is_authenticated else None
             user_id = int(u_id) if u_id else None
-            row = AuditHistory.query.filter(
+            audit_row = AuditHistory.query.filter(
                 (AuditHistory.user_id == user_id) | (AuditHistory.user_id == None)
             ).order_by(AuditHistory.audit_date.desc()).first()
-            if row:
-                audit_id = str(row.id)
+            if audit_row:
+                audit_id = str(audit_row.id)
         except Exception:
             pass
-
-    # Try specific audit first
-    if audit_id and audit_id not in ("0", "latest"):
+    elif audit_id and audit_id != "0":
         try:
-            audit = AuditHistory.query.get(int(audit_id))
-            if audit and audit.job_id:
-                job_graph = PROJECT_DIR / "web_portal" / "verification_results" / audit.job_id / "state_graph.json"
-                if job_graph.exists():
-                    try:
-                        return jsonify(json.loads(job_graph.read_text(encoding="utf-8")))
-                    except Exception:
-                        pass
+            audit_row = AuditHistory.query.get(int(audit_id))
         except (ValueError, TypeError):
             pass
+
+    if audit_row:
+        try:
+            payload = _build_counterexample_payload(audit_row, audit_id)
+            if payload.get("state_graph"):
+                return jsonify(payload["state_graph"])
+        except Exception as e:
+            current_app.logger.warning(f"Error building state graph payload for {audit_id}: {e}")
 
     sg = _load_state_graph()
     return jsonify(sg) if sg else (jsonify({"error": "Not found"}), 404)
