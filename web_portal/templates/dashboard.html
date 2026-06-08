@@ -167,7 +167,11 @@
         </h1>
         <p class="page-subtitle" id="dashboard-datetime"></p>
     </div>
-    <div class="page-header-right"></div>
+    <div class="page-header-right">
+        <button class="btn btn-secondary btn-sm" onclick="startGuideTour()" style="display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-circle-question"></i> Tour Guide
+        </button>
+    </div>
 </div>
 
 <!-- Desktop sync status -->
@@ -669,6 +673,202 @@
             allRows.forEach(function (r) {
                 tbody.appendChild(r);
             });
+        }
+
+        // --- In-App Guidance Tour System ---
+        class InAppGuide {
+            constructor(steps) {
+                this.steps = steps;
+                this.currentStep = 0;
+                this.highlighter = null;
+                this.card = null;
+                this.overlay = null;
+            }
+            
+            start() {
+                this.finish(); // Clean up any existing tour instances
+                this.currentStep = 0;
+                this.createElements();
+                this.showStep();
+                document.body.style.overflow = 'hidden';
+            }
+            
+            createElements() {
+                // Overlay backdrop
+                this.overlay = document.createElement("div");
+                this.overlay.style.position = "fixed";
+                this.overlay.style.top = "0";
+                this.overlay.style.left = "0";
+                this.overlay.style.width = "100vw";
+                this.overlay.style.height = "100vh";
+                this.overlay.style.background = "rgba(5, 7, 16, 0.6)";
+                this.overlay.style.backdropFilter = "blur(2px)";
+                this.overlay.style.zIndex = "999995";
+                this.overlay.style.transition = "opacity 0.3s ease";
+                document.body.appendChild(this.overlay);
+
+                // Target Highlighter
+                this.highlighter = document.createElement("div");
+                this.highlighter.className = "dg-guide-highlighter";
+                this.highlighter.style.position = "absolute";
+                this.highlighter.style.border = "2px solid #00d1ff";
+                this.highlighter.style.boxShadow = "0 0 20px rgba(0, 209, 255, 0.4)";
+                this.highlighter.style.borderRadius = "8px";
+                this.highlighter.style.pointerEvents = "none";
+                this.highlighter.style.zIndex = "999996";
+                this.highlighter.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
+                document.body.appendChild(this.highlighter);
+                
+                // Guide Card
+                this.card = document.createElement("div");
+                this.card.className = "dg-guide-card";
+                this.card.style.position = "absolute";
+                this.card.style.zIndex = "999997";
+                this.card.style.width = "320px";
+                this.card.style.background = "rgba(18, 22, 40, 0.98)";
+                this.card.style.border = "1px solid rgba(0, 209, 255, 0.2)";
+                this.card.style.borderRadius = "12px";
+                this.card.style.padding = "1.25rem";
+                this.card.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 209, 255, 0.05)";
+                this.card.style.backdropFilter = "blur(10px)";
+                this.card.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
+                this.card.style.color = "#ffffff";
+                document.body.appendChild(this.card);
+            }
+            
+            showStep() {
+                const step = this.steps[this.currentStep];
+                const target = document.querySelector(step.target);
+                
+                if (!target) {
+                    this.next();
+                    return;
+                }
+                
+                target.scrollIntoView({ block: "center", behavior: "smooth" });
+                
+                setTimeout(() => {
+                    const rect = target.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                    
+                    const pad = 8;
+                    this.highlighter.style.top = (rect.top + scrollTop - pad) + "px";
+                    this.highlighter.style.left = (rect.left + scrollLeft - pad) + "px";
+                    this.highlighter.style.width = (rect.width + pad * 2) + "px";
+                    this.highlighter.style.height = (rect.height + pad * 2) + "px";
+                    
+                    let cardTop = rect.bottom + scrollTop + 15;
+                    let cardLeft = rect.left + scrollLeft;
+                    
+                    if (rect.bottom + 250 > window.innerHeight) {
+                        cardTop = rect.top + scrollTop - 200;
+                    }
+                    if (rect.left + 340 > window.innerWidth) {
+                        cardLeft = window.innerWidth - 350;
+                    }
+                    if (cardLeft < 10) cardLeft = 10;
+                    
+                    this.card.style.top = cardTop + "px";
+                    this.card.style.left = cardLeft + "px";
+                    
+                    const progress = ((this.currentStep + 1) / this.steps.length) * 100;
+                    this.card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-size:0.75rem; color:#00d1ff; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Step ${this.currentStep + 1} of ${this.steps.length}</span>
+                            <button onclick="window.dgGuide.finish()" style="background:none; border:none; color:#888; font-size:1.1rem; cursor:pointer; line-height:1;">&times;</button>
+                        </div>
+                        <div style="height:3px; background:rgba(255,255,255,0.08); border-radius:3px; margin-bottom:12px; overflow:hidden;">
+                            <div style="height:100%; width:${progress}%; background:linear-gradient(90deg, #00d1ff, #0055ff); transition:width 0.3s ease;"></div>
+                        </div>
+                        <h4 style="font-size:1.05rem; font-weight:700; margin:0 0 6px 0; color:#fff; display:flex; align-items:center; gap:8px;">
+                            ${step.title}
+                        </h4>
+                        <p style="font-size:0.82rem; line-height:1.4; color:#aaa; margin:0 0 15px 0;">
+                            ${step.text}
+                        </p>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <button onclick="window.dgGuide.finish()" style="background:none; border:none; color:#666; font-size:0.78rem; cursor:pointer; font-weight:600; padding:0;">Skip</button>
+                            <div style="display:flex; gap:6px;">
+                                ${this.currentStep > 0 ? `<button onclick="window.dgGuide.back()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:4px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer;">Back</button>` : ''}
+                                <button onclick="window.dgGuide.next()" style="background:linear-gradient(135deg, #00d1ff, #0055ff); border:none; color:#fff; padding:5px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; box-shadow:0 0 10px rgba(0, 209, 255, 0.2);">
+                                    ${this.currentStep === this.steps.length - 1 ? 'Finish' : 'Next'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }, 150);
+            }
+            
+            next() {
+                if (this.currentStep < this.steps.length - 1) {
+                    this.currentStep++;
+                    this.showStep();
+                } else {
+                    this.finish();
+                }
+            }
+            
+            back() {
+                if (this.currentStep > 0) {
+                    this.currentStep--;
+                    this.showStep();
+                }
+            }
+            
+            finish() {
+                if (this.overlay) { this.overlay.remove(); this.overlay = null; }
+                if (this.highlighter) { this.highlighter.remove(); this.highlighter = null; }
+                if (this.card) { this.card.remove(); this.card = null; }
+                document.body.style.overflow = '';
+                localStorage.setItem("dg_tour_completed", "true");
+            }
+        }
+
+        const tourSteps = [
+            {
+                target: ".kpi-grid",
+                title: "📊 Verification Metrics",
+                text: "Monitor total states explored, active path depths, and critical LTL property test results across all verified smart contracts."
+            },
+            {
+                target: "#sync-status-bar",
+                title: "🔄 Sync Status Monitor",
+                text: "Keep your local desktop workspace and this remote web portal in harmony. Click 'Sync now' to fetch recent verification logs."
+            },
+            {
+                target: ".runs-filter-bar",
+                title: "🔍 Advanced Run Filters",
+                text: "Narrow down verification histories by engine tool, PASS/FAIL verification status, or contract file keywords instantly."
+            },
+            {
+                target: "#runs-table",
+                title: "📋 Completed Runs History",
+                text: "Browse your historical formal verification runs. Use the action items to view interactive counterexamples or detailed trace logs."
+            },
+            {
+                target: "#tools-status-list",
+                title: "🛠️ Available Toolchains",
+                text: "Verify the availability of local formal verification engines like SPIN, Certora, Kani, Verus, and others."
+            },
+            {
+                target: "#live-feed",
+                title: "⚡ Live Event Feed",
+                text: "Keep track of active audit job progress and worker pipeline statuses in real-time."
+            }
+        ];
+
+        window.dgGuide = new InAppGuide(tourSteps);
+
+        window.startGuideTour = function() {
+            window.dgGuide.start();
+        };
+
+        // Auto start for first-time visitors
+        if (!localStorage.getItem("dg_tour_completed")) {
+            setTimeout(function() {
+                window.startGuideTour();
+            }, 1000);
         }
     })();
 </script>
