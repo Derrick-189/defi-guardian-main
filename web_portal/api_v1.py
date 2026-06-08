@@ -848,18 +848,23 @@ def _build_counterexample_payload(row, audit_id_label):
         steps = trace_dict.get("steps", [])
         if steps:
             nodes, edges, seen = [], [], set()
+            import re as _re
             for i, s in enumerate(steps):
                 sid = s.get("state") or f"S{i}"
                 if sid not in seen:
+                    label = s.get("action", sid)
+                    label = _re.sub(r"/tmp/[^:]+:\d+:\d+:\s*", "", label).strip()
                     nodes.append({
                         "id": sid,
-                        "label": s.get("action", sid)[:30],
+                        "label": label[:30],
                         "type": "error" if s.get("is_error") else ("initial" if i == 0 else "normal"),
                     })
                     seen.add(sid)
                 if i > 0:
                     prev_sid = steps[i - 1].get("state") or f"S{i-1}"
-                    edges.append({"from": prev_sid, "to": sid, "label": s.get("action", "")[:20]})
+                    label = s.get("action", "")
+                    label = _re.sub(r"/tmp/[^:]+:\d+:\d+:\s*", "", label).strip()
+                    edges.append({"from": prev_sid, "to": sid, "label": label[:20]})
             state_graph = {"nodes": nodes, "edges": edges}
         else:
             # Minimal FSM for lending pool (always visible)
@@ -921,6 +926,17 @@ def _build_counterexample_payload(row, audit_id_label):
             print(f"DEBUG: AI Spec Recommendation failed: {e}")
 
     # ── 9. Assemble response ──────────────────────────────────────────────
+    source_code = row.source_code or ""
+    if not source_code and row.filename:
+        try:
+            p = Path(row.filename)
+            if not p.is_absolute():
+                p = PROJECT_DIR / p
+            if p.exists() and p.is_file():
+                source_code = p.read_text(encoding="utf-8")
+        except:
+            pass
+
     return {
         "audit_id": audit_id_label,
         "tool": tool,
@@ -930,7 +946,7 @@ def _build_counterexample_payload(row, audit_id_label):
         "trace_data": trace_dict,
         "recommendations": recs,
         "state_graph": state_graph,
-        "source_code": row.source_code or "",
+        "source_code": source_code,
         "output": log_content[:3000] if log_content else "",
         "job_id": row.job_id or "",
         "stats": {

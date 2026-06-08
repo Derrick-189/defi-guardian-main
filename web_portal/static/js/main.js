@@ -26,6 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Restore last viewed audit ID for sidebar links
+    const lastAuditId = localStorage.getItem('lastAuditId');
+    if (lastAuditId && lastAuditId !== 'latest') {
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && (href.includes('/counterexample/latest') || href.includes('/visualization/latest') || href.includes('/trace/latest'))) {
+                link.setAttribute('href', href.replace('latest', lastAuditId));
+            }
+        });
+    }
+
     // ── Mobile Menu Toggle ──────────────────────────────────────────────────
     const mobileToggle = document.getElementById('mobile-menu-toggle');
     const sidebar = document.getElementById('sidebar');

@@ -744,6 +744,11 @@
       })
       .then(function (data) {
         _data = data;
+        
+        if (data.audit_id && data.audit_id !== "latest") {
+            localStorage.setItem('lastAuditId', data.audit_id);
+        }
+
         _allSteps =
           data.trace_data && data.trace_data.steps ? data.trace_data.steps : [];
         _filteredSteps = _allSteps.slice();
@@ -946,6 +951,9 @@
           ? "/counterexample/latest"
           : "/counterexample/" + val;
         history.pushState({}, "", newUrl);
+        if (val !== "latest") {
+            localStorage.setItem('lastAuditId', val);
+        }
         if (typeof window._ceLoadData === "function") {
           window._ceLoadData(val);
         }
