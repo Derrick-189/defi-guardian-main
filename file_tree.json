@@ -1650,14 +1650,14 @@
               "type": "file",
               "icon": "text",
               "path": "generated/reports/active_file.txt",
-              "size": 48
+              "size": 11
             },
             {
               "name": "audit_log.json",
               "type": "file",
               "icon": "json",
               "path": "generated/reports/audit_log.json",
-              "size": 288553
+              "size": 289152
             },
             {
               "name": "dashboard_users.db.synced",
@@ -1678,7 +1678,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/state_graph.json",
-              "size": 545
+              "size": 534
             },
             {
               "name": "verification_report.pdf",
@@ -1692,7 +1692,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/verification_state.json",
-              "size": 23272
+              "size": 23114
             }
           ]
         },
@@ -4144,6 +4144,13 @@
               "size": 9828
             },
             {
+              "name": "spin_verification_20260608_172315.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260608_172315.log",
+              "size": 9746
+            },
+            {
               "name": "translated_output.pml.trail",
               "type": "file",
               "icon": "file",
@@ -4157,7 +4164,7 @@
           "type": "file",
           "icon": "log",
           "path": "logs/portal_server.log",
-          "size": 4330
+          "size": 8549
         },
         {
           "name": "spin.log",
@@ -5773,7 +5780,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 70061
+          "size": 70361
         },
         {
           "name": "api_v1.py.bak",
@@ -5916,6 +5923,13 @@
       "icon": "file",
       "path": "_spin_nvr.tmp",
       "size": 1983
+    },
+    {
+      "name": "Account.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "Account.sol",
+      "size": 5555
     },
     {
       "name": "aeneas_integration.py",
@@ -6461,7 +6475,7 @@
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 30907
+      "size": 23114
     },
     {
       "name": "verification_worker.py",

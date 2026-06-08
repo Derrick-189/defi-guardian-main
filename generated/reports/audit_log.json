@@ -1,5 +1,21 @@
 [
   {
+    "id": "27a26b0b",
+    "timestamp": "2026-06-08 17:23:15",
+    "tool": "SPIN",
+    "file": "Account.sol",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260608_172315.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
     "id": "ab10d041",
     "timestamp": "2026-05-29 18:16:56",
     "tool": "COQ",
@@ -1580,22 +1596,6 @@
       "states": 3,
       "transitions": 3,
       "depth": 5,
-      "error_msg": ""
-    }
-  },
-  {
-    "id": "6c8acc30",
-    "timestamp": "2026-05-08 19:12:45",
-    "tool": "CREUSOT",
-    "file": "test_contract.rs",
-    "status": "SKIPPED",
-    "log_path": "",
-    "trace_path": "",
-    "specs": "",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
       "error_msg": ""
     }
   }

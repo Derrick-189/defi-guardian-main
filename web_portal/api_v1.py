@@ -840,7 +840,7 @@ def _build_counterexample_payload(row, audit_id_label):
                     pass
 
     # b) Global fallback graph
-    if not state_graph:
+    if not state_graph and not trace_dict.get("steps"):
         state_graph = _load_state_graph()
 
     # c) Synthesise from trace steps when nothing else is available
