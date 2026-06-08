@@ -3772,6 +3772,30 @@ Ready for verification!
     def save_portal_audit_record(self, job_entry):
         """Mirror desktop job history into the web portal audit database."""
         try:
+            log_path = job_entry.get('log_path', '')
+            trace_path = job_entry.get('trace_path', '') or job_entry.get('report_path', '')
+            log_content = ""
+            trail_content = ""
+            
+            if log_path and os.path.exists(log_path):
+                try:
+                    with open(log_path, 'r', encoding='utf-8', errors='replace') as f:
+                        log_content = f.read()
+                except: pass
+            if not log_content:
+                log_content = log_path or trace_path
+                
+            if trace_path and os.path.exists(trace_path):
+                try:
+                    with open(trace_path, 'r', encoding='utf-8', errors='replace') as f:
+                        trail_content = f.read()
+                except: pass
+                
+            if trail_content:
+                verification_output = f"=== TRAIL TRACE ===\n{trail_content}\n=== LOG OUTPUT ===\n{log_content}"
+            else:
+                verification_output = log_content
+
             # Check for PostgreSQL first (Render/Production mode)
             db_url = os.environ.get("DATABASE_URL")
             if db_url:
@@ -3799,9 +3823,9 @@ Ready for verification!
                             depth_reached=job_entry.get('details', {}).get('depth', 0),
                             vulnerabilities_found=job_entry.get('details', {}).get('error_msg', ''),
                             ltl_properties=json.dumps([]),
-                            verification_output=job_entry.get('log_path', '') or job_entry.get('trace_path', ''),
+                            verification_output=verification_output,
                             audit_date=datetime.now(),
-                            report_path=job_entry.get('trace_path', '')
+                            report_path=trace_path
                         )
                         db.session.add(new_audit)
                         db.session.commit()
@@ -3841,9 +3865,9 @@ Ready for verification!
                 job_entry.get('details', {}).get('depth', 0),
                 job_entry.get('details', {}).get('error_msg', ''),
                 json.dumps([]),
-                job_entry.get('log_path', '') or job_entry.get('trace_path', ''),
+                verification_output,
                 job_entry.get('timestamp', datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
-                job_entry.get('trace_path', '')
+                trace_path
             ))
             conn.commit()
             conn.close()

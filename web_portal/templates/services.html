@@ -49,17 +49,35 @@
     </div>
     <div class="plan-cta">
       {% if plan.price == 0 %}
-      <a href="{{ url_for('register') }}" class="btn btn-primary btn-block">
-        <i class="fa-solid fa-rocket"></i> Get Started Free
-      </a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-block">
+          <i class="fa-solid fa-gauge"></i> Go to Dashboard
+        </a>
+        {% else %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-block">
+          <i class="fa-solid fa-rocket"></i> Get Started Free
+        </a>
+        {% endif %}
       {% elif plan.price == -1 %}
-      <a href="{{ url_for('contact') }}" class="btn btn-secondary btn-block">
-        <i class="fa-solid fa-envelope"></i> Contact Sales
-      </a>
+        {% if current_user.is_authenticated %}
+        <button class="btn btn-secondary btn-block btn-subscribe" data-plan-name="{{ plan.name }}" data-plan-price="-1">
+          <i class="fa-solid fa-envelope"></i> Contact Sales
+        </button>
+        {% else %}
+        <a href="{{ url_for('contact') }}" class="btn btn-secondary btn-block">
+          <i class="fa-solid fa-envelope"></i> Contact Sales
+        </a>
+        {% endif %}
       {% else %}
-      <a href="{{ url_for('register') }}" class="btn {% if plan.featured %}btn-primary{% else %}btn-secondary{% endif %} btn-block">
-        <i class="fa-solid fa-credit-card"></i> Subscribe
-      </a>
+        {% if current_user.is_authenticated %}
+        <button class="btn {% if plan.featured %}btn-primary{% else %}btn-secondary{% endif %} btn-block btn-subscribe" data-plan-name="{{ plan.name }}" data-plan-price="{{ plan.price }}">
+          <i class="fa-solid fa-credit-card"></i> {% if plan.name == 'Installation Service' %}Request Setup{% else %}Subscribe{% endif %}
+        </button>
+        {% else %}
+        <a href="{{ url_for('register') }}" class="btn {% if plan.featured %}btn-primary{% else %}btn-secondary{% endif %} btn-block">
+          <i class="fa-solid fa-credit-card"></i> Subscribe
+        </a>
+        {% endif %}
       {% endif %}
     </div>
   </div>
@@ -91,9 +109,15 @@
       </ul>
     </div>
     <div class="plan-cta">
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-block">
+        <i class="fa-solid fa-gauge"></i> Go to Dashboard
+      </a>
+      {% else %}
       <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block">
         <i class="fa-solid fa-rocket"></i> Get Started Free
       </a>
+      {% endif %}
     </div>
   </div>
 
@@ -122,9 +146,15 @@
       </ul>
     </div>
     <div class="plan-cta">
+      {% if current_user.is_authenticated %}
+      <button class="btn btn-primary btn-block btn-subscribe" data-plan-name="Professional" data-plan-price="49">
+        <i class="fa-solid fa-credit-card"></i> Subscribe
+      </button>
+      {% else %}
       <a href="{{ url_for('register') }}" class="btn btn-primary btn-block">
         <i class="fa-solid fa-credit-card"></i> Subscribe
       </a>
+      {% endif %}
     </div>
   </div>
 
@@ -149,9 +179,15 @@
       </ul>
     </div>
     <div class="plan-cta">
+      {% if current_user.is_authenticated %}
+      <button class="btn btn-secondary btn-block btn-subscribe" data-plan-name="Enterprise" data-plan-price="-1">
+        <i class="fa-solid fa-envelope"></i> Contact Sales
+      </button>
+      {% else %}
       <a href="{{ url_for('contact') }}" class="btn btn-secondary btn-block">
         <i class="fa-solid fa-envelope"></i> Contact Sales
       </a>
+      {% endif %}
     </div>
   </div>
 
@@ -176,9 +212,15 @@
       </ul>
     </div>
     <div class="plan-cta">
+      {% if current_user.is_authenticated %}
+      <button class="btn btn-secondary btn-block btn-subscribe" data-plan-name="Installation Service" data-plan-price="200">
+        <i class="fa-solid fa-credit-card"></i> Request Setup
+      </button>
+      {% else %}
       <a href="{{ url_for('contact') }}" class="btn btn-secondary btn-block">
         <i class="fa-solid fa-envelope"></i> Request Setup
       </a>
+      {% endif %}
     </div>
   </div>
 
@@ -207,5 +249,1007 @@
     </div>
   </div>
 </div>
+
+<!-- ========================================== -->
+<!-- 💳 PREMIUM INTERACTIVE PAYMENT GATEWAY MODAL -->
+<!-- ========================================== -->
+{% if current_user.is_authenticated %}
+<div id="checkoutModal" class="checkout-modal-backdrop" style="display: none;">
+  <div class="checkout-modal-card">
+    <button class="checkout-modal-close" onclick="closeCheckout()">&times;</button>
+    
+    <div class="checkout-modal-grid">
+      <!-- Left: Order Summary -->
+      <div class="checkout-summary-column">
+        <div class="checkout-summary-header">
+          <div class="checkout-summary-badge">Safe &amp; Encrypted</div>
+          <h3 class="checkout-summary-title">Order Summary</h3>
+        </div>
+        
+        <div class="checkout-summary-details">
+          <div class="checkout-plan-info">
+            <span class="checkout-plan-lbl">Selected Plan:</span>
+            <strong id="summaryPlanName" class="checkout-plan-val">Professional</strong>
+          </div>
+          <div class="checkout-plan-info">
+            <span class="checkout-plan-lbl">Price:</span>
+            <strong id="summaryPlanPrice" class="checkout-plan-val">$49.00/mo</strong>
+          </div>
+        </div>
+
+        <div class="checkout-divider"></div>
+
+        <div class="checkout-benefits-list">
+          <div class="checkout-benefit"><i class="fa-solid fa-circle-check"></i> Immediate active access</div>
+          <div class="checkout-benefit"><i class="fa-solid fa-circle-check"></i> Custom API token key</div>
+          <div class="checkout-benefit"><i class="fa-solid fa-circle-check"></i> Priority queue slot allocation</div>
+          <div class="checkout-benefit"><i class="fa-solid fa-circle-check"></i> Export verification PDF reports</div>
+        </div>
+
+        <div class="checkout-price-total">
+          <span>Total Due:</span>
+          <strong id="summaryPlanTotal">$49.00</strong>
+        </div>
+      </div>
+
+      <!-- Right: Interactive Billing Form -->
+      <div class="checkout-billing-column">
+        <!-- Tabs -->
+        <div class="checkout-tabs">
+          <button class="checkout-tab-btn active" onclick="switchTab('card')">
+            <i class="fa-solid fa-credit-card"></i> Card Payment
+          </button>
+          <button class="checkout-tab-btn" onclick="switchTab('crypto')">
+            <i class="fa-brands fa-ethereum"></i> Crypto / Web3
+          </button>
+        </div>
+
+        <!-- Card Form Section -->
+        <div id="cardPaymentForm" class="payment-tab-content active">
+          <!-- 3D Card Preview -->
+          <div class="card-preview-wrapper">
+            <div id="creditCard" class="credit-card">
+              <!-- Front -->
+              <div class="card-side card-front">
+                <div class="card-front-top">
+                  <span class="card-logo-chip"></span>
+                  <span class="card-network-logo" id="cardBrand">Visa</span>
+                </div>
+                <div class="card-number-display" id="cardNumDisp">•••• •••• •••• ••••</div>
+                <div class="card-front-bottom">
+                  <div class="card-holder-info">
+                    <span class="card-front-lbl">CARD HOLDER</span>
+                    <strong class="card-front-val" id="cardNameDisp">YOUR NAME</strong>
+                  </div>
+                  <div class="card-expiry-info">
+                    <span class="card-front-lbl">EXPIRES</span>
+                    <strong class="card-front-val" id="cardExpiryDisp">MM/YY</strong>
+                  </div>
+                </div>
+              </div>
+              <!-- Back -->
+              <div class="card-side card-back">
+                <div class="card-back-strip"></div>
+                <div class="card-back-signature">
+                  <div class="card-cvv-display" id="cardCvvDisp">•••</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inputs -->
+          <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input type="text" id="cardNumberInput" class="form-control checkout-input" placeholder="4111 2222 3333 4444" maxlength="19" oninput="updateCardNumber(this)" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label class="form-label">Cardholder Name</label>
+              <input type="text" id="cardNameInput" class="form-control checkout-input" placeholder="John Doe" oninput="updateCardName(this)" required>
+            </div>
+            <div class="form-group flex-1">
+              <label class="form-label">Expiry</label>
+              <input type="text" id="cardExpiryInput" class="form-control checkout-input" placeholder="MM/YY" maxlength="5" oninput="updateCardExpiry(this)" required>
+            </div>
+            <div class="form-group flex-1">
+              <label class="form-label">CVV</label>
+              <input type="password" id="cardCvvInput" class="form-control checkout-input" placeholder="123" maxlength="4" onfocus="flipCard(true)" onblur="flipCard(false)" oninput="updateCardCvv(this)" required>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-block checkout-pay-btn" onclick="processPayment('card')">
+            <i class="fa-solid fa-lock"></i> Pay Securely Now
+          </button>
+        </div>
+
+        <!-- Crypto Form Section -->
+        <div id="cryptoPaymentForm" class="payment-tab-content">
+          <div class="crypto-info-box">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Connect a Web3 provider to subscribe directly using USDC, USDT, or ETH.</span>
+          </div>
+
+          <div id="walletConnectionState" class="wallet-connection-state">
+            <button class="btn btn-secondary btn-block wallet-btn" onclick="simulateWalletConnect('MetaMask')">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" alt="MetaMask" class="wallet-icon" style="height: 20px; width: 20px; margin-right: 8px;">
+              MetaMask
+            </button>
+            <button class="btn btn-secondary btn-block wallet-btn" onclick="simulateWalletConnect('Coinbase')">
+              <img src="https://images.ctfassets.net/c5bd0qq37623/24G9tQ6qvQ6vP2V9xQpQ2G/29c4ba01e6e0d9b4b0e8c0500b469b62/Coinbase_Wallet_Icon.svg" alt="Coinbase" class="wallet-icon" style="height: 20px; width: 20px; margin-right: 8px;">
+              Coinbase Wallet
+            </button>
+          </div>
+
+          <div id="walletDetails" class="wallet-details-box" style="display: none;">
+            <div class="wallet-detail-row">
+              <span>Connected Address:</span>
+              <strong id="connectedWalletAddr">0x000...0000</strong>
+            </div>
+            <div class="wallet-detail-row">
+              <span>Network:</span>
+              <strong>Ethereum Mainnet (Simulated)</strong>
+            </div>
+            <div class="wallet-detail-row">
+              <span>Simulated Gas Fee:</span>
+              <strong style="color:var(--success-color);">$1.20</strong>
+            </div>
+
+            <button class="btn btn-primary btn-block checkout-pay-btn" onclick="processPayment('crypto')">
+              <i class="fa-brands fa-ethereum"></i> Sign &amp; Authorize Transaction
+            </button>
+          </div>
+        </div>
+
+        <!-- Processing States -->
+        <div id="processingState" class="checkout-processing-box" style="display: none;">
+          <div class="checkout-spinner"></div>
+          <h4 id="processingStatusText" class="processing-status">Processing Payment...</h4>
+          <div class="processing-steps-container">
+            <div class="processing-step" id="step1"><i class="fa-solid fa-spinner fa-spin"></i> Securing pipeline connection...</div>
+            <div class="processing-step" id="step2"><i class="fa-regular fa-circle"></i> Authorizing payment token...</div>
+            <div class="processing-step" id="step3"><i class="fa-regular fa-circle"></i> Committing updates...</div>
+          </div>
+        </div>
+
+        <!-- Success Details -->
+        <div id="successState" class="checkout-success-box" style="display: none;">
+          <div class="success-icon-wrap">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <h3>Payment Successful!</h3>
+          <p id="successMessageText">Welcome to the Professional plan. Your account has been upgraded.</p>
+          <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top: 15px; display: inline-block;">
+            <i class="fa-solid fa-gauge"></i> Go to Dashboard
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="confettiCanvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:1001; display:none;"></canvas>
+
+<!-- Modal & CSS Styles -->
+<style>
+.checkout-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8, 12, 24, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeInModal 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.checkout-modal-card {
+  background: rgba(18, 22, 38, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 209, 255, 0.1);
+  animation: slideUpModal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.checkout-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: var(--text-color, #ffffff);
+  font-size: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.checkout-modal-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: rotate(90deg);
+}
+
+.checkout-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  min-height: 520px;
+}
+
+@media (max-width: 768px) {
+  .checkout-modal-grid {
+    grid-template-columns: 1fr;
+  }
+  .checkout-summary-column {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Summary Panel */
+.checkout-summary-column {
+  background: rgba(14, 17, 30, 0.98);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout-summary-header {
+  margin-bottom: 1.5rem;
+}
+
+.checkout-summary-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #00d1ff;
+  background: rgba(0, 209, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 50px;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.checkout-summary-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.checkout-summary-details {
+  margin-top: 1rem;
+}
+
+.checkout-plan-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.checkout-plan-lbl {
+  color: var(--text-muted, #888888);
+}
+
+.checkout-plan-val {
+  color: #ffffff;
+}
+
+.checkout-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 1.5rem 0;
+}
+
+.checkout-benefits-list {
+  flex-grow: 1;
+}
+
+.checkout-benefit {
+  font-size: 0.88rem;
+  color: var(--text-muted, #aaaaaa);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkout-benefit i {
+  color: var(--success-color, #10b981);
+}
+
+.checkout-price-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.checkout-price-total span {
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.checkout-price-total strong {
+  font-size: 1.8rem;
+  color: #00d1ff;
+  font-weight: 800;
+}
+
+/* Billing Panel */
+.checkout-billing-column {
+  padding: 2.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 1.75rem;
+}
+
+.checkout-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #aaaaaa);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.checkout-tab-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.payment-tab-content {
+  display: none;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.payment-tab-content.active {
+  display: flex;
+}
+
+/* 3D Card Animation */
+.card-preview-wrapper {
+  perspective: 1000px;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.credit-card {
+  width: 320px;
+  height: 190px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.credit-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  padding: 1.25rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.card-front {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-back {
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: rotateY(180deg);
+}
+
+.card-front-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-logo-chip {
+  width: 40px;
+  height: 30px;
+  background: radial-gradient(circle, #e2e8f0 0%, #cbd5e1 100%);
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+.card-network-logo {
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.card-number-display {
+  font-size: 1.25rem;
+  letter-spacing: 0.15em;
+  font-family: monospace;
+  text-align: center;
+  margin: 1.25rem 0;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.card-front-bottom {
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-front-lbl {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.5);
+  display: block;
+  text-transform: uppercase;
+}
+
+.card-front-val {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.card-back-strip {
+  height: 35px;
+  background: #000;
+  margin: 0.5rem -1.25rem 0 -1.25rem;
+}
+
+.card-back-signature {
+  background: rgba(255, 255, 255, 0.8);
+  height: 35px;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 4px;
+}
+
+.card-cvv-display {
+  color: #000;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+/* Forms styling */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.checkout-input {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.checkout-input:focus {
+  border-color: #00d1ff !important;
+  box-shadow: 0 0 10px rgba(0, 209, 255, 0.2) !important;
+}
+
+.checkout-pay-btn {
+  margin-top: 1.25rem;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Crypto / Web3 Style */
+.crypto-info-box {
+  background: rgba(0, 209, 255, 0.06);
+  border: 1px solid rgba(0, 209, 255, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.crypto-info-box i {
+  color: #00d1ff;
+  margin-top: 2px;
+}
+
+.wallet-btn {
+  padding: 12px;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.wallet-details-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 1.5rem;
+}
+
+.wallet-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+}
+
+.wallet-detail-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Processing Spinner Box */
+.checkout-processing-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding: 2rem 0;
+}
+
+.checkout-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.05);
+  border-top-color: #00d1ff;
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.processing-status {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.processing-steps-container {
+  width: 100%;
+  max-width: 320px;
+}
+
+.processing-step {
+  font-size: 0.9rem;
+  color: var(--text-muted, #888888);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.processing-step i {
+  width: 16px;
+  text-align: center;
+}
+
+.processing-step.active {
+  color: #00d1ff;
+}
+
+.processing-step.done {
+  color: var(--success-color, #10b981);
+}
+
+/* Success details box */
+.checkout-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-grow: 1;
+  padding: 2rem 0;
+  animation: popSuccess 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popSuccess {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.success-icon-wrap {
+  width: 70px;
+  height: 70px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 2px solid #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  color: #10b981;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.checkout-success-box h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+</style>
+
+<!-- Javascript Interactions -->
+<script>
+let selectedPlan = "";
+let selectedPrice = 0;
+let connectedWallet = "";
+
+// Open Payment Dialog Modal
+document.querySelectorAll(".btn-subscribe").forEach(btn => {
+  btn.addEventListener("click", function() {
+    selectedPlan = this.getAttribute("data-plan-name");
+    selectedPrice = parseFloat(this.getAttribute("data-plan-price"));
+    
+    // Fill summary details
+    document.getElementById("summaryPlanName").textContent = selectedPlan;
+    if (selectedPrice === -1) {
+      document.getElementById("summaryPlanPrice").textContent = "Custom Pricing";
+      document.getElementById("summaryPlanTotal").textContent = "Quotes Sent";
+    } else {
+      document.getElementById("summaryPlanPrice").textContent = "$" + selectedPrice.toFixed(2) + " / mo";
+      document.getElementById("summaryPlanTotal").textContent = "$" + selectedPrice.toFixed(2);
+    }
+    
+    // Reset view states
+    switchTab('card');
+    document.getElementById("cardPaymentForm").style.display = "flex";
+    document.getElementById("cryptoPaymentForm").style.display = "none";
+    document.getElementById("processingState").style.display = "none";
+    document.getElementById("successState").style.display = "none";
+    
+    // Reset inputs
+    document.getElementById("cardNumberInput").value = "";
+    document.getElementById("cardNameInput").value = "";
+    document.getElementById("cardExpiryInput").value = "";
+    document.getElementById("cardCvvInput").value = "";
+    document.getElementById("creditCard").classList.remove("flipped");
+    document.getElementById("cardNumDisp").textContent = "•••• •••• •••• ••••";
+    document.getElementById("cardNameDisp").textContent = "YOUR NAME";
+    document.getElementById("cardExpiryDisp").textContent = "MM/YY";
+    document.getElementById("cardCvvDisp").textContent = "•••";
+    
+    document.getElementById("walletConnectionState").style.display = "block";
+    document.getElementById("walletDetails").style.display = "none";
+    connectedWallet = "";
+    
+    // Show Modal
+    document.getElementById("checkoutModal").style.display = "flex";
+  });
+});
+
+function closeCheckout() {
+  document.getElementById("checkoutModal").style.display = "none";
+  stopConfetti();
+}
+
+function switchTab(tab) {
+  // Toggle active tab buttons
+  const tabs = document.querySelectorAll(".checkout-tab-btn");
+  tabs[0].classList.toggle("active", tab === 'card');
+  tabs[1].classList.toggle("active", tab === 'crypto');
+  
+  // Toggle form panels
+  document.getElementById("cardPaymentForm").style.display = tab === 'card' ? 'flex' : 'none';
+  document.getElementById("cryptoPaymentForm").style.display = tab === 'crypto' ? 'flex' : 'none';
+  document.getElementById("processingState").style.display = 'none';
+  document.getElementById("successState").style.display = 'none';
+}
+
+/* Card Flipping & Real-Time Input Mirroring */
+function flipCard(flip) {
+  const card = document.getElementById("creditCard");
+  if (flip) {
+    card.classList.add("flipped");
+  } else {
+    card.classList.remove("flipped");
+  }
+}
+
+function updateCardNumber(input) {
+  // Format Card Number (space every 4 digits)
+  let val = input.value.replace(/\D/g, '');
+  let formatted = "";
+  for (let i = 0; i < val.length; i++) {
+    if (i > 0 && i % 4 === 0) formatted += " ";
+    formatted += val[i];
+  }
+  input.value = formatted;
+  
+  // Set card brand
+  const brand = document.getElementById("cardBrand");
+  if (val.startsWith("4")) brand.textContent = "Visa";
+  else if (val.startsWith("5")) brand.textContent = "Mastercard";
+  else if (val.startsWith("3")) brand.textContent = "Amex";
+  else brand.textContent = "Card";
+  
+  // Update display
+  let fill = formatted + "•••• •••• •••• ••••".slice(formatted.length);
+  document.getElementById("cardNumDisp").textContent = fill;
+}
+
+function updateCardName(input) {
+  let val = input.value.toUpperCase();
+  document.getElementById("cardNameDisp").textContent = val || "YOUR NAME";
+}
+
+function updateCardExpiry(input) {
+  let val = input.value.replace(/\D/g, '');
+  if (val.length >= 2) {
+    input.value = val.slice(0, 2) + '/' + val.slice(2, 4);
+  } else {
+    input.value = val;
+  }
+  document.getElementById("cardExpiryDisp").textContent = input.value || "MM/YY";
+}
+
+function updateCardCvv(input) {
+  let val = input.value.replace(/\D/g, '');
+  input.value = val;
+  document.getElementById("cardCvvDisp").textContent = "•".repeat(val.length) || "•••";
+}
+
+/* Crypto Web3 Simulation */
+function simulateWalletConnect(wallet) {
+  const button = event.currentTarget;
+  const originalHtml = button.innerHTML;
+  
+  button.disabled = true;
+  button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Connecting to ${wallet}...`;
+  
+  setTimeout(() => {
+    button.disabled = false;
+    button.innerHTML = originalHtml;
+    
+    // Show connection details
+    connectedWallet = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
+    const trunc = connectedWallet.slice(0, 6) + "..." + connectedWallet.slice(-4);
+    
+    document.getElementById("connectedWalletAddr").textContent = trunc;
+    document.getElementById("walletConnectionState").style.display = "none";
+    document.getElementById("walletDetails").style.display = "block";
+  }, 1000);
+}
+
+/* Process Payment Simulated States & Server Integration */
+function processPayment(method) {
+  // Validate inputs first
+  if (method === 'card') {
+    const cardNum = document.getElementById("cardNumberInput").value;
+    const cardName = document.getElementById("cardNameInput").value;
+    const expiry = document.getElementById("cardExpiryInput").value;
+    const cvv = document.getElementById("cardCvvInput").value;
+    
+    if (cardNum.length < 15 || !cardName || expiry.length < 5 || cvv.length < 3) {
+      alert("Please check and complete your card payment fields.");
+      return;
+    }
+  }
+  
+  // Hide active forms
+  document.getElementById("cardPaymentForm").style.display = "none";
+  document.getElementById("cryptoPaymentForm").style.display = "none";
+  
+  // Show processing
+  const procBox = document.getElementById("processingState");
+  procBox.style.display = "flex";
+  
+  // Step resets
+  const s1 = document.getElementById("step1");
+  const s2 = document.getElementById("step2");
+  const s3 = document.getElementById("step3");
+  
+  s1.className = "processing-step active";
+  s1.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Securing pipeline connection...`;
+  s2.className = "processing-step";
+  s2.innerHTML = `<i class="fa-regular fa-circle"></i> Authorizing payment token...`;
+  s3.className = "processing-step";
+  s3.innerHTML = `<i class="fa-regular fa-circle"></i> Committing updates...`;
+  
+  // Step 1 done
+  setTimeout(() => {
+    s1.className = "processing-step done";
+    s1.innerHTML = `<i class="fa-solid fa-circle-check"></i> Connection established.`;
+    
+    s2.className = "processing-step active";
+    s2.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Authorizing payment token...`;
+    
+    // Step 2 done
+    setTimeout(() => {
+      s2.className = "processing-step done";
+      s2.innerHTML = `<i class="fa-solid fa-circle-check"></i> Funds authorized successfully.`;
+      
+      s3.className = "processing-step active";
+      s3.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Finalizing database status...`;
+      
+      // Step 3 API submission
+      const payload = {
+        plan_name: selectedPlan
+      };
+      if (method === 'card') {
+        payload.card_number = document.getElementById("cardNumberInput").value.slice(-4);
+      } else {
+        payload.wallet_address = connectedWallet;
+        payload.tx_hash = "0x" + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+      }
+      
+      fetch("/api/v1/subscription/upgrade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          s3.className = "processing-step done";
+          s3.innerHTML = `<i class="fa-solid fa-circle-check"></i> Account upgraded!`;
+          
+          setTimeout(() => {
+            procBox.style.display = "none";
+            document.getElementById("successState").style.display = "flex";
+            document.getElementById("successMessageText").textContent = `Welcome to the ${selectedPlan} plan. Your account has been upgraded successfully.`;
+            startConfetti();
+          }, 600);
+        } else {
+          alert("Upgrade failed: " + (data.error || "Unknown error"));
+          switchTab(method);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Payment confirmation pipeline error.");
+        switchTab(method);
+      });
+      
+    }, 1200);
+  }, 1000);
+}
+
+/* 🎊 CONFETTI CANVAS IMPLEMENTATION */
+let confettiInterval;
+const canvas = document.getElementById("confettiCanvas");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function startConfetti() {
+  canvas.style.display = "block";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  particles = [];
+  
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * canvas.height,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+      tilt: Math.random() * 10 - 5,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+      tiltAngle: 0
+    });
+  }
+  
+  if (confettiInterval) clearInterval(confettiInterval);
+  confettiInterval = setInterval(drawConfetti, 18);
+}
+
+function drawConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  particles.forEach((p, idx) => {
+    p.tiltAngle += p.tiltAngleIncremental;
+    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+    p.x += Math.sin(p.tiltAngle);
+    p.tilt = Math.sin(p.tiltAngle - idx/3) * 15;
+    
+    ctx.beginPath();
+    ctx.lineWidth = p.r;
+    ctx.strokeStyle = p.color;
+    ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+    ctx.stroke();
+    
+    // Reset particles falling off bottom
+    if (p.y > canvas.height) {
+      particles[idx] = {
+        x: Math.random() * canvas.width,
+        y: -20,
+        r: p.r,
+        d: p.d,
+        color: p.color,
+        tilt: p.tilt,
+        tiltAngleIncremental: p.tiltAngleIncremental,
+        tiltAngle: p.tiltAngle
+      };
+    }
+  });
+}
+
+function stopConfetti() {
+  clearInterval(confettiInterval);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = "none";
+}
+
+window.addEventListener("resize", () => {
+  if (canvas.style.display === "block") {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+});
+</script>
+{% endif %}
 
 {% endblock %}

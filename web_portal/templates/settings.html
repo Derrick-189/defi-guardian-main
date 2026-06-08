@@ -298,11 +298,20 @@
     .then(function (data) {
       document.querySelectorAll('[data-tool-cmd]').forEach(function (badge) {
         var cmd    = badge.dataset.toolCmd;
-        var status = data[cmd] || data[badge.closest('.tool-avail-item').querySelector('.tool-avail-name').textContent.trim()];
-        if (status === true || status === 'available') {
+        var name   = badge.closest('.tool-avail-item').querySelector('.tool-avail-name').textContent.trim();
+        
+        // Normalize names to uppercase to match backend keys (e.g. "LEAN 4" -> "LEAN")
+        var key = name.toUpperCase();
+        if (key === 'LEAN 4') key = 'LEAN';
+        
+        var toolInfo = data[key] || data[cmd.toUpperCase()] || {};
+        var available = toolInfo.available;
+        var status = toolInfo.status || '';
+        
+        if (available === true || status.toUpperCase() === 'AVAILABLE' || status.toUpperCase() === 'PASS') {
           badge.className = 'badge badge-success tool-avail-badge';
           badge.textContent = 'Available';
-        } else if (status === 'simulated') {
+        } else if (status.toUpperCase() === 'SIMULATED') {
           badge.className = 'badge badge-warning tool-avail-badge';
           badge.textContent = 'Simulated';
         } else {

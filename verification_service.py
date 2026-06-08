@@ -222,9 +222,31 @@ def run_real_verification(tool, contract_path, spec_path, output_dir):
 def run_spin(contract_path, spec_path, output_dir):
     """Execute SPIN model checker."""
     try:
+        # Check if a separate specification file is provided and exists
+        spin_contract_path = contract_path
+        combined_used = False
+        if spec_path and os.path.exists(spec_path):
+            try:
+                with open(contract_path, "r", encoding="utf-8", errors="replace") as f:
+                    contract_content = f.read()
+                with open(spec_path, "r", encoding="utf-8", errors="replace") as f:
+                    spec_content = f.read()
+                
+                # Combine them
+                combined_filename = "combined_" + os.path.basename(contract_path)
+                combined_path = os.path.join(output_dir, combined_filename)
+                with open(combined_path, "w", encoding="utf-8") as f:
+                    f.write(contract_content)
+                    f.write("\n\n/* Specifications */\n")
+                    f.write(spec_content)
+                spin_contract_path = combined_path
+                combined_used = True
+            except Exception as e:
+                print(f"Error combining SPIN contract and spec: {e}")
+
         # Translate Promela to C
         subprocess.run(
-            ["spin", "-a", contract_path],
+            ["spin", "-a", spin_contract_path],
             cwd=output_dir,
             capture_output=True,
             timeout=60
@@ -257,6 +279,18 @@ def run_spin(contract_path, spec_path, output_dir):
             timeout=300
         )
         
+        # If combined was used, rename the resulting combined trail to the expected filename
+        if combined_used:
+            generated_trail = os.path.join(output_dir, f"combined_{os.path.basename(contract_path)}.trail")
+            expected_trail = os.path.join(output_dir, f"{os.path.basename(contract_path)}.trail")
+            if os.path.exists(generated_trail):
+                try:
+                    if os.path.exists(expected_trail):
+                        os.remove(expected_trail)
+                    os.rename(generated_trail, expected_trail)
+                except Exception as e:
+                    print(f"Error renaming trail file: {e}")
+
         trail_path = os.path.join(output_dir, f"{os.path.basename(contract_path)}.trail")
         trail_exists = os.path.exists(trail_path)
         
@@ -313,6 +347,7 @@ def run_verus(contract_path, output_dir):
 def run_certora(contract_path, spec_path, output_dir):
     """Execute Certora prover."""
     try:
+        import re
         if not spec_path:
             return {
                 "status": "error",
@@ -320,8 +355,19 @@ def run_certora(contract_path, spec_path, output_dir):
                 "message": "Certora requires a specification file"
             }
         
+        # Extract contract name
+        contract_name = "Contract"
+        try:
+            with open(contract_path, 'r', encoding='utf-8', errors='replace') as f:
+                content = f.read()
+                match = re.search(r'contract\s+(\w+)', content)
+                if match:
+                    contract_name = match.group(1)
+        except Exception:
+            pass
+
         result = subprocess.run(
-            ["certoraRun", contract_path, "--specs", spec_path],
+            ["certoraRun", contract_path, "--verify", f"{contract_name}:{spec_path}"],
             cwd=output_dir,
             capture_output=True,
             text=True,
@@ -333,7 +379,7 @@ def run_certora(contract_path, spec_path, output_dir):
             "tool": "certora",
             "stdout": result.stdout[:10000],
             "stderr": result.stderr[:10000],
-            "counterexample_found": "counterexample" in result.stdout.lower(),
+            "counterexample_found": "counterexample" in result.stdout.lower() or "violated" in result.stdout.lower(),
             "return_code": result.returncode
         }
         

@@ -5,8 +5,20 @@ from pathlib import Path
 # `config` gets the same resolved string.  Covers both Render's
 # 'postgres://…' form and the SQLAlchemy 2.x-required 'postgresql://…' form.
 _RAW_DB_URL = os.environ.get("DATABASE_URL")
-if _RAW_DB_URL and _RAW_DB_URL.startswith("postgres://"):
-    _RAW_DB_URL = "postgresql://" + _RAW_DB_URL[len("postgres://"):]
+if _RAW_DB_URL:
+    if _RAW_DB_URL.startswith("postgres://"):
+        _RAW_DB_URL = "postgresql://" + _RAW_DB_URL[len("postgres://"):]
+    
+    import socket
+    from urllib.parse import urlparse
+    try:
+        parsed = urlparse(_RAW_DB_URL)
+        if parsed.hostname:
+            # Check if host resolves to prevent psycopg2.OperationalError
+            socket.gethostbyname(parsed.hostname)
+    except Exception as e:
+        print(f"WARNING: Database host {parsed.hostname if 'parsed' in locals() else 'unknown'} could not be resolved: {e}. Falling back to SQLite.")
+        _RAW_DB_URL = None
 
 class Config:
     """Base configuration."""

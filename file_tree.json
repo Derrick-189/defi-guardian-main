@@ -4686,7 +4686,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/benchmarks.html",
-              "size": 17238
+              "size": 17308
             },
             {
               "name": "contact.html",
@@ -5780,7 +5780,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 70361
+          "size": 70393
         },
         {
           "name": "api_v1.py.bak",
@@ -5794,7 +5794,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/app.py",
-          "size": 30643
+          "size": 31951
         },
         {
           "name": "app.py.bak",
@@ -5808,7 +5808,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/audit_db.py",
-          "size": 20593
+          "size": 20581
         },
         {
           "name": "benchmarks_runner.py",
@@ -6097,7 +6097,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 206582
+      "size": 206971
     },
     {
       "name": "fix_admin.py",

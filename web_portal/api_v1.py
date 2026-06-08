@@ -1182,6 +1182,7 @@ def _check_tool_available(tool: str) -> bool:
 
 
 @api_v1.route("/tools/status")
+@api_v1.route("/tool-status")
 def api_tools_status():
     """Per-tool status merged from PATH check + DB last-known status."""
     state = load_state()
@@ -1702,3 +1703,36 @@ def api_visualization_state_diagram_download():
         )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api_v1.route("/subscription/upgrade", methods=["POST"])
+@login_required
+def api_upgrade_subscription():
+    """Upgrade user's subscription plan after mock payment verification."""
+    try:
+        data = request.get_json() or {}
+        plan_name = data.get("plan_name", "Professional")
+        card_number = data.get("card_number", "")
+        wallet_address = data.get("wallet_address", "")
+        tx_hash = data.get("tx_hash", "")
+        
+        # Validation: check for either credit card or crypto transaction details
+        if not card_number and not wallet_address:
+            return jsonify({"success": False, "error": "Payment details are required."}), 400
+            
+        current_user.subscription_plan = plan_name
+        db.session.add(current_user)
+        db.session.commit()
+        
+        # Log successful subscription update in console
+        payment_method = "Crypto" if wallet_address else "Credit Card"
+        print(f"💰 [PAYMENT] User '{current_user.username}' successfully subscribed to '{plan_name}' via {payment_method}.")
+        
+        return jsonify({
+            "success": True, 
+            "message": f"Successfully subscribed to {plan_name} plan!",
+            "plan": plan_name
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500

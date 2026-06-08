@@ -120,16 +120,25 @@ class BaseParser:
             if len(parts) > 1:
                 return parts[1]
             return ""
-        # If it looks like content (newlines or long string that isn't a path), return it
-        if "\n" in path_or_content or (len(path_or_content) > 255 and not os.path.exists(path_or_content)):
-            return path_or_content
-        # Otherwise treat as path
+            
+        # Heuristic to detect if it's a file path
+        is_path_like = (
+            ("/" in path_or_content or "\\" in path_or_content or path_or_content.endswith((".log", ".txt", ".pml", ".sol", ".rs", ".trail")))
+            and " " not in path_or_content
+        )
+        
         if os.path.exists(path_or_content):
             try:
                 with open(path_or_content, "r", encoding="utf-8", errors="replace") as f:
                     return f.read()
             except Exception:
                 return ""
+        elif is_path_like:
+            return ""
+            
+        # If it looks like content (newlines or long string that isn't a path), return it
+        if "\n" in path_or_content or len(path_or_content) > 255:
+            return path_or_content
         return path_or_content
 
     def _extract_line_info(self, text: str) -> tuple[int, str]:

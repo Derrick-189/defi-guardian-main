@@ -36,7 +36,29 @@ def sync_local_to_remote():
     
     sync_jobs = []
     for row in audits:
-        sync_jobs.append(dict(row))
+        job_dict = dict(row)
+        
+        # Resolve verification_output if it's a path
+        vo = job_dict.get('verification_output', '')
+        if vo and not ('\n' in vo) and os.path.exists(vo):
+            try:
+                with open(vo, 'r', encoding='utf-8', errors='replace') as f:
+                    job_dict['verification_output'] = f.read()
+            except Exception as e:
+                print(f"Error reading log file {vo}: {e}")
+                
+        # Resolve trail/report file if it exists and read it
+        trail_path = job_dict.get('report_path', '')
+        trail_content = ''
+        if trail_path and os.path.exists(trail_path):
+            try:
+                with open(trail_path, 'r', encoding='utf-8', errors='replace') as f:
+                    trail_content = f.read()
+            except Exception as e:
+                print(f"Error reading trail file {trail_path}: {e}")
+        job_dict['trail_content'] = trail_content
+        
+        sync_jobs.append(job_dict)
 
     sync_users = []
     for row in users:
@@ -69,7 +91,8 @@ def sync_local_to_remote():
                     },
                     "specs": a.get('ltl_properties', ""),
                     "log_content": a.get('verification_output', ""),
-                    "trail_path": a.get('report_path', "")
+                    "trail_path": a.get('report_path', ""),
+                    "trail_content": a.get('trail_content', "")
                 }
                 for a in sync_jobs
             ],

@@ -275,19 +275,62 @@
           }
           aiTooltip.innerHTML = '<span class="tooltip-tag" style="background:var(--success);color:white;">AI Insight</span> Generating explanation...';
           
-          // Simulate AI explanation fetch
+          // Simulate AI explanation fetch with dynamic sentence variations
           setTimeout(() => {
-              const explanations = {
-                  "lock": "The contract is setting a reentrancy lock. This is a common safety pattern to prevent multiple calls to the same function.",
-                  "transfer": "An external asset transfer is occurring. This is a critical point where reentrancy must be guarded.",
-                  "require": "The contract is enforcing a safety condition. If this fails in the trace, it indicates a boundary condition was met.",
-                  "state": "A state transition is happening, which might change the contract's behavior for future calls."
-              };
-              let exp = "This step represents a state change or action in the contract execution flow.";
-              const lowAction = actionText.toLowerCase();
-              for (const key in explanations) {
-                  if (lowAction.includes(key)) { exp = explanations[key]; break; }
+              const jobId = (_data && _data.job_id) || "run_default";
+              const filename = (_data && _data.filename) || "Contract.sol";
+              
+              // Hash function to get a stable index from our inputs
+              const inputStr = jobId + "_" + filename + "_" + lineNum + "_" + actionText;
+              let hash = 0;
+              for (let i = 0; i < inputStr.length; i++) {
+                  hash = (hash << 5) - hash + inputStr.charCodeAt(i);
+                  hash |= 0; // Convert to 32bit integer
               }
+              const index = Math.abs(hash);
+
+              const lowAction = actionText.toLowerCase();
+
+              // Define categories of recommendations
+              let category = "state"; // default
+              if (lowAction.includes("lock")) {
+                  category = "lock";
+              } else if (lowAction.includes("transfer") || lowAction.includes("call{") || lowAction.includes("send")) {
+                  category = "transfer";
+              } else if (lowAction.includes("require") || lowAction.includes("assert")) {
+                  category = "require";
+              }
+
+              // A rich collection of templates with distinct sentence structures
+              const templates = {
+                  "lock": [
+                      `Audit Alert: Reentrancy lock modification detected at line ${lineNum} of ${filename}. Ensure state changes follow the Checks-Effects-Interactions pattern *prior* to modifying this lock state.`,
+                      `Mutex Verification: Line ${lineNum} modifies a reentrancy mutex. If external untrusted calls exist in this block, confirm they execute only *after* the lock is set.`,
+                      `Critical Path Security: Guarding re-entrant entrypoint at line ${lineNum}. Ensure the lock boolean is reset in a \`finally\` or cleanup block so user funds are not locked permanently.`,
+                      `State Guarding: Mutex modification on line ${lineNum} in run ${jobId}. Double-check that all functions sharing this critical state check the lock status immediately on entry.`
+                  ],
+                  "transfer": [
+                      `Security Notice: External transfer on line ${lineNum} of ${filename}. Make sure all internal account balances are updated *before* this external execution to prevent reentrancy.`,
+                      `Reentrancy Vector: Asset transfer/external call at line ${lineNum}. Consider using OpenZeppelin's ReentrancyGuard or limiting gas to protect against malicious recipient fallback execution.`,
+                      `Interaction Point: External invocation observed in run ${jobId}. Verify that the return value of this call is checked and that it doesn't allow recursive callback execution.`,
+                      `Critical Asset Send: External messaging point at line ${lineNum}. Ensure no local state changes follow this transfer, adhering to strict checks-effects-interactions practices.`
+                  ],
+                  "require": [
+                      `Logic Assertion: Constraint condition check on line ${lineNum} of ${filename}. If this check fails under verification, analyze the trace inputs for integer overflow or boundary limits.`,
+                      `Invariant Check: Safety guard validated at line ${lineNum}. Ensure this check doesn't lead to a permanent Denial of Service (DoS) if state variables reach their upper limit.`,
+                      `Input Guardrail: Verification rule checked on line ${lineNum} in run ${jobId}. If unexpected failures occur here, check if helper functions properly validate prerequisite parameters.`,
+                      `Assertion Verification: Boundary validation at line ${lineNum}. Restrict the usage of raw assertions to unreached states, and prefer \`require\` for input sanity validations.`
+                  ],
+                  "state": [
+                      `State Mutation: Modification of contract storage at line ${lineNum} of ${filename}. Ensure no external calls were performed before this write, as stale states could be read.`,
+                      `Storage Update: Storage variable modified in run ${jobId}. If this variable controls permissions or reward ratios, ensure a corresponding state change event is emitted.`,
+                      `Variable Assignment: Line ${lineNum} updates local or global state. Double-check that access modifiers (e.g. \`onlyOwner\`) are correctly enforced on this execution branch.`,
+                      `Execution Transition: State transition at line ${lineNum}. Confirm that the new state doesn't violate any LTL properties checked in the verification spec.`
+                  ]
+              };
+
+              const choiceList = templates[category];
+              const exp = choiceList[index % choiceList.length];
               aiTooltip.innerHTML = '<span class="tooltip-tag" style="background:var(--success);color:white;">AI Insight</span> ' + exp;
           }, 600);
       }

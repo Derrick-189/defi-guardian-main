@@ -24,6 +24,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     organization = db.Column(db.String(120))
     role = db.Column(db.String(20), default='user')
+    subscription_plan = db.Column(db.String(50), default='Community')
     created_at = db.Column(db.DateTime, default=datetime.now)
     last_login = db.Column(db.DateTime)
     audits = db.relationship('AuditHistory', backref='user', lazy=True)
@@ -68,6 +69,13 @@ def init_db(app) -> None:
             db_path.parent.mkdir(parents=True, exist_ok=True)
             
         db.create_all()
+        
+        # Micro-migration to add subscription_plan column if it doesn't exist
+        try:
+            db.session.execute(text("ALTER TABLE users ADD COLUMN subscription_plan VARCHAR(50) DEFAULT 'Community'"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
 def _read_log_content(log_path: str, max_bytes: int = 50000) -> str:
     """
@@ -176,6 +184,12 @@ def sync_audit_log(audit_jobs: list | None = None, users: list | None = None) ->
         # Prefer inlined content from sync script if available
         log_content = job.get("log_content")
         log_path    = job.get("log_path", "")
+        
+        # If log_content is actually a path, treat it as log_path
+        if log_content and not ("\n" in log_content) and len(log_content) < 600:
+            if not log_path:
+                log_path = log_content
+            log_content = ""
         
         if not log_content:
             log_content = _read_log_content(log_path)
