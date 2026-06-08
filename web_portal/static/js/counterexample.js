@@ -1012,13 +1012,11 @@
     // ── Re-populate selector after new verification ──────────────────────
     document.addEventListener("dg:verification_complete", function () {
       populateRunSelector(window.DG_AUDIT_ID);
-      if (window.DG_AUDIT_ID === "latest") {
-        setTimeout(function () { loadData("latest"); }, 1000);
-      }
+      setTimeout(function () { loadData(window.DG_AUDIT_ID); }, 1000);
     });
 
     document.addEventListener("dg:state_update", function () {
-      if (window.DG_AUDIT_ID === "latest") { loadData("latest"); }
+      loadData(window.DG_AUDIT_ID);
     });
   });
 

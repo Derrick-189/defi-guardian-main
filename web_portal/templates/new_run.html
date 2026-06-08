@@ -653,7 +653,10 @@ Guardian{% endblock %} {% block content %}
            .then(function (r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
            .then(function (data) {
              done++;
-             if (data.audit_id) lastAuditId = data.audit_id;
+             if (data.audit_id) {
+                 lastAuditId = data.audit_id;
+                 localStorage.setItem('lastAuditId', data.audit_id);
+             }
              if (data.job_id)   lastJobId   = data.job_id;
 
              // If async job, poll for completion

@@ -518,10 +518,9 @@ endblock %} {% block extra_css %}
         }
       });
 
-      // ── Load graph ─────────────────────────────────────────────────────────
       function loadGraph() {
-        // Use /visualization/current to get the correct contract name and audit_id
-        // instead of the stale global verification_state.json
+        var lastAuditId = localStorage.getItem('lastAuditId');
+        
         fetch('/api/v1/visualization/current', { credentials: 'same-origin' })
           .then(function(r) { return r.ok ? r.json() : null; })
           .then(function(meta) {
@@ -529,8 +528,8 @@ endblock %} {% block extra_css %}
               var fnEl = document.getElementById('viz-filename');
               if (fnEl) fnEl.textContent = meta.model_name;
             }
-            // Fetch graph for the specific audit, not always "0"
-            var graphAuditId = (meta && meta.audit_id) ? String(meta.audit_id) : 'latest';
+            // Use the explicit last viewed run if available, otherwise fallback to the absolutely latest run
+            var graphAuditId = lastAuditId && lastAuditId !== 'latest' ? lastAuditId : ((meta && meta.audit_id) ? String(meta.audit_id) : 'latest');
             return Promise.all([
               fetch('/api/v1/state-graph/' + graphAuditId, { credentials: 'same-origin' }).then(function(r) { return r.ok ? r.json() : {}; }),
               fetch('/api/v1/ltl-properties', { credentials: 'same-origin' }).then(function(r) { return r.ok ? r.json() : []; })
