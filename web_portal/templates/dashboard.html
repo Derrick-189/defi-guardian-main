@@ -710,7 +710,7 @@
                 // Target Highlighter
                 this.highlighter = document.createElement("div");
                 this.highlighter.className = "dg-guide-highlighter";
-                this.highlighter.style.position = "absolute";
+                this.highlighter.style.position = "fixed";
                 this.highlighter.style.border = "2px solid #00d1ff";
                 this.highlighter.style.boxShadow = "0 0 20px rgba(0, 209, 255, 0.4)";
                 this.highlighter.style.borderRadius = "8px";
@@ -722,7 +722,7 @@
                 // Guide Card
                 this.card = document.createElement("div");
                 this.card.className = "dg-guide-card";
-                this.card.style.position = "absolute";
+                this.card.style.position = "fixed";
                 this.card.style.zIndex = "999997";
                 this.card.style.width = "320px";
                 this.card.style.background = "rgba(18, 22, 40, 0.98)";
@@ -749,25 +749,34 @@
                 
                 setTimeout(() => {
                     const rect = target.getBoundingClientRect();
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-                    
                     const pad = 8;
-                    this.highlighter.style.top = (rect.top + scrollTop - pad) + "px";
-                    this.highlighter.style.left = (rect.left + scrollLeft - pad) + "px";
+                    
+                    // Fixed coordinates relative to viewport
+                    this.highlighter.style.top = (rect.top - pad) + "px";
+                    this.highlighter.style.left = (rect.left - pad) + "px";
                     this.highlighter.style.width = (rect.width + pad * 2) + "px";
                     this.highlighter.style.height = (rect.height + pad * 2) + "px";
                     
-                    let cardTop = rect.bottom + scrollTop + 15;
-                    let cardLeft = rect.left + scrollLeft;
+                    let cardTop = rect.bottom + 15;
+                    let cardLeft = rect.left + (rect.width - 320) / 2;
                     
-                    if (rect.bottom + 250 > window.innerHeight) {
-                        cardTop = rect.top + scrollTop - 200;
+                    // Place card above target if there's no space below
+                    if (cardTop + 240 > window.innerHeight) {
+                        cardTop = rect.top - 240;
                     }
-                    if (rect.left + 340 > window.innerWidth) {
-                        cardLeft = window.innerWidth - 350;
+                    
+                    // Fallback to center of screen if target is extremely large/tall
+                    if (cardTop < 10 || cardTop + 240 > window.innerHeight) {
+                        cardTop = (window.innerHeight - 220) / 2;
                     }
-                    if (cardLeft < 10) cardLeft = 10;
+                    
+                    // Horizontal bounds checking
+                    if (cardLeft + 320 > window.innerWidth - 10) {
+                        cardLeft = window.innerWidth - 330;
+                    }
+                    if (cardLeft < 10) {
+                        cardLeft = 10;
+                    }
                     
                     this.card.style.top = cardTop + "px";
                     this.card.style.left = cardLeft + "px";
