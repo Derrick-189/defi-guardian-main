@@ -24,7 +24,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     organization = db.Column(db.String(120))
     role = db.Column(db.String(20), default='user')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     last_login = db.Column(db.DateTime)
     audits = db.relationship('AuditHistory', backref='user', lazy=True)
 
@@ -45,7 +45,7 @@ class AuditHistory(db.Model):
     verification_output = db.Column(db.Text)
     trace_data = db.Column(db.Text)
     source_code = db.Column(db.Text)
-    audit_date = db.Column(db.DateTime, default=datetime.utcnow)
+    audit_date = db.Column(db.DateTime, default=datetime.now)
     report_path = db.Column(db.String(500))
 
 class ContactMessage(db.Model):
@@ -55,7 +55,7 @@ class ContactMessage(db.Model):
     email = db.Column(db.String(120), nullable=False)
     subject = db.Column(db.String(200))
     message = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     is_read = db.Column(db.Boolean, default=False)
 
 def init_db(app) -> None:
@@ -170,7 +170,7 @@ def sync_audit_log(audit_jobs: list | None = None, users: list | None = None) ->
         try:
             timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
         except (ValueError, TypeError):
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now()
 
         # ── Read log content ─────────────────────────────────────────────────
         # Prefer inlined content from sync script if available

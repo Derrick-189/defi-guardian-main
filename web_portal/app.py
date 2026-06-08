@@ -504,6 +504,36 @@ def benchmarks():
                             str(r.get("status","")).upper() in ("PASS","SUCCESS","TRUE")))),
             "date":     str(r.get("date", r.get("timestamp", r.get("audit_date", ""))))[:16],
         })
+    # Combine DB runs and synthetic benchmarks
+    try:
+        u_id = current_user.get_id() if current_user.is_authenticated else None
+        user_id = int(u_id) if u_id else None
+        db_logs = AuditHistory.query.filter(
+            (AuditHistory.user_id == user_id) | (AuditHistory.user_id.is_(None))
+        ).order_by(AuditHistory.audit_date.desc()).limit(100).all()
+        
+        for r in db_logs:
+            # Try to extract time from verification_output if possible
+            time_val = 0.0
+            vo = r.verification_output or ""
+            if "elapsed time" in vo.lower():
+                m = re.search(r"elapsed time\s+([0-9.]+)\s+seconds", vo, re.IGNORECASE)
+                if m: time_val = float(m.group(1))
+            
+            passed = str(r.status).upper() in ("PASS", "SUCCESS", "TRUE")
+            
+            results.append({
+                "tool": r.tool_used or "?",
+                "contract": r.filename or "?",
+                "time": time_val,
+                "states": r.states_explored or 0,
+                "rate": 100 if passed else 0,
+                "passed": passed,
+                "date": str(r.audit_date)[:16] if r.audit_date else ""
+            })
+    except Exception as e:
+        app.logger.error(f"Error appending DB logs to benchmarks: {e}")
+
     return render_template("benchmarks.html", results=results)
 
 @app.route("/logs")

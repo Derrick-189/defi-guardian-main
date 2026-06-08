@@ -258,7 +258,9 @@
           '<div class="text-muted text-xs mt-1">' + data.contract + '</div>';
         liveGrid.appendChild(card);
       } else {
-        card.querySelector('.kpi-value').innerText = 'Running...';
+        var val = card.querySelector('.kpi-value');
+        val.innerText = 'Running...';
+        val.className = 'kpi-value text-info';
         card.querySelector('.text-muted').innerText = data.contract;
       }
     });
