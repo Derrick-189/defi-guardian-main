@@ -629,9 +629,7 @@ Guardian{% endblock %} {% block content %}
            if (idx >= total) {
              setProgress(100, 'All tools complete!');
              setTimeout(function () {
-               window.location.href = lastJobId
-                 ? '/artifacts/' + lastJobId
-                 : (lastAuditId ? '/counterexample/' + lastAuditId : '/counterexample/latest');
+               window.location.href = lastAuditId ? '/counterexample/' + lastAuditId : '/counterexample/latest';
              }, 800);
              return;
            }
