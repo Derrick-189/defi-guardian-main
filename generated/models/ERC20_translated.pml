@@ -3,8 +3,10 @@
 
 /* === SYSTEM STATE VARIABLES === */
 bool lock = false;
-int totalVaultBalance = 1000;
-int balances[2];
+int _totalSupply = 0;
+int _owner = 0;
+int _balances[2];
+int _nonces[2];
 int amount = 10;
 int user_collateral = 5000;
 int user_debt = 3000;
@@ -29,8 +31,7 @@ ltl fairness { [] <> (lock == false) }
 ltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }
 
 /* === EXTRACTED PROPERTIES FROM SOURCE === */
-/* Precondition: balances[1] >= amount */
-/* Precondition: 1 == 1 */
+/* Precondition: _owner == 1 */
 
 /* === MAIN CONTRACT PROCESS === */
 active proctype Contract() {
@@ -41,12 +42,12 @@ active proctype Contract() {
 
     do
         :: state == 1 -> atomic {
-            assert(lock == false); /* Reentrancy guard */
-            lock = true;
             /* === INVARIANT CHECKS === */
             assert(user_collateral >= 0);
             assert(user_debt >= 0);
             assert(price_eth > 0);
+            assert(deadline >= block.timestamp); /* Business logic invariant */
+            assert(recoveredAddress != address(0); /* Business logic invariant */
             
             /* === STATE UPDATE === */
             health_factor = calculate_health_factor;
@@ -60,7 +61,6 @@ active proctype Contract() {
                 :: else ->
                     printf("Position healthy: health_factor = %d\n", health_factor);
             fi
-            lock = false;
             printf("Formal Verification: Execution Completed\n");
             state = 2; // END
         }

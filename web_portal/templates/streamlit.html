@@ -207,7 +207,8 @@
 
   function getStreamlitUrl() {
     const theme = localStorage.getItem('dg-theme') || 'dark';
-    return `http://localhost:${PORT}/?embed=true&theme=${theme}`;
+    const host = window.location.hostname;
+    return `http://${host}:${PORT}/?embed=true&theme=${theme}`;
   }
 
   // Track active portal theme for real-time synchronization
@@ -279,7 +280,8 @@
   }
 
   function openNewTab() {
-    window.open(`http://localhost:${PORT}`, '_blank');
+    const host = window.location.hostname;
+    window.open(`http://${host}:${PORT}`, '_blank');
   }
 
   function waitForStreamlit() {
@@ -307,7 +309,7 @@
         <h5>Timed Out</h5>
         <p style="color:var(--text2)">Streamlit didn't start in 30 s.</p>
         <button class="btn btn-primary mt-2" onclick="startStreamlit()">Retry</button>
-        <a class="btn btn-secondary mt-2 ms-2" href="http://localhost:${PORT}" target="_blank">Try Direct Link</a>
+        <button class="btn btn-secondary mt-2 ms-2" onclick="openNewTab()">Try Direct Link</button>
       `);
       }
     }, 500);

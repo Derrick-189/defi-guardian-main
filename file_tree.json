@@ -3,6 +3,32 @@
   "type": "folder",
   "children": [
     {
+      "name": "analytics",
+      "type": "folder",
+      "children": [
+        {
+          "name": "core",
+          "type": "folder",
+          "children": [
+            {
+              "name": "audit_engine.py",
+              "type": "file",
+              "icon": "python",
+              "path": "analytics/core/audit_engine.py",
+              "size": 3306
+            }
+          ]
+        },
+        {
+          "name": "main.py",
+          "type": "file",
+          "icon": "python",
+          "path": "analytics/main.py",
+          "size": 3324
+        }
+      ]
+    },
+    {
       "name": "app",
       "type": "folder",
       "children": [
@@ -1537,11 +1563,32 @@
               "size": 2409
             },
             {
+              "name": "creusot_test_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/creusot_test_translated.pml",
+              "size": 1184
+            },
+            {
               "name": "defi_vault_translated.pml",
               "type": "file",
               "icon": "promela",
               "path": "generated/models/defi_vault_translated.pml",
               "size": 1184
+            },
+            {
+              "name": "ERC20_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/ERC20_translated.pml",
+              "size": 2680
+            },
+            {
+              "name": "ERC20Fixed_translated.pml",
+              "type": "file",
+              "icon": "promela",
+              "path": "generated/models/ERC20Fixed_translated.pml",
+              "size": 3567
             },
             {
               "name": "IERC1363Spender_translated.pml",
@@ -1597,14 +1644,14 @@
               "type": "file",
               "icon": "promela",
               "path": "generated/models/test_vault_translated.pml",
-              "size": 2550
+              "size": 2639
             },
             {
               "name": "translated_output.pml",
               "type": "file",
               "icon": "promela",
               "path": "generated/models/translated_output.pml",
-              "size": 2418
+              "size": 1654
             },
             {
               "name": "translated_output.pml.trail",
@@ -1650,14 +1697,14 @@
               "type": "file",
               "icon": "text",
               "path": "generated/reports/active_file.txt",
-              "size": 11
+              "size": 46
             },
             {
               "name": "audit_log.json",
               "type": "file",
               "icon": "json",
               "path": "generated/reports/audit_log.json",
-              "size": 289152
+              "size": 282995
             },
             {
               "name": "dashboard_users.db.synced",
@@ -1678,7 +1725,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/state_graph.json",
-              "size": 534
+              "size": 563
             },
             {
               "name": "verification_report.pdf",
@@ -1692,7 +1739,7 @@
               "type": "file",
               "icon": "json",
               "path": "generated/reports/verification_state.json",
-              "size": 23114
+              "size": 23629
             }
           ]
         },
@@ -2647,6 +2694,13 @@
               "icon": "log",
               "path": "logs/coq/coq_verification_20260529_181656.log",
               "size": 489
+            },
+            {
+              "name": "coq_verification_20260608_191755.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/coq/coq_verification_20260608_191755.log",
+              "size": 486
             }
           ]
         },
@@ -2905,6 +2959,20 @@
               "icon": "log",
               "path": "logs/lean/lean_verification_20260529_181543.log",
               "size": 519
+            },
+            {
+              "name": "lean_verification_20260608_191914.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260608_191914.log",
+              "size": 516
+            },
+            {
+              "name": "lean_verification_20260608_191957.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/lean/lean_verification_20260608_191957.log",
+              "size": 516
             }
           ]
         },
@@ -3336,7 +3404,7 @@
               "type": "file",
               "icon": "file",
               "path": "logs/spin/pan",
-              "size": 148392
+              "size": 148464
             },
             {
               "name": "spin_verification_20260409_143057.log",
@@ -4151,6 +4219,69 @@
               "size": 9746
             },
             {
+              "name": "spin_verification_20260608_191654.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260608_191654.log",
+              "size": 9824
+            },
+            {
+              "name": "spin_verification_20260608_191921.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260608_191921.log",
+              "size": 9751
+            },
+            {
+              "name": "spin_verification_20260609_172911.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_172911.log",
+              "size": 9752
+            },
+            {
+              "name": "spin_verification_20260609_173335.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_173335.log",
+              "size": 9789
+            },
+            {
+              "name": "spin_verification_20260609_173407.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_173407.log",
+              "size": 9831
+            },
+            {
+              "name": "spin_verification_20260609_173454.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_173454.log",
+              "size": 9822
+            },
+            {
+              "name": "spin_verification_20260609_173521.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_173521.log",
+              "size": 9827
+            },
+            {
+              "name": "spin_verification_20260609_174155.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_174155.log",
+              "size": 9826
+            },
+            {
+              "name": "spin_verification_20260609_174222.log",
+              "type": "file",
+              "icon": "log",
+              "path": "logs/spin/spin_verification_20260609_174222.log",
+              "size": 9869
+            },
+            {
               "name": "translated_output.pml.trail",
               "type": "file",
               "icon": "file",
@@ -4573,7 +4704,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/counterexample.js",
-                  "size": 39696
+                  "size": 43793
                 },
                 {
                   "name": "dashboard.js",
@@ -4587,7 +4718,7 @@
                   "type": "file",
                   "icon": "file",
                   "path": "web_portal/static/js/main.js",
-                  "size": 2068
+                  "size": 2613
                 },
                 {
                   "name": "socket.js",
@@ -4714,14 +4845,14 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/dashboard.html",
-              "size": 25133
+              "size": 35863
             },
             {
               "name": "desktop_app.html",
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/desktop_app.html",
-              "size": 78856
+              "size": 78847
             },
             {
               "name": "index.html",
@@ -4756,7 +4887,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/new_run.html",
-              "size": 31660
+              "size": 31687
             },
             {
               "name": "register.html",
@@ -4770,14 +4901,14 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/services.html",
-              "size": 9482
+              "size": 41055
             },
             {
               "name": "settings.html",
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/settings.html",
-              "size": 14358
+              "size": 14757
             },
             {
               "name": "specifications.html",
@@ -4791,7 +4922,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/streamlit.html",
-              "size": 10821
+              "size": 10888
             },
             {
               "name": "terms.html",
@@ -4819,7 +4950,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/visualization.html",
-              "size": 60402
+              "size": 60230
             }
           ]
         },
@@ -5644,6 +5775,72 @@
                   "size": 21033
                 }
               ]
+            },
+            {
+              "name": "job-163",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "_spin_nvr.tmp",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-163/_spin_nvr.tmp",
+                  "size": 495
+                },
+                {
+                  "name": "contract.pml",
+                  "type": "file",
+                  "icon": "promela",
+                  "path": "web_portal/uploads/job-163/contract.pml",
+                  "size": 574
+                },
+                {
+                  "name": "pan.h",
+                  "type": "file",
+                  "icon": "file",
+                  "path": "web_portal/uploads/job-163/pan.h",
+                  "size": 17812
+                }
+              ]
+            },
+            {
+              "name": "job-164",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/uploads/job-164/contract.sol",
+                  "size": 155
+                }
+              ]
+            },
+            {
+              "name": "job-165",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/uploads/job-165/contract.sol",
+                  "size": 159
+                }
+              ]
+            },
+            {
+              "name": "job-166",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "contract.sol",
+                  "type": "file",
+                  "icon": "solidity",
+                  "path": "web_portal/uploads/job-166/contract.sol",
+                  "size": 32
+                }
+              ]
             }
           ]
         },
@@ -5780,7 +5977,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 70393
+          "size": 72397
         },
         {
           "name": "api_v1.py.bak",
@@ -5808,7 +6005,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/audit_db.py",
-          "size": 20581
+          "size": 21215
         },
         {
           "name": "benchmarks_runner.py",
@@ -5822,14 +6019,14 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/config.py",
-          "size": 2573
+          "size": 3046
         },
         {
           "name": "defi_guardian.db",
           "type": "file",
           "icon": "file",
           "path": "web_portal/defi_guardian.db",
-          "size": 716800
+          "size": 860160
         },
         {
           "name": "defi_guardian.db.migrated",
@@ -5885,7 +6082,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/trace_parsers.py",
-          "size": 36749
+          "size": 37028
         },
         {
           "name": "utils.py",
@@ -5899,14 +6096,14 @@
           "type": "file",
           "icon": "file",
           "path": "web_portal/verification_queue.db",
-          "size": 61440
+          "size": 65536
         },
         {
           "name": "verification_server.py",
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_server.py",
-          "size": 23038
+          "size": 25291
         },
         {
           "name": "verification_simulator.py",
@@ -5916,13 +6113,6 @@
           "size": 17351
         }
       ]
-    },
-    {
-      "name": "_spin_nvr.tmp",
-      "type": "file",
-      "icon": "file",
-      "path": "_spin_nvr.tmp",
-      "size": 1983
     },
     {
       "name": "Account.sol",
@@ -6016,6 +6206,13 @@
       "size": 1471
     },
     {
+      "name": "creusot_test.rs",
+      "type": "file",
+      "icon": "rust",
+      "path": "creusot_test.rs",
+      "size": 666
+    },
+    {
       "name": "deepseek_python_20260506_b2360f.py",
       "type": "file",
       "icon": "python",
@@ -6048,7 +6245,7 @@
       "type": "file",
       "icon": "python",
       "path": "desktop_app.py",
-      "size": 301239
+      "size": 305235
     },
     {
       "name": "desktop_bridge.py",
@@ -6086,6 +6283,20 @@
       "size": 771
     },
     {
+      "name": "ERC20.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "ERC20.sol",
+      "size": 7755
+    },
+    {
+      "name": "ERC20Fixed.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "ERC20Fixed.sol",
+      "size": 13250
+    },
+    {
       "name": "events.py",
       "type": "file",
       "icon": "python",
@@ -6097,7 +6308,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 206971
+      "size": 210985
     },
     {
       "name": "fix_admin.py",
@@ -6119,6 +6330,13 @@
       "icon": "file",
       "path": "formal-verification.yml",
       "size": 10445
+    },
+    {
+      "name": "IERC1363Spender.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "IERC1363Spender.sol",
+      "size": 1119
     },
     {
       "name": "install.sh",
@@ -6210,34 +6428,6 @@
       "icon": "file",
       "path": "my_contract.verify.yaml",
       "size": 699
-    },
-    {
-      "name": "pan.b",
-      "type": "file",
-      "icon": "file",
-      "path": "pan.b",
-      "size": 1824
-    },
-    {
-      "name": "pan.m",
-      "type": "file",
-      "icon": "file",
-      "path": "pan.m",
-      "size": 27083
-    },
-    {
-      "name": "pan.p",
-      "type": "file",
-      "icon": "file",
-      "path": "pan.p",
-      "size": 56174
-    },
-    {
-      "name": "pan.t",
-      "type": "file",
-      "icon": "file",
-      "path": "pan.t",
-      "size": 28070
     },
     {
       "name": "preview_desktop_web.py",
@@ -6349,7 +6539,7 @@
       "type": "file",
       "icon": "python",
       "path": "sync_to_remote.py",
-      "size": 4121
+      "size": 5161
     },
     {
       "name": "test.v",
@@ -6378,6 +6568,13 @@
       "icon": "python",
       "path": "test_report.py",
       "size": 748
+    },
+    {
+      "name": "test_vault.sol",
+      "type": "file",
+      "icon": "solidity",
+      "path": "test_vault.sol",
+      "size": 464
     },
     {
       "name": "test_verification.py",
@@ -6468,14 +6665,14 @@
       "type": "file",
       "icon": "python",
       "path": "verification_service.py",
-      "size": 14258
+      "size": 16483
     },
     {
       "name": "verification_state.json",
       "type": "file",
       "icon": "json",
       "path": "verification_state.json",
-      "size": 23114
+      "size": 23629
     },
     {
       "name": "verification_worker.py",

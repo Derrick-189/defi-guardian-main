@@ -125,7 +125,8 @@ def verify():
                 file.save(str(raw_contract_path))
         elif contract_text:
             # Save raw text first; detect language later
-            raw_contract_path = job_dir / "contract_input"
+            form_filename = request.form.get("filename", "contract.pml")
+            raw_contract_path = job_dir / form_filename
             with open(raw_contract_path, "w", encoding="utf-8") as f:
                 f.write(contract_text)
 
@@ -371,6 +372,12 @@ def run_real_verification(tool, contract_path, spec_path, output_dir):
 
         if tool == "spin":
             return run_spin(contract_path, spec_path, output_dir)
+        elif tool == "spinspider":
+            return run_spinspider(contract_path, output_dir)
+        elif tool == "idot":
+            return run_idot(contract_path, output_dir)
+        elif tool == "erigone":
+            return run_erigone(contract_path, output_dir)
         elif tool == "verus":
             return run_verus(contract_path, output_dir)
         elif tool == "certora":
@@ -522,6 +529,80 @@ def run_spin(contract_path, spec_path, output_dir):
             "message": str(e)
         }
 
+
+def run_spinspider(contract_path, output_dir):
+    """Generate state space graph using SpinSpider."""
+    try:
+        # 1. Generate pan.c with -DDUMP
+        subprocess.run(["spin", "-a", "-DDUMP", contract_path], cwd=output_dir, capture_output=True, timeout=30)
+        
+        # 2. Compile pan.c
+        subprocess.run(["gcc", "-o", "pan", "pan.c"], cwd=output_dir, capture_output=True, timeout=30)
+        
+        # 3. Run pan to get dump
+        with open(os.path.join(output_dir, "pan.dump"), "w") as f:
+            subprocess.run(["./pan"], cwd=output_dir, stdout=f, timeout=60)
+            
+        # 4. Run SpinSpider
+        graph_file = os.path.join(output_dir, "state_space.dot")
+        with open(graph_file, "w") as f:
+            subprocess.run(["spinspider", "pan.dump"], cwd=output_dir, stdout=f, timeout=30)
+            
+        # 5. Convert to PNG
+        png_file = os.path.join(output_dir, "state_space.png")
+        subprocess.run(["dot", "-Tpng", graph_file, "-o", png_file], cwd=output_dir, timeout=30)
+        
+        if os.path.exists(png_file):
+            return {
+                "status": "completed",
+                "success": True,
+                "tool": "spinspider",
+                "message": "State space graph generated successfully",
+                "artifact": "state_space.png"
+            }
+        return {"status": "error", "message": "Failed to generate PNG image"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def run_idot(contract_path, output_dir):
+    """Run iDot visualizer (generates DOT output)."""
+    try:
+        graph_file = os.path.join(output_dir, "idot_graph.dot")
+        with open(graph_file, "w") as f:
+            subprocess.run(["idot", contract_path], cwd=output_dir, stdout=f, timeout=30)
+            
+        if os.path.exists(graph_file):
+            return {
+                "status": "completed",
+                "success": True,
+                "tool": "idot",
+                "message": "iDot graph generated",
+                "artifact": "idot_graph.dot"
+            }
+        return {"status": "error", "message": "Failed to generate iDot graph"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def run_erigone(contract_path, output_dir):
+    """Execute Erigone model checker."""
+    try:
+        result = subprocess.run(
+            ["erigone", contract_path],
+            cwd=output_dir,
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+        return {
+            "status": "completed" if result.returncode == 0 else "failed",
+            "success": result.returncode == 0,
+            "tool": "erigone",
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "returncode": result.returncode
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 def run_verus(contract_path, output_dir):
     """Execute Verus verifier."""

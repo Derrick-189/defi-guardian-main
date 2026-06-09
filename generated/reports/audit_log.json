@@ -1,5 +1,117 @@
 [
   {
+    "id": "0712ffe2",
+    "timestamp": "2026-06-09 17:42:22",
+    "tool": "SPIN",
+    "file": "test_contract.rs",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_174222.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }\n\nltl invariant_balance { [] (balance >= 0) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
+    "id": "a8e31f78",
+    "timestamp": "2026-06-09 17:41:55",
+    "tool": "SPIN",
+    "file": "defi_vault.rs",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_174155.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }\n\nltl invariant_balance { [] (balance >= 0) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
+    "id": "2b57070d",
+    "timestamp": "2026-06-09 17:35:21",
+    "tool": "SPIN",
+    "file": "ERC20Fixed.sol",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_173521.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }\n\nltl invariant_balance { [] (balance >= 0) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
+    "id": "43cdfed2",
+    "timestamp": "2026-06-09 17:34:54",
+    "tool": "SPIN",
+    "file": "ERC20.sol",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_173454.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }\n\nltl invariant_balance { [] (balance >= 0) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
+    "id": "08b14887",
+    "timestamp": "2026-06-09 17:34:07",
+    "tool": "SPIN",
+    "file": "creusot_test.rs",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_173407.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }\n\nltl invariant_balance { [] (balance >= 0) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
+    "id": "9a3afcda",
+    "timestamp": "2026-06-09 17:33:35",
+    "tool": "SPIN",
+    "file": "test_vault.sol",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_173335.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
+    "id": "6c8150e2",
+    "timestamp": "2026-06-09 17:29:12",
+    "tool": "SPIN",
+    "file": "SimpleLending.sol",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260609_172911.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
     "id": "86686b9a",
     "timestamp": "2026-06-08 19:19:57",
     "tool": "LEAN",
@@ -1484,118 +1596,6 @@
       "states": 0,
       "transitions": 0,
       "depth": 0,
-      "error_msg": ""
-    }
-  },
-  {
-    "id": "65083fd4",
-    "timestamp": "2026-05-08 21:00:52",
-    "tool": "LEAN",
-    "file": "user_lending.rs",
-    "status": "SUCCESS",
-    "log_path": "/home/slade/defi_guardian/logs/lean/lean_verification_20260508_210052.log",
-    "trace_path": "",
-    "specs": "-- Lean 4 Formal Verification\n-- Contract: user_lending\n-- Generated by DeFi Guardian\n-- Lean version: 4.29.1 (no imports needed)\n\n-- State variables extracted from Promela model\ndef lock : Nat := 0\ndef state : Nat := 0\ndef balance : Nat := 0\n\n-- Core safety theorem: balance is non-negative\ntheorem balance_non_negative (b : Nat) : b \u2265 0 := Nat.zero_le b\n\n-- Reentrancy guard model\ndef lock_after_op (locked : Bool) : Bool :=\n  if locked then locked else true\n\ntheorem lock_acquired (locked : Bool) (h : locked = false) :\n    lock_after_op locked = true := by\n  simp [lock_after_op, h]\n\n-- LTL property: safety_no_overflow\n-- Formula: [] (balance >= 0 && balance <= 1000000)\ntheorem ltl_safety_no_overflow : (balance \u2265 0 \u2227 balance \u2264 1000000) := by\n  native_decide\n\n-- LTL property: invariant_balance\n-- Formula: [] (balance >= 0)\ntheorem ltl_invariant_balance : (balance \u2265 0) := by\n  native_decide\n\n#check balance_non_negative\n#check lock_acquired",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
-      "error_msg": ""
-    }
-  },
-  {
-    "id": "086bba55",
-    "timestamp": "2026-05-08 20:59:55",
-    "tool": "COQ",
-    "file": "user_lending.rs",
-    "status": "FAILED",
-    "log_path": "/home/slade/defi_guardian/logs/coq/coq_verification_20260508_205955.log",
-    "trace_path": "",
-    "specs": "(*\n    Coq Formal Verification Script\n    Generated from: translated_output.pml\n    Contract/Process: user_lending\n    Generated by DeFi Guardian\n*)\n\nRequire Import Coq.Arith.Arith.\nRequire Import Coq.Bool.Bool.\nRequire Import Coq.Lists.List.\nRequire Import Lia.\n\n(* === Contract State Definition ===\n   Extracted from Promela proctype: Program\n   State variables: 3\n*)\n\nRecord ContractState : Type := mkState {\n    lock : nat;  (* Promela: int = 0 *)\n    state : nat;  (* Promela: int = 0 *)\n    balance : nat  (* Promela: int = 0 *)\n}.\n\n(* === Initial State (from Promela initial values) === *)\nDefinition initial_state : ContractState :=\n  {| \n    lock := 0;\n    state := 0;\n    balance := 0\n  |}.\n\n(* === LTL Properties from Promela (3 found) === *)\n\n(* LTL: ltl safety_no_overflow {[] (balance >= 0 && balance <= 1000000)} *)\nDefinition ltl_safety_no_overflow (s : ContractState) : Prop :=\n    ((balance s) >= 0 /\\ (balance s) <= 1000000).\n\n(* LTL: ltl liveness_progress {<> (state == 1)} *)\nDefinition ltl_liveness_progress (s : ContractState) : Prop :=\n    ((state s) = 1).\n\n(* LTL: ltl invariant_balance {[] (balance >= 0)} *)\nDefinition ltl_invariant_balance (s : ContractState) : Prop :=\n    ((balance s) >= 0).\n\n(* ========================================\n   VERIFIED PROPERTIES\n   ======================================== *)\n\n(* Property 1: All state values are non-negative (safety) *)\nTheorem all_values_non_negative :\n    forall (s : ContractState),\n    (lock s) >= 0 /\\     (state s) >= 0 /\\     (balance s) >= 0.\nProof.\n    intros s.\n    repeat split; apply Nat.le_0_l.\nQed.\n\n(* Property 2: LTL - safety_no_overflow *)\n(* Formula: [] (balance >= 0 && balance <= 1000000) *)\nTheorem ltl_safety_no_overflow_holds :\n    ltl_safety_no_overflow initial_state.\nProof.\n    unfold ltl_safety_no_overflow, initial_state.\n    simpl.\n    try (compute; auto).\n    try lia.\nQed.\n\n(* Property 3: LTL - liveness_progress *)\n(* Formula: <> (state == 1) *)\nTheorem ltl_liveness_progress_holds :\n    ltl_liveness_progress initial_state.\nProof.\n    unfold ltl_liveness_progress, initial_state.\n    simpl. try (compute; auto). try lia.\nQed.\n\n(* Property 4: LTL - invariant_balance *)\n(* Formula: [] (balance >= 0) *)\nTheorem ltl_invariant_balance_holds :\n    ltl_invariant_balance initial_state.\nProof.\n    unfold ltl_invariant_balance, initial_state.\n    simpl.\n    try (compute; auto).\n    try lia.\nQed.\n\n\n(* ========================================\n   VERIFICATION SUMMARY\n   ========================================\n   Contract: user_lending\n   State Variables: 3\n   LTL Properties: 3\n   Assertions: 0\n   Admitted Proofs: 3\n   \n   NOTE: Admitted proofs require manual verification.\n   Replace 'admit' with actual proof tactics based on\n   your contract's specific business logic.\n   ======================================== *)\n",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
-      "error_msg": "File \"/tmp/tmp0yo9z9ml.v\", line 35, characters 0-113:\nWarning: To avoid stack overflow, large numbers in nat are interpreted as\napplications of Init.Nat.of_num_uint. [abstract-large-number,numbers,def"
-    }
-  },
-  {
-    "id": "f2bb0030",
-    "timestamp": "2026-05-08 20:59:13",
-    "tool": "SPIN",
-    "file": "user_lending.rs",
-    "status": "SUCCESS",
-    "log_path": "/home/slade/defi_guardian/logs/spin/spin_verification_20260508_205913.log",
-    "trace_path": "",
-    "specs": "ltl safety_no_overflow { [] (balance >= 0 && balance <= 1000000) }\n\nltl liveness_progress { <> (state == 1) }\n\nltl invariant_balance { [] (balance >= 0) }",
-    "details": {
-      "states": 5,
-      "transitions": 6,
-      "depth": 11,
-      "error_msg": ""
-    }
-  },
-  {
-    "id": "c6ea91b6",
-    "timestamp": "2026-05-08 20:34:28",
-    "tool": "CREUSOT",
-    "file": "defi_vault.rs",
-    "status": "FAILED",
-    "log_path": "/home/slade/defi_guardian/logs/rust_tools/creusot_verification_20260508_203428.log",
-    "trace_path": "",
-    "specs": "",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
-      "error_msg": "    Updating crates.io index\n   Compiling autocfg v1.5.0\n   Compiling proc-macro2 v1.0.106\n   Compiling libc v0.2.186\n   Compiling quote v1.0.45\n   Compiling unicode-ident v1.0.24\n   Compiling getrand"
-    }
-  },
-  {
-    "id": "6e644876",
-    "timestamp": "2026-05-08 20:32:44",
-    "tool": "LEAN",
-    "file": "defi_vault.rs",
-    "status": "SUCCESS",
-    "log_path": "/home/slade/defi_guardian/logs/lean/lean_verification_20260508_203244.log",
-    "trace_path": "",
-    "specs": "-- Lean 4 Formal Verification\n-- Contract: defi_vault\n-- Generated by DeFi Guardian\n-- Lean version: 4.29.1 (no imports needed)\n\n-- State variables extracted from Promela model\ndef lock : Nat := 0\ndef state : Nat := 0\ndef balance : Nat := 0\n\n-- Core safety theorem: balance is non-negative\ntheorem balance_non_negative (b : Nat) : b \u2265 0 := Nat.zero_le b\n\n-- Reentrancy guard model\ndef lock_after_op (locked : Bool) : Bool :=\n  if locked then locked else true\n\ntheorem lock_acquired (locked : Bool) (h : locked = false) :\n    lock_after_op locked = true := by\n  simp [lock_after_op, h]\n\n-- LTL property: safety_no_overflow\n-- Formula: [] (balance >= 0 && balance <= 1000000)\ntheorem ltl_safety_no_overflow : (balance \u2265 0 \u2227 balance \u2264 1000000) := by\n  native_decide\n\n-- LTL property: invariant_balance\n-- Formula: [] (balance >= 0)\ntheorem ltl_invariant_balance : (balance \u2265 0) := by\n  native_decide\n\n#check balance_non_negative\n#check lock_acquired",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
-      "error_msg": ""
-    }
-  },
-  {
-    "id": "65c40fc9",
-    "timestamp": "2026-05-08 20:32:26",
-    "tool": "COQ",
-    "file": "defi_vault.rs",
-    "status": "FAILED",
-    "log_path": "/home/slade/defi_guardian/logs/coq/coq_verification_20260508_203226.log",
-    "trace_path": "",
-    "specs": "(*\n    Coq Formal Verification Script\n    Generated from: translated_output.pml\n    Contract/Process: defi_vault\n    Generated by DeFi Guardian\n*)\n\nRequire Import Coq.Arith.Arith.\nRequire Import Coq.Bool.Bool.\nRequire Import Coq.Lists.List.\nRequire Import Lia.\n\n(* === Contract State Definition ===\n   Extracted from Promela proctype: Program\n   State variables: 3\n*)\n\nRecord ContractState : Type := mkState {\n    lock : nat;  (* Promela: int = 0 *)\n    state : nat;  (* Promela: int = 0 *)\n    balance : nat  (* Promela: int = 0 *)\n}.\n\n(* === Initial State (from Promela initial values) === *)\nDefinition initial_state : ContractState :=\n  {| \n    lock := 0;\n    state := 0;\n    balance := 0\n  |}.\n\n(* === LTL Properties from Promela (3 found) === *)\n\n(* LTL: ltl safety_no_overflow {[] (balance >= 0 && balance <= 1000000)} *)\nDefinition ltl_safety_no_overflow (s : ContractState) : Prop :=\n    ((balance s) >= 0 /\\ (balance s) <= 1000000).\n\n(* LTL: ltl liveness_progress {<> (state == 1)} *)\nDefinition ltl_liveness_progress (s : ContractState) : Prop :=\n    ((state s) = 1).\n\n(* LTL: ltl invariant_balance {[] (balance >= 0)} *)\nDefinition ltl_invariant_balance (s : ContractState) : Prop :=\n    ((balance s) >= 0).\n\n(* ========================================\n   VERIFIED PROPERTIES\n   ======================================== *)\n\n(* Property 1: All state values are non-negative (safety) *)\nTheorem all_values_non_negative :\n    forall (s : ContractState),\n    (lock s) >= 0 /\\     (state s) >= 0 /\\     (balance s) >= 0.\nProof.\n    intros s.\n    repeat split; apply Nat.le_0_l.\nQed.\n\n(* Property 2: LTL - safety_no_overflow *)\n(* Formula: [] (balance >= 0 && balance <= 1000000) *)\nTheorem ltl_safety_no_overflow_holds :\n    ltl_safety_no_overflow initial_state.\nProof.\n    unfold ltl_safety_no_overflow, initial_state.\n    simpl.\n    try (compute; auto).\n    try lia.\nQed.\n\n(* Property 3: LTL - liveness_progress *)\n(* Formula: <> (state == 1) *)\nTheorem ltl_liveness_progress_holds :\n    ltl_liveness_progress initial_state.\nProof.\n    unfold ltl_liveness_progress, initial_state.\n    simpl. try (compute; auto). try lia.\nQed.\n\n(* Property 4: LTL - invariant_balance *)\n(* Formula: [] (balance >= 0) *)\nTheorem ltl_invariant_balance_holds :\n    ltl_invariant_balance initial_state.\nProof.\n    unfold ltl_invariant_balance, initial_state.\n    simpl.\n    try (compute; auto).\n    try lia.\nQed.\n\n\n(* ========================================\n   VERIFICATION SUMMARY\n   ========================================\n   Contract: defi_vault\n   State Variables: 3\n   LTL Properties: 3\n   Assertions: 0\n   Admitted Proofs: 3\n   \n   NOTE: Admitted proofs require manual verification.\n   Replace 'admit' with actual proof tactics based on\n   your contract's specific business logic.\n   ======================================== *)\n",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
-      "error_msg": "File \"/tmp/tmp_roo87j_.v\", line 35, characters 0-113:\nWarning: To avoid stack overflow, large numbers in nat are interpreted as\napplications of Init.Nat.of_num_uint. [abstract-large-number,numbers,def"
-    }
-  },
-  {
-    "id": "aba66beb",
-    "timestamp": "2026-05-08 20:31:15",
-    "tool": "SPIN",
-    "file": "defi_vault.rs",
-    "status": "SUCCESS",
-    "log_path": "/home/slade/defi_guardian/logs/spin/spin_verification_20260508_203115.log",
-    "trace_path": "",
-    "specs": "ltl safety_no_overflow { [] (balance >= 0 && balance <= 1000000) }\n\nltl liveness_progress { <> (state == 1) }\n\nltl invariant_balance { [] (balance >= 0) }",
-    "details": {
-      "states": 5,
-      "transitions": 6,
-      "depth": 11,
       "error_msg": ""
     }
   }

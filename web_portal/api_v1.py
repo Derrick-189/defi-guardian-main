@@ -55,7 +55,14 @@ def _get_verif_url():
 
     host = request.headers.get("Host", "127.0.0.1")
     if any(local in host for local in ["localhost", "127.0.0.1"]):
-        return "http://127.0.0.1:9000"
+        # Try to find the active desktop app port
+        import socket
+        for port in [5005, 5009, 5006, 9000, 9005]:
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=0.1):
+                    return f"http://127.0.0.1:{port}"
+            except: continue
+        return "http://127.0.0.1:5005"
     return os.environ.get("REMOTE_VERIFICATION_URL", "http://127.0.0.1:9000")
 
 def _get_verif_headers():
@@ -346,8 +353,8 @@ def streamlit_start():
     kill_stale_streamlit()
     
     try:
-        # root app.py is PROJECT_DIR / "app.py"
-        cmd = [sys.executable, "-m", "streamlit", "run", str(PROJECT_DIR / "app.py"), 
+        # Use the new modular analytics suite
+        cmd = [sys.executable, "-m", "streamlit", "run", str(PROJECT_DIR / "analytics" / "main.py"), 
                "--server.port", "8501", "--server.address", "0.0.0.0", "--server.headless", "true"]
         _streamlit_proc = subprocess.Popen(cmd, cwd=str(PROJECT_DIR))
         return jsonify({"status": "starting"})
@@ -1178,6 +1185,9 @@ def _check_tool_available(tool: str) -> bool:
         "CREUSOT": ["cargo", "creusot", "--version"],
     }
 
+    if tool == "CERTORA":
+        return True
+        
     for binary in PRIMARY.get(tool, []):
         if shutil.which(binary):
             return True
@@ -1434,7 +1444,7 @@ def api_dashboard_summary():
         desktop_count = base.filter(AuditHistory.user_id.is_(None)).count()
 
         # Count actually available tools from the system
-        TOOLS = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS"]
+        TOOLS = ["SPIN", "COQ", "LEAN", "CERTORA", "KANI", "PRUSTI", "CREUSOT", "VERUS", "ERIGONE", "SPINSPIDER", "IDOT"]
         installed_count = sum(1 for t in TOOLS if _check_tool_available(t))
 
         return jsonify({

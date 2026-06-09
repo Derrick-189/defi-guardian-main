@@ -3,8 +3,9 @@
 
 /* === SYSTEM STATE VARIABLES === */
 bool lock = false;
-int totalVaultBalance = 1000;
-int balances[2];
+int _totalSupply = 0;
+int _owner = 0;
+int _balances[2];
 int amount = 10;
 int user_collateral = 5000;
 int user_debt = 3000;
@@ -29,7 +30,8 @@ ltl fairness { [] <> (lock == false) }
 ltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }
 
 /* === EXTRACTED PROPERTIES FROM SOURCE === */
-/* Precondition: balances[1] >= amount */
+/* Precondition: _owner == 1 */
+/* Precondition: amount <= _balances[1] */
 /* Precondition: 1 == 1 */
 
 /* === MAIN CONTRACT PROCESS === */
@@ -47,6 +49,21 @@ active proctype Contract() {
             assert(user_collateral >= 0);
             assert(user_debt >= 0);
             assert(price_eth > 0);
+            /* invariant (guarded): 
+            currentAllowance >= amount */
+            /* invariant (guarded): 
+            currentAllowance >= subtractedValue */
+            assert(sender != address(0); /* Business logic invariant */
+            assert(recipient != address(0); /* Business logic invariant */
+            /* invariant (guarded): 
+            senderBalance >= amount */
+            assert(account != address(0); /* Business logic invariant */
+            assert(account != address(0); /* Business logic invariant */
+            /* invariant (guarded): accountBalance >= amount */
+            assert(owner != address(0); /* Business logic invariant */
+            assert(spender != address(0); /* Business logic invariant */
+            assert(msg.value > amount); /* Business logic invariant */
+            assert(to != address(this); /* Business logic invariant */
             
             /* === STATE UPDATE === */
             health_factor = calculate_health_factor;

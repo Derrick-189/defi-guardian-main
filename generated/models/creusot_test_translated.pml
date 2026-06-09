@@ -5,12 +5,11 @@
 int lock = 0;
 byte state = 0;
 int balance = 0;
-int user_balance = 0;
 
 /* === LTL PROPERTIES === */
-
-
-
+ltl safety_no_overflow { [] (balance >= 0 && balance <= 1000000) }
+ltl liveness_progress { <> (state == 1) }
+ltl invariant_balance { [] (balance >= 0) }
 
 /* === MAIN PROCESS === */
 active proctype Program() {
@@ -44,23 +43,3 @@ active proctype Program() {
         }
     od
 }
-
-
-/* === CUSTOM SPECIFICATIONS === */
-ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }
-
-ltl safety_reentrancy { [] !(lock && amount > 100) }
-
-ltl liveness_progress { <> (state == 2) }
-
-ltl invariant_collateral { [] (user_collateral >= user_debt) }
-
-ltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }
-
-ltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }
-
-ltl fairness { [] <> (lock == false) }
-
-ltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }
-
-ltl invariant_balance { [] (balance >= 0) }

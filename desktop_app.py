@@ -1180,7 +1180,30 @@ except ImportError:
                 json.dump(state, f, indent=2)
             return True
 
-# Import translators
+# ── Path setup for verification tools ────────────────────────────────────────
+def _augment_path():
+    from pathlib import Path
+    home = Path.home()
+    extra_paths = [
+        str(home / ".elan" / "bin"),
+        str(home / ".cargo" / "bin"),
+        str(home / ".opam" / "default" / "bin"),
+        str(home / ".local" / "bin"),
+        str(home / "Library/Python/3.9/bin"),
+        "/usr/local/bin",
+        "/opt/verus",
+        "/usr/bin",
+        "/bin"
+    ]
+    current_path = os.environ.get("PATH", "")
+    for p in extra_paths:
+        if p not in current_path:
+            current_path = f"{p}{os.pathsep}{current_path}"
+    os.environ["PATH"] = current_path
+
+_augment_path()
+
+# ── Import translators ───────────────────────────────────────────────────────
 try:
     from translator import DeFiTranslator, VerifiedTranslator
 except ImportError:
@@ -1671,7 +1694,7 @@ class FormalVerifierApp(ctk.CTk):
         self._sidebar_section("FORMAL VERIFICATION")
 
         self.verify_btn = self._sidebar_item_button(
-            "Run SPIN (Promela)", self.run_verification,
+            "Run SPIN Verification", self.run_verification,
             icon="▶", tag="spin", state="disabled"
         )
         self.stop_spin_btn = self._sidebar_stop_button("spin")
@@ -1683,7 +1706,7 @@ class FormalVerifierApp(ctk.CTk):
         self.stop_erigone_btn = self._sidebar_stop_button("erigone")
 
         self.verify_with_certora_btn = self._sidebar_item_button(
-            "Verify with Certora", self.verify_with_certora, icon="⬡", tag="certora"
+            "Run Certora Prover", self.verify_with_certora, icon="⬡", tag="certora"
         )
         self.stop_certora_btn = self._sidebar_stop_button("certora")
 
@@ -2314,14 +2337,32 @@ class FormalVerifierApp(ctk.CTk):
         """Update UI elements when a new file is loaded"""
         if self.current_file:
             filename = os.path.basename(self.current_file)
+            ext = os.path.splitext(filename)[1].lower()
+            
             if hasattr(self, 'file_label'):
                 self.file_label.configure(text=f"  {filename}", text_color=self.theme.ACCENT)
             elif hasattr(self, 'file_info'):
                 self.file_info.configure(text=f"  {filename}", text_color=self.theme.ACCENT)
 
+            # SPIN works for all supported types (via translation)
             self.verify_btn.configure(state="normal")
+            
+            # Certora only for Solidity
+            if hasattr(self, 'verify_with_certora_btn'):
+                state = "normal" if ext == '.sol' else "disabled"
+                self.verify_with_certora_btn.configure(state=state)
+                
+            # Erigone for Promela/Solidity
             if hasattr(self, 'erigone_btn'):
                 self.erigone_btn.configure(state="normal")
+                
+            # Rust specific tools
+            rust_state = "normal" if ext == '.rs' else "disabled"
+            if hasattr(self, 'kani_btn'): self.kani_btn.configure(state=rust_state)
+            if hasattr(self, 'prusti_btn'): self.prusti_btn.configure(state=rust_state)
+            if hasattr(self, 'creusot_btn'): self.creusot_btn.configure(state=rust_state)
+            if hasattr(self, 'verus_btn'): self.verus_btn.configure(state=rust_state)
+            
             self.status_label.configure(text=f"Loaded: {filename}")
 
     def load_file_to_editor(self, file_path):
@@ -3270,10 +3311,26 @@ Ready for verification!
             messagebox.showwarning("No File", "Please load a file first.")
             return
 
+        # Force save current editor content to disk before running verification
+        # to ensure SPIN and other tools see the latest changes.
+        try:
+            content = self.source_editor.get("1.0", "end-1c")
+            if content.strip():
+                with open(self.current_file, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                self.console.insert("end", f"ℹ️ Auto-saved changes to {os.path.basename(self.current_file)}\n", "dim")
+        except Exception as e:
+            self.console.insert("end", f"⚠️ Auto-save failed: {e}\n", "warning")
+
         def verify():
-            self.verify_btn.configure(state="disabled", text="VERIFYING...")
+            self.verify_btn.configure(state="disabled", text="RUNNING SPIN...")
             self.set_tool_running("spin", True)
             self.status_label.configure(text="Running SPIN verification...")
+
+            # === PIPELINE DIAGNOSTIC: ENSURE FRESH CONTENT ===
+            source_content = self.source_editor.get("1.0", "end-1c")
+            self.console.insert("end", f"DEBUG: Reading model directly from editor instance (length: {len(source_content)})\n", "dim")
+            # =================================================
 
             self.console.insert("end", "\nRUNNING SPIN VERIFICATION\n", "header")
             self.console.insert("end", f"Model: {os.path.basename(self.current_file)}\n", "dim")
@@ -3283,9 +3340,12 @@ Ready for verification!
                 self.console.see("end")
 
             try:
-                # Read source file
-                with open(self.current_file, 'r') as src:
-                    content = src.read()
+                # === MODIFIED: USE EDITOR CONTENT INSTEAD OF DISK ===
+                content = self.source_editor.get("1.0", "end-1c")
+                if not content.strip() and self.current_file:
+                    with open(self.current_file, 'r') as src:
+                        content = src.read()
+                # ====================================================
 
                 translated_content = None
                 translated_path = None
@@ -3634,25 +3694,6 @@ Ready for verification!
                             self.console.insert("end", "\nCounterexample preview:\n")
                             self.console.insert("end", trail_content + "\n")
 
-                # Save results for dashboard
-                VerificationState.save_result(
-                    success,
-                    verify_result.stdout,
-                    verify_result.stderr,
-                    os.path.basename(self.current_file),
-                    ltl_results
-                )
-
-                # Copy to project root for unified access
-                try:
-                    state_file_src = os.path.join(REPORTS_DIR, "verification_state.json")
-                    state_file_dest = os.path.join(PROJECT_DIR, "verification_state.json")
-                    if os.path.exists(state_file_src):
-                        import shutil
-                        shutil.copy2(state_file_src, state_file_dest)
-                except:
-                    pass
-
                 self.console.insert("end", "\n[5/5] Verification results saved to verification_state.json\n")
 
                 # Export state graph for 3D visualization - THIS MUST HAPPEN
@@ -3674,7 +3715,7 @@ Ready for verification!
 
             if self.auto_scroll_enabled:
                 self.console.see("end")
-            self.verify_btn.configure(state="normal", text="🚀 RUN SPIN VERIFICATION")
+            self.verify_btn.configure(state="normal", text="Run SPIN Verification")
             self.set_tool_running("spin", False)
 
             # Cleanup
@@ -3912,6 +3953,8 @@ Ready for verification!
             'states_stored': result.get('states_stored', 0),
             'transitions': result.get('transitions', 0),
             'depth': result.get('depth', 0),
+            'job_url': result.get('job_url', ''),
+            'spec_content': result.get('spec_content', ''),
         }
 
         # Also update overall verification info if this is SPIN
@@ -4066,6 +4109,14 @@ Ready for verification!
         if not self.current_file:
             self.console.insert("end", "No file selected\n", "error")
             return
+
+        # Force save current editor content to disk
+        try:
+            content = self.source_editor.get("1.0", "end-1c")
+            if content.strip():
+                with open(self.current_file, 'w', encoding='utf-8') as f:
+                    f.write(content)
+        except Exception: pass
 
         self.coq_btn.configure(state="disabled", text="Running Coq...")
 
@@ -4325,9 +4376,12 @@ Ready for verification!
 
         def run_prusti():
             try:
-                # Read the user's Rust source first (same path as the open editor file).
-                with open(self.current_file, 'r', encoding="utf-8") as f:
-                    rust_code = f.read()
+                # === MODIFIED: USE EDITOR CONTENT INSTEAD OF DISK ===
+                rust_code = self.source_editor.get("1.0", "end-1c")
+                if not rust_code.strip() and self.current_file:
+                    with open(self.current_file, 'r', encoding="utf-8") as f:
+                        rust_code = f.read()
+                # ====================================================
 
                 self.after(0, lambda: self.console.insert(
                     "end",
@@ -4501,8 +4555,13 @@ Ready for verification!
                 self.after(0, lambda: self.console.insert("end",
                     "\n" + "="*60 + "\nCREUSOT VERIFICATION\n" + "="*60 + "\n"))
 
-                with open(self.current_file, 'r') as f:
-                    rust_code = f.read()
+                # === MODIFIED: USE EDITOR CONTENT INSTEAD OF DISK ===
+                rust_code = self.source_editor.get("1.0", "end-1c")
+                if not rust_code.strip() and self.current_file:
+                    with open(self.current_file, 'r') as f:
+                        rust_code = f.read()
+                # ====================================================
+
                 skip, reason = self._should_skip_tool("creusot", rust_code)
                 if skip:
                     self.after(0, lambda: self.console.insert(
@@ -4731,7 +4790,7 @@ Ready for verification!
              self.console.insert("end", "   If already set in your system, ensure it is exported to this IDE session.\n", "warning")
              self.console.insert("end", "   Attempting to run anyway...\n\n")
 
-         self.verify_with_certora_btn.configure(state="disabled", text="Running Certora...")
+         self.verify_with_certora_btn.configure(state="disabled", text="Running Certora Prover...")
          self.set_tool_running("certora", True)
 
          def run_certora():
@@ -4749,11 +4808,20 @@ Ready for verification!
                  contract_name = os.path.splitext(os.path.basename(self.current_file))[0]
                  dest_path = os.path.join(certora_dir, os.path.basename(self.current_file))
 
-                 import shutil
-                 if os.path.abspath(self.current_file) != os.path.abspath(dest_path):
-                     shutil.copy2(self.current_file, dest_path)
-                 self.after(0, lambda: self.console.insert("end",
-                     f"Contract copied to: {dest_path}\n"))
+                 # === MODIFIED: USE EDITOR CONTENT INSTEAD OF DISK ===
+                 editor_content = self.source_editor.get("1.0", "end-1c")
+                 if editor_content.strip():
+                     with open(dest_path, 'w', encoding="utf-8") as f:
+                         f.write(editor_content)
+                     self.after(0, lambda: self.console.insert("end",
+                         f"Contract updated from editor to: {dest_path}\n"))
+                 else:
+                     import shutil
+                     if os.path.abspath(self.current_file) != os.path.abspath(dest_path):
+                         shutil.copy2(self.current_file, dest_path)
+                     self.after(0, lambda: self.console.insert("end",
+                         f"Contract copied to: {dest_path}\n"))
+                 # ====================================================
 
                  # Check if spec file exists
                  spec_file = os.path.join(PROJECT_DIR, "certora", "specs", f"{contract_name}.spec")
@@ -4888,14 +4956,14 @@ Ready for verification!
                          self.console.insert("end", f"Log saved: {log_path}\n")
 
                      self.console.see("end")
-                     self.verify_with_certora_btn.configure(state="normal", text="VERIFY WITH CERTORA")
+                     self.verify_with_certora_btn.configure(state="normal", text="Run Certora Prover")
 
                  self.after(0, display)
 
              except subprocess.TimeoutExpired:
                  self.after(0, lambda: self.console.insert("end", "Certora timed out (10 min)\n"))
                  self.after(0, lambda: self.verify_with_certora_btn.configure(
-                     state="normal", text="VERIFY WITH CERTORA"))
+                     state="normal", text="Run Certora Prover"))
              except Exception as e:
                  self.after(0, lambda: self.console.insert("end", f"Certora error: {e}\n"))
                  self.after(0, lambda: self.verify_with_certora_btn.configure(
@@ -5238,8 +5306,13 @@ rule noUnexpectedRevert(method f) {{
                     "\n🦀 KANI VERIFICATION\n", "header"))
                 self.after(0, lambda: self.console.insert("end", "─"*60 + "\n", "dim"))
 
-                with open(self.current_file, 'r') as f:
-                    rust_code = f.read()
+                # === MODIFIED: USE EDITOR CONTENT INSTEAD OF DISK ===
+                rust_code = self.source_editor.get("1.0", "end-1c")
+                if not rust_code.strip() and self.current_file:
+                    with open(self.current_file, 'r') as f:
+                        rust_code = f.read()
+                # ====================================================
+
                 skip, reason = self._should_skip_tool("kani", rust_code)
                 if skip:
                     self.after(0, lambda: self.console.insert(
@@ -5342,8 +5415,12 @@ rule noUnexpectedRevert(method f) {{
 
         def run_verus():
             try:
-                with open(self.current_file, 'r', encoding="utf-8") as f:
-                    rust_code = f.read()
+                # === MODIFIED: USE EDITOR CONTENT INSTEAD OF DISK ===
+                rust_code = self.source_editor.get("1.0", "end-1c")
+                if not rust_code.strip() and self.current_file:
+                    with open(self.current_file, 'r', encoding="utf-8") as f:
+                        rust_code = f.read()
+                # ====================================================
 
                 self.after(0, lambda: self.console.insert(
                     "end",
