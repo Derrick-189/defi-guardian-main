@@ -913,15 +913,30 @@ def _build_counterexample_payload(row, audit_id_label):
                 ],
             }
 
-    # ── 8. Recommendations ────────────────────────────────────────────────
+    # ── 8. Determine actual status based on rules first ───────────────────
+    # Check if any rules are violated to determine the correct status
+    actual_status = row.status or "FAIL"
+    if rules:
+        has_violations = any(
+            (rule.get("status") or "").upper() in ("VIOLATED", "FAILED") or
+            rule.get("success") is False or
+            rule.get("errors", 0) > 0
+            for rule in rules
+        )
+        if has_violations:
+            actual_status = "FAIL"
+        else:
+            actual_status = "PASS"
+
+    # ── 9. Recommendations (using actual_status now) ──────────────────────
     recs = []
     if parser:
         try:
-            recs = parser.get_recommendations(row.status or "FAIL", log_content)
+            recs = parser.get_recommendations(actual_status, log_content)
         except Exception:
             recs = []
     if not recs:
-        overall = (row.status or "FAIL").upper()
+        overall = actual_status.upper()
         if overall == "PASS":
             recs = [f"All {tool} properties verified successfully."]
         else:
@@ -952,21 +967,6 @@ def _build_counterexample_payload(row, audit_id_label):
                 recs.append(f"🤖 [AI Security Invariant] Suggested safety check: {specs['invariants'][0]}")
         except Exception as e:
             print(f"DEBUG: AI Spec Recommendation failed: {e}")
-
-    # ── 9. Determine actual status based on rules ─────────────────────────
-    # Check if any rules are violated to determine the correct status
-    actual_status = row.status or "FAIL"
-    if rules:
-        has_violations = any(
-            (rule.get("status") or "").upper() in ("VIOLATED", "FAILED") or
-            rule.get("success") is False or
-            rule.get("errors", 0) > 0
-            for rule in rules
-        )
-        if has_violations:
-            actual_status = "FAIL"
-        else:
-            actual_status = "PASS"
 
     # ── 10. Assemble response ─────────────────────────────────────────────
     source_code = row.source_code or ""
@@ -1101,6 +1101,22 @@ def api_trace(audit_id):
             return jsonify({"error": "Invalid audit ID"}), 400
 
     if not row: return jsonify({"error": "Not found"}), 404
+
+    # Try stored trace data first (from verification_worker)
+    if row.trace_data:
+        try:
+            stored_trace = json.loads(row.trace_data)
+            if stored_trace and stored_trace.get("steps"):
+                return jsonify({
+                    "steps":           stored_trace.get("steps", []),
+                    "trace":           stored_trace.get("steps", []),
+                    "final_variables": stored_trace.get("final_variables", {}),
+                    "error_message":   stored_trace.get("error_message", ""),
+                    "tool":            row.tool_used,
+                    "warnings":        stored_trace.get("warnings", []),
+                })
+        except Exception:
+            pass
 
     from trace_parsers import get_parser
     parser = get_parser(row.tool_used)

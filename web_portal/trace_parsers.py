@@ -871,6 +871,9 @@ class CreusotParser(BaseParser):
 
 _PARSERS: dict[str, BaseParser] = {
     "SPIN":    SpinParser(),
+    "ERIGONE": SpinParser(),  # Erigone is SPIN-compatible
+    "SPINSPIDER": BaseParser(),
+    "IDOT": BaseParser(),
     "COQ":     CoqParser(),
     "LEAN":    LeanParser(),
     "CERTORA": CertoraParser(),
