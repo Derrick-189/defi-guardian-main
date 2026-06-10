@@ -1,6 +1,9 @@
 import os, requests, json
+from pathlib import Path
 from web_portal.audit_db import db, AuditHistory
 from flask import current_app
+
+PROJECT_DIR = Path(__file__).parent.parent
 
 # Make Celery optional: if Celery isn't installed, provide a synchronous
 # fallback decorator so the rest of the codebase doesn't crash on import.
@@ -119,7 +122,13 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
             else:
                 res_data["success"] = not res_data.get("counterexample_found", False)
 
-        has_failed = not res_data.get("success", True) or res_data.get("errors_count", 0) > 0
+        # Check ltl_results for failures
+        ltl_results = res_data.get("ltl_results", [])
+        if ltl_results:
+            has_failed = any(r.get("status") == "VIOLATED" or r.get("errors", 0) > 0 for r in ltl_results)
+        else:
+            has_failed = not res_data.get("success", True) or res_data.get("errors_count", 0) > 0
+            
         if res_data.get("status") in ("error", "failed", "timeout"):
             status = "ERROR"
         else:
@@ -127,12 +136,14 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
 
         
         audit.status = status
+        if ltl_results:
+            audit.ltl_properties = json.dumps(ltl_results)
         db.session.commit()
 
         # ── Sync Global State ──────────────────────────────────────────────────
         try:
-            # Absolute path for reliability
-            state_path = Path("/home/slade/defi-guardian-main/verification_state.json")
+            # Centralized project state path
+            state_path = PROJECT_DIR / "verification_state.json"
             
             # 1. Read the existing state file
             state = {}

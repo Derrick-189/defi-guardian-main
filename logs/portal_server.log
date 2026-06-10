@@ -141,7 +141,47 @@ we strongly recommend against using it for new projects.
 If you are already using Eventlet, we recommend migrating to a different1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other m1 RLock( * Debugger is active!
  * Debugger PIN: 457-663-341
 (175453) wsgi starting up on http://0.0.0.0:5001
+ * Detected change in '/home/slade/defi-guardian-main/verification_worker.py', reloading
+ * Restarting with watchdog (inotify)
+/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is curren/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other m1 RLock( * Debugger is active!
+ * Debugger PIN: 457-663-341
+(187378) wsgi starting up on http://0.0.0.0:5001
+ * Detected change in '/home/slade/defi-guardian-main/web_portal/app.py', reloading
+ * Restarting with watchdog (inotify)
+/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
+ * Debugger is active!
+ * Debugger PIN: 457-663-341
+(187969) wsgi starting up on http://0.0.0.0:5001
+ * Detected change in '/home/slade/defi-guardian-main/desktop_app.py', reloading
+ * Restarting with watchdog (inotify)
+/home/slade/defi-guardian-main/web_portal/app.py:2: EventletDeprecationWarning: 
+Eventlet is deprecated. It is curren/home/slade/defi-guardian-main/web_portal/app.py:2: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+1 RLock( * Debugger is active!
+ * Debugger PIN: 457-663-341
+(189219) wsgi starting up on http://0.0.0.0:5001
  other modules.
  * Debugger is active!
  * Debugger PIN: 457-663-341
-(175454) wsgi starting up on http://0.0.0.0:5001
+(189220) wsgi starting up on http://0.0.0.0:5001

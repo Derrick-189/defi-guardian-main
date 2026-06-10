@@ -4059,7 +4059,7 @@ Ready for verification!
 
     def update_tool_status_display(self):
         """Update the tool status display in sidebar"""
-        state_file = os.path.join(REPORTS_DIR, 'verification_state.json')
+        state_file = os.path.join(PROJECT_DIR, 'verification_state.json')
         if not os.path.exists(state_file):
             return
 
@@ -4084,7 +4084,7 @@ Ready for verification!
 
         def monitor():
             last_mtime = 0
-            state_file = os.path.join(REPORTS_DIR, "verification_state.json")
+            state_file = os.path.join(PROJECT_DIR, "verification_state.json")
 
             while self.monitoring:
                 if os.path.exists(state_file):

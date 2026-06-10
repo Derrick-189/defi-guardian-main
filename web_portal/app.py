@@ -1,13 +1,12 @@
+from __future__ import annotations
+import eventlet
+eventlet.monkey_patch()
+
 """
 DeFi Guardian — Web Portal v2
 Unified Flask application: portal + Streamlit dashboard features combined.
 Real-time data via SocketIO file-watcher + desktop event bridge.
 """
-from __future__ import annotations
-
-# ── Monkey Patching (Must be first) ──────────────────────────────────────────
-import eventlet
-eventlet.monkey_patch()
 
 import os, sys
 import json, re, time, threading, shutil

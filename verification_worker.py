@@ -99,22 +99,29 @@ def run_verification_job(job):
                 # For spin/certora etc which use counterexample_found
                 result["success"] = not result.get("counterexample_found", False)
 
-        # --- 1. Parse traces if a trail file was produced ---
+        # --- 1. Parse traces and rules if a parser is available ---
         trace_data = None
+        rules = []
         try:
             from web_portal.trace_parsers import get_parser
             parser = get_parser(tool)
-            if parser and result.get("trail_path") and Path(result["trail_path"]).exists():
-                parsed = parser.parse_trace(result.get("trail_path", ""), result.get("trail_path", ""))
-                if parsed:
-                    import json as _json
-                    parsed_payload = parsed.to_dict() if hasattr(parsed, "to_dict") else {"steps": []}
-                    trace_data = _json.dumps(parsed_payload)
-                    # Also save to physical file
-                    parsed_json_path = Path(output_dir) / "parsed_trace.json"
-                    with open(parsed_json_path, "w") as pf:
-                        _json.dump(parsed_payload, pf, indent=2)
-                    result["parsed_trace_path"] = str(parsed_json_path)
+            stdout = result.get("stdout", result.get("output", ""))
+            
+            if parser:
+                # Parse rules to determine status accurately
+                rules = parser.parse_rules(stdout)
+                
+                if result.get("trail_path") and Path(result["trail_path"]).exists():
+                    parsed = parser.parse_trace(result.get("trail_path", ""), result.get("trail_path", ""))
+                    if parsed:
+                        import json as _json
+                        parsed_payload = parsed.to_dict() if hasattr(parsed, "to_dict") else {"steps": []}
+                        trace_data = _json.dumps(parsed_payload)
+                        # Also save to physical file
+                        parsed_json_path = Path(output_dir) / "parsed_trace.json"
+                        with open(parsed_json_path, "w") as pf:
+                            _json.dump(parsed_payload, pf, indent=2)
+                        result["parsed_trace_path"] = str(parsed_json_path)
             
             # --- Generate state graph for SPIN ---
             if tool.lower() == "spin":
@@ -156,6 +163,9 @@ def run_verification_job(job):
         except Exception as pe:
             print(f"Trace parsing failed: {pe}")
 
+        if rules:
+            result["ltl_results"] = rules
+
         # --- 2. Persist result using SQLAlchemy (Supports Postgres/SQLite) ---
         with app.app_context():
             # Try to find by Job ID first
@@ -170,14 +180,23 @@ def run_verification_job(job):
                     status="PENDING"
                 ).order_by(AuditHistory.audit_date.desc()).first()
 
-            if audit:
-                # FIX: Check success or errors_count instead of missing counterexample_found
+            # Determine final status
+            if rules:
+                has_failed = any(r.get("status") == "VIOLATED" or r.get("errors", 0) > 0 for r in rules)
+            else:
                 has_failed = not result.get("success", True) or result.get("errors_count", 0) > 0
-                if result.get("status") in ("error", "failed", "timeout"):
-                    audit.status = "ERROR"
-                else:
-                    audit.status = "FAIL" if has_failed else "PASS"
-                
+
+            if result.get("status") in ("error", "failed", "timeout"):
+                final_status = "ERROR"
+            else:
+                final_status = "FAIL" if has_failed else "PASS"
+
+            if audit:
+                audit.status = final_status
+                if rules:
+                    import json as _json
+                    audit.ltl_properties = _json.dumps(rules)
+
                 audit.states_explored = result.get("states_stored", 0)
                 audit.transitions = result.get("transitions", 0)
                 audit.depth_reached = result.get("depth", 0)
@@ -202,20 +221,16 @@ def run_verification_job(job):
                 except Exception:
                     pass
 
-                has_failed = not result.get("success", True) or result.get("errors_count", 0) > 0
-                if result.get("status") in ("error", "failed", "timeout"):
-                    status = "ERROR"
-                else:
-                    status = "FAIL" if has_failed else "PASS"
-
+                import json as _json
                 audit = AuditHistory(
                     filename=Path(contract_path).name,
                     file_type=Path(contract_path).suffix or "",
                     tool_used=tool.upper(),
-                    status=status,
+                    status=final_status,
                     states_explored=result.get("states_stored", 0),
                     transitions=result.get("transitions", 0),
                     depth_reached=result.get("depth", 0),
+                    ltl_properties=_json.dumps(rules) if rules else "[]",
                     verification_output=result.get("stdout", result.get("output", ""))[:10000],
                     report_path=result.get("trail_path", "") or "",
                     trace_data=trace_data,

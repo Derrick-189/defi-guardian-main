@@ -370,34 +370,58 @@ def run_real_verification(tool, contract_path, spec_path, output_dir):
                 "output": f"Tool {tool.upper()} only supports Solidity files (.sol), but got {suffix}"
             }
 
+        result = None
         if tool == "spin":
-            return run_spin(contract_path, spec_path, output_dir)
+            result = run_spin(contract_path, spec_path, output_dir)
         elif tool == "spinspider":
-            return run_spinspider(contract_path, output_dir)
+            result = run_spinspider(contract_path, output_dir)
         elif tool == "idot":
-            return run_idot(contract_path, output_dir)
+            result = run_idot(contract_path, output_dir)
         elif tool == "erigone":
-            return run_erigone(contract_path, output_dir)
+            result = run_erigone(contract_path, output_dir)
         elif tool == "verus":
-            return run_verus(contract_path, output_dir)
+            result = run_verus(contract_path, output_dir)
         elif tool == "certora":
-            return run_certora(contract_path, spec_path, output_dir)
+            result = run_certora(contract_path, spec_path, output_dir)
         elif tool == "coq":
-            return run_coq(contract_path, output_dir)
+            result = run_coq(contract_path, output_dir)
         elif tool == "lean":
-            return run_lean(contract_path, output_dir)
+            result = run_lean(contract_path, output_dir)
         elif tool == "kani":
-            return run_kani(contract_path, output_dir)
+            result = run_kani(contract_path, output_dir)
         elif tool == "prusti":
-            return run_prusti(contract_path, output_dir)
+            result = run_prusti(contract_path, output_dir)
         elif tool == "creusot":
-            return run_creusot(contract_path, output_dir)
+            result = run_creusot(contract_path, output_dir)
         else:
-            return {
+            result = {
                 "status": "error",
                 "success": False,
                 "message": f"Unsupported tool: {tool}"
             }
+
+        # --- Post-process: Extract LTL results and determine status ---
+        if result and ("stdout" in result or "output" in result):
+            try:
+                from trace_parsers import get_parser
+                parser = get_parser(tool)
+                if parser:
+                    log_content = result.get("stdout", result.get("output", ""))
+                    ltl_results = parser.parse_rules(log_content)
+                    if ltl_results:
+                        result["ltl_results"] = ltl_results
+                        # Determine if any LTL property was violated
+                        has_violation = any(r.get("status") == "VIOLATED" or r.get("errors", 0) > 0 for r in ltl_results)
+                        if has_violation:
+                            result["counterexample_found"] = True
+                            result["success"] = False
+                        else:
+                            # If all LTL passed, we can say it's successful if no other error
+                            if result.get("status") == "completed" and not result.get("counterexample_found", False):
+                                result["success"] = True
+            except Exception: pass
+            
+        return result
     except subprocess.TimeoutExpired:
         return {
             "status": "timeout",
