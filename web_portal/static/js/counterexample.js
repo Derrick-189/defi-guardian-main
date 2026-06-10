@@ -137,11 +137,15 @@
     if (!container) return;
 
     if (!steps || steps.length === 0) {
+      let desc = "The verification passed without violations, or this tool does not generate a step-by-step trace. Check the Raw Output tab for full tool output.";
+      if (typeof _data !== 'undefined' && _data && (_data.status === "FAIL" || _data.status === "ERROR")) {
+        desc = "No trace steps available. The verification failed or encountered an error. Check the Raw Output tab for details.";
+      }
       container.innerHTML =
         '<div class="empty-state">' +
         '<span class="empty-state-icon">🔍</span>' +
         '<div class="empty-state-title">No trace steps</div>' +
-        '<div class="empty-state-desc">The verification passed without violations, or this tool does not generate a step-by-step trace. Check the Raw Output tab for full tool output.</div>' +
+        '<div class="empty-state-desc">' + desc + '</div>' +
         "</div>";
       return;
     }
@@ -356,6 +360,12 @@
       return;
     }
 
+    // Helper to sanitize labels for Mermaid to prevent syntax errors
+    function sanitizeMermaid(text) {
+      if (!text) return "";
+      return String(text).replace(/"/g, "'").replace(/[\n\r]/g, " ");
+    }
+
     // Build mermaid syntax
     let lines = ['stateDiagram-v2'];
     
@@ -378,7 +388,8 @@
         
         const id = String(nodeObj.id).replace(/[^a-zA-Z0-9_]/g, '');
         nodeIds.add(id);
-        lines.push(`    state "${nodeObj.label || nodeObj.id}" as ${id}`);
+        const safeLabel = sanitizeMermaid(nodeObj.label || nodeObj.id);
+        lines.push(`    state "${safeLabel}" as ${id}`);
         if (nodeObj.type === 'initial') lines.push(`    [*] --> ${id}`);
         if (nodeObj.type === 'error') lines.push(`    class ${id} failedState`);
       });
@@ -390,7 +401,8 @@
         const sid = String(sourceVal).replace(/[^a-zA-Z0-9_]/g, '');
         const tid = String(targetVal).replace(/[^a-zA-Z0-9_]/g, '');
         if (nodeIds.has(sid) && nodeIds.has(tid)) {
-          lines.push(`    ${sid} --> ${tid}${e.label ? ' : ' + e.label : ''}`);
+          const safeEdgeLabel = sanitizeMermaid(e.label);
+          lines.push(`    ${sid} --> ${tid}${safeEdgeLabel ? ' : ' + safeEdgeLabel : ''}`);
         }
       });
     } 
@@ -398,7 +410,7 @@
     else if (steps.length > 0) {
       lines.push('    [*] --> Step0');
       steps.forEach((step, i) => {
-        const label = step.action || step.label || `Step ${i}`;
+        const label = sanitizeMermaid(step.action || step.label || `Step ${i}`);
         lines.push(`    state "${label}" as Step${i}`);
         if (i < steps.length - 1) {
           lines.push(`    Step${i} --> Step${i+1}`);
