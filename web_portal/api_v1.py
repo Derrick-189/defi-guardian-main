@@ -445,7 +445,7 @@ def api_run():
     # ── Reset Global State for a Fresh Run ──────────────────────────────────
     # This prevents old "FAIL" or "PASS" statuses from appearing in the UI
     state = load_state()
-    TOOLS = ["spin", "coq", "lean", "certora", "kani", "prusti", "creusot", "verus"]
+    TOOLS = ["spin", "coq", "lean", "certora", "kani", "prusti", "creusot", "verus", "erigone", "spinspider", "idot"]
     for t in TOOLS:
         if t not in state:
             state[t] = {}
@@ -610,8 +610,10 @@ def _ensure_worker_running(app):
 @login_required
 def api_job_status(job_id):
     # Try to find by Audit ID first (for Celery-based runs)
+    audit = None
     try:
-        audit = AuditHistory.query.get(int(job_id))
+        audit_id = int(job_id)
+        audit = AuditHistory.query.get(audit_id)
         if audit:
             # Map AuditHistory status to frontend-expected status
             status_map = {
@@ -630,22 +632,10 @@ def api_job_status(job_id):
             })
     except (ValueError, TypeError):
         # job_id was not an integer audit id
-        # For the web new-run UI, return a JSON running payload instead of proxying.
-        return jsonify({"status": "running", "result": {}})
+        pass
 
-    # If no AuditHistory row exists for this audit id, don't proxy to the
-    # verification server (it can return HTML on errors/404). Return JSON.
-    if not audit:
-        return jsonify({"status": "running", "result": {}})
-
-    # Fallback to proxying to the verification server
-    verif_url = _get_verif_url()
-    try:
-        resp = requests.get(f"{verif_url}/job/{job_id}", headers=_get_verif_headers(), timeout=10)
-        resp.raise_for_status()
-        return jsonify(resp.json())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    # If no AuditHistory row exists for this audit id, return running status
+    return jsonify({"status": "running", "result": {}})
 
 
 @api_v1.route("/artifact/<job_id>/<filename>")
