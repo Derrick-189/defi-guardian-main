@@ -6617,8 +6617,19 @@ def api_save_file():
     main_app = globals().get('app') or getattr(sys.modules.get('__main__'), 'app', None)
     if not main_app:
         return jsonify({'status': 'error', 'message': 'App instance not initialized'}), 500
-    if not main_app.current_file:
-        return jsonify({'status': 'error', 'message': 'No file loaded'}), 400
+        
+    target_file = main_app.current_file
+    if not target_file:
+        custom_path = data.get('path')
+        if custom_path:
+            import os
+            basename = os.path.basename(custom_path)
+            target_file = os.path.join(PROJECT_DIR, basename)
+        else:
+            target_file = os.path.join(PROJECT_DIR, "scratch.sol")
+        main_app.current_file = target_file
+        with open(os.path.join(REPORTS_DIR, "active_file.txt"), "w") as f:
+            f.write(target_file)
         
     try:
         if content is not None:
@@ -6631,7 +6642,7 @@ def api_save_file():
             main_app.spec_editor.delete("1.0", "end")
             main_app.spec_editor.insert("1.0", specs)
             
-        return jsonify({'status': 'success'})
+        return jsonify({'status': 'success', 'path': target_file})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -6944,24 +6955,26 @@ def api_desktop_runs():
 @flask_app.route('/api/v1/portal/start')
 def api_start_portal():
     """API endpoint to trigger portal start from web UI"""
-    # This is a bit tricky as we need to access the app instance
-    # We'll use a global or find the instance
-    try:
-        # Check if portal is already up
-        import socket
-        with socket.create_connection(("localhost", 5001), timeout=0.5):
-            return jsonify({"status": "already_running", "url": "http://localhost:5001/dashboard"})
-    except:
-        pass
+    import socket
+    import time
+    
+    def is_up():
+        try:
+            with socket.create_connection(("localhost", 5001), timeout=0.5):
+                return True
+        except:
+            return False
+
+    if is_up():
+        return jsonify({"status": "already_running", "url": "http://localhost:5001/dashboard"})
         
-    # Trigger the background launch (we can't easily call app.open_account_dashboard() 
-    # without a reference, so we'll just re-implement the launch logic briefly)
     def _launch():
         try:
             web_portal_dir = os.path.join(PROJECT_DIR, 'web_portal')
             web_app_path = os.path.join(web_portal_dir, 'app.py')
             portal_log = os.path.join(LOGS_DIR, "portal_server.log")
             with open(portal_log, 'w') as log_f:
+                import subprocess
                 subprocess.Popen(
                     [sys.executable, '-u', web_app_path],
                     cwd=web_portal_dir,
@@ -6973,7 +6986,13 @@ def api_start_portal():
             pass
             
     threading.Thread(target=_launch, daemon=True).start()
-    return jsonify({"status": "starting", "url": "http://localhost:5001/dashboard"})
+    
+    for _ in range(30):
+        time.sleep(0.5)
+        if is_up():
+            return jsonify({"status": "started", "url": "http://localhost:5001/dashboard"})
+            
+    return jsonify({"status": "timeout", "url": "http://localhost:5001/dashboard"})
 
 @flask_app.route('/dashboard')
 def desktop_dashboard():

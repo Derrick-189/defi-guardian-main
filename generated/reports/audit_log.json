@@ -1,5 +1,21 @@
 [
   {
+    "id": "a58bd251",
+    "timestamp": "2026-06-10 14:34:58",
+    "tool": "SPIN",
+    "file": "scratch.sol",
+    "status": "SUCCESS",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260610_143458.log",
+    "trace_path": "",
+    "specs": "",
+    "details": {
+      "states": 3,
+      "transitions": 3,
+      "depth": 4,
+      "error_msg": ""
+    }
+  },
+  {
     "id": "0712ffe2",
     "timestamp": "2026-06-09 17:42:22",
     "tool": "SPIN",
@@ -1580,22 +1596,6 @@
       "states": 3,
       "transitions": 3,
       "depth": 5,
-      "error_msg": ""
-    }
-  },
-  {
-    "id": "add7383b",
-    "timestamp": "2026-05-08 21:00:58",
-    "tool": "KANI",
-    "file": "user_lending.rs",
-    "status": "SUCCESS",
-    "log_path": "/home/slade/defi_guardian/logs/rust_tools/kani_verification_20260508_210058.log",
-    "trace_path": "",
-    "specs": "",
-    "details": {
-      "states": 0,
-      "transitions": 0,
-      "depth": 0,
       "error_msg": ""
     }
   }

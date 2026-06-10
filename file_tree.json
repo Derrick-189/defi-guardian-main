@@ -4852,7 +4852,7 @@
               "type": "file",
               "icon": "file",
               "path": "web_portal/templates/desktop_app.html",
-              "size": 78847
+              "size": 80866
             },
             {
               "name": "index.html",
@@ -5977,7 +5977,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/api_v1.py",
-          "size": 72397
+          "size": 72735
         },
         {
           "name": "api_v1.py.bak",
@@ -6103,7 +6103,7 @@
           "type": "file",
           "icon": "python",
           "path": "web_portal/verification_server.py",
-          "size": 25291
+          "size": 28540
         },
         {
           "name": "verification_simulator.py",
@@ -6245,7 +6245,7 @@
       "type": "file",
       "icon": "python",
       "path": "desktop_app.py",
-      "size": 305235
+      "size": 306846
     },
     {
       "name": "desktop_bridge.py",
@@ -6308,7 +6308,7 @@
       "type": "file",
       "icon": "json",
       "path": "file_tree.json",
-      "size": 210985
+      "size": 213384
     },
     {
       "name": "fix_admin.py",
