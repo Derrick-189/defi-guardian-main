@@ -164,12 +164,11 @@ open_tab "5 - Health Check" "
   WP=\$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5001/ 2>/dev/null)
   [ \"\$WP\" = '200' ] && echo '✔ Web portal            OK  (port 5001)' || echo '✘ Web portal            FAILED'
 
-  # Check worker is alive (it writes to queue DB)
-  QUEUEDB=$PROJECT_DIR/web_portal/verification_queue.db
-  if [ -f \"\$QUEUEDB\" ]; then
-    echo '✔ Verification worker   OK  (queue DB exists)'
+  # Check worker is alive by looking for the process
+  if pgrep -f "verification_worker.py" > /dev/null; then
+    echo '✔ Verification worker   OK  (process is running)'
   else
-    echo '⚠ Verification worker   queue DB not yet created (normal if no job run yet)'
+    echo '✘ Verification worker   FAILED (process not found)'
   fi
 
   cd $PROJECT_DIR

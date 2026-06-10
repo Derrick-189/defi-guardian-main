@@ -505,11 +505,42 @@ def api_run():
             )
             os.makedirs(job_dir, exist_ok=True)
 
-            # Persist the contract text so the worker can find it
-            ext = os.path.splitext(filename)[1] or ".pml"
+            # --- NEW TRANSLATION LOGIC ---
+            final_content = contract_content
+            ext = os.path.splitext(filename)[1].lower() or ".pml"
+            is_sol = ext == '.sol' or 'contract ' in contract_content[:200].lower() or 'pragma solidity' in contract_content.lower()
+            is_rs = ext == '.rs' or 'fn main' in contract_content[:200]
+            
+            if tool.lower() == "spin" and (is_sol or is_rs):
+                try:
+                    import sys
+                    if str(PROJECT_DIR) not in sys.path:
+                        sys.path.insert(0, str(PROJECT_DIR))
+                    from translator import DeFiTranslator, VerifiedTranslator
+                    if is_sol:
+                        if VerifiedTranslator and hasattr(VerifiedTranslator, 'translate_with_proof'):
+                            final_content, _ = VerifiedTranslator().translate_with_proof(contract_content)
+                        else:
+                            final_content = DeFiTranslator.translate_solidity(contract_content)
+                    else:
+                        final_content = DeFiTranslator.translate_rust(contract_content)
+                    
+                    import re
+                    if spec_text:
+                        cleaned = re.sub(r'ltl\s+\w+\s*\{[^}]*\}', '', final_content, flags=re.DOTALL)
+                        final_content = cleaned + "\n\n/* === CUSTOM SPECIFICATIONS === */\n" + spec_text
+                        
+                    # ensure proper format
+                    final_content = re.sub(r'(?m)^(\s*(?:active\s+)?proctype\s+\w+)(?!\s*\()\s*\{', r'\1() {', final_content)
+                    ext = ".pml"
+                    filename = "contract_translated.pml"
+                except Exception as te:
+                    current_app.logger.error(f"Fallback translation failed: {te}")
+            # ------------------------------
+
             contract_path = os.path.join(job_dir, f"contract{ext}")
             with open(contract_path, "w", encoding="utf-8") as _cf:
-                _cf.write(contract_content)
+                _cf.write(final_content)
 
             # Persist the spec text if provided
             spec_path = None
