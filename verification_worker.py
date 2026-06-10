@@ -173,12 +173,15 @@ def run_verification_job(job):
             if audit:
                 # FIX: Check success or errors_count instead of missing counterexample_found
                 has_failed = not result.get("success", True) or result.get("errors_count", 0) > 0
-                audit.status = "FAIL" if has_failed else "PASS"
+                if result.get("status") in ("error", "failed", "timeout"):
+                    audit.status = "ERROR"
+                else:
+                    audit.status = "FAIL" if has_failed else "PASS"
                 
                 audit.states_explored = result.get("states_stored", 0)
                 audit.transitions = result.get("transitions", 0)
                 audit.depth_reached = result.get("depth", 0)
-                audit.verification_output = result.get("output", "")[:10000] # Using 'output' instead of 'stdout'
+                audit.verification_output = result.get("stdout", result.get("output", ""))[:10000]
                 audit.report_path = result.get("trail_path", "") or ""
                 audit.trace_data = trace_data
                 audit.job_id = job_id
@@ -200,15 +203,20 @@ def run_verification_job(job):
                     pass
 
                 has_failed = not result.get("success", True) or result.get("errors_count", 0) > 0
+                if result.get("status") in ("error", "failed", "timeout"):
+                    status = "ERROR"
+                else:
+                    status = "FAIL" if has_failed else "PASS"
+
                 audit = AuditHistory(
                     filename=Path(contract_path).name,
                     file_type=Path(contract_path).suffix or "",
                     tool_used=tool.upper(),
-                    status="FAIL" if has_failed else "PASS",
+                    status=status,
                     states_explored=result.get("states_stored", 0),
                     transitions=result.get("transitions", 0),
                     depth_reached=result.get("depth", 0),
-                    verification_output=result.get("output", "")[:10000],
+                    verification_output=result.get("stdout", result.get("output", ""))[:10000],
                     report_path=result.get("trail_path", "") or "",
                     trace_data=trace_data,
                     source_code=s_code,
@@ -294,6 +302,24 @@ def run_verification_job(job):
         error_result = {"status": "error", "message": str(e)}
         complete_job(job_id, error_result)
         print(f"Job {job_id} failed: {e}")
+        
+        # Also update AuditHistory so UI doesn't hang in PENDING
+        try:
+            with app.app_context():
+                audit = AuditHistory.query.filter_by(job_id=job_id).first()
+                if not audit:
+                    audit = AuditHistory.query.filter_by(
+                        filename=Path(job[3]).name,
+                        tool_used=job[2].upper(),
+                        status="PENDING"
+                    ).order_by(AuditHistory.audit_date.desc()).first()
+                
+                if audit:
+                    audit.status = "ERROR"
+                    audit.verification_output = f"Worker crashed: {str(e)}"
+                    db.session.commit()
+        except Exception as db_e:
+            print(f"Failed to update AuditHistory for failed job: {db_e}")
 
 def main():
     print("Starting DeFi Guardian Verification Worker...")

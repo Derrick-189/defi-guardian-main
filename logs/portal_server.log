@@ -36,7 +36,37 @@ https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
 1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any o1 RLock(s) wer * Debugger is active!
  * Debugger PIN: 457-663-341
 (51204) wsgi starting up on http://0.0.0.0:5001
-r modules.
+ * Detected change in '/home/slade/defi-guardian-main/verification_worker.py', reloading
+ * Detected change in '/home/slade/defi-guardian-main/verification_worker.py', reloading
+ * Restarting with watchdog (inotify)
+/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is /home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+frame1 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any o1 RLock(s) wer * Debugger is active!
+ * Debugger PIN: 457-663-341
+(67884) wsgi starting up on http://0.0.0.0:5001
+ * Detected * Debugger is active!
+ * Debugger PIN: 457-663-341
+(67883) wsgi starting up on http://0.0.0.0:5001
+ * Detected change in '/home/slade/defi-guardian-main/verification_worker.py', reloading
+ * Detected change in '/home/slade/defi-guardian-main/verification_worker.py', reloading
+ * Restarting with watchdog (inotify)
+/home/slade/defi-guardian-main/web_portal/app.py:9: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+1 RLock( * Debugger is active!
+ * Debugger PIN: 457-663-341
+(68713) wsgi starting up on http://0.0.0.0:5001
+y other modules.
  * Debugger is active!
  * Debugger PIN: 457-663-341
-(51203) wsgi starting up on http://0.0.0.0:5001
+(68975) wsgi starting up on http://0.0.0.0:5001

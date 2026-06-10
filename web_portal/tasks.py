@@ -112,8 +112,19 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
                 ]
             }
 
+        # Map counterexample_found to success if success is not present
+        if "success" not in res_data:
+            if res_data.get("status") in ("error", "failed", "timeout"):
+                res_data["success"] = False
+            else:
+                res_data["success"] = not res_data.get("counterexample_found", False)
+
         has_failed = not res_data.get("success", True) or res_data.get("errors_count", 0) > 0
-        status = "FAIL" if has_failed else "PASS"
+        if res_data.get("status") in ("error", "failed", "timeout"):
+            status = "ERROR"
+        else:
+            status = "FAIL" if has_failed else "PASS"
+
         
         audit.status = status
         db.session.commit()
@@ -133,12 +144,13 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
                     print(f"DEBUG: Failed to read state file: {e}")
 
             # 2. Update the specific tool and global fields
+            from datetime import datetime
             t_low = tool.lower()
             state[t_low] = {
                 "status": status,
                 "timestamp": datetime.now().isoformat(),
                 "model_name": filename,
-                "success": not has_failed,
+                "success": status == "PASS",
                 "progress": 100,
                 "ltl_results": res_data.get("ltl_results", []),
                 "states_stored": res_data.get("states_stored", 0),
@@ -147,7 +159,7 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
             }
             state["active_tool"] = tool.upper()
             state["active_status"] = status
-            state["success"] = not has_failed
+            state["success"] = status == "PASS"
             state["ltl_results"] = res_data.get("ltl_results", [])
             state["model_name"] = filename
             
@@ -173,7 +185,7 @@ def run_verification_task(self, audit_id, tool, filename, contract_text, spec_te
         audit.states_explored = res_data.get("states_stored", 0)
         audit.transitions = res_data.get("transitions", 0)
         audit.depth_reached = res_data.get("depth", 0)
-        audit.verification_output = res_data.get("stdout", "")[:10000]
+        audit.verification_output = res_data.get("stdout", res_data.get("output", ""))[:10000]
         audit.report_path = res_data.get("trail_path", "") or ""
         # Persist the contract source so the Counterexample Source Code tab works
         if contract_text and not audit.source_code:
