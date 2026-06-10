@@ -570,10 +570,17 @@ def api_run():
                 "message": f"Both Celery and fallback queue failed: {str(fallback_err)}"
             }), 500
 
+    # Determine which job_id to return in response!
+    response_job_id = None
+    if task:
+        response_job_id = task.id
+    else:
+        response_job_id = job_id  # which is "q-xxx-xxx"
+
     return jsonify({
         "status": "accepted",
         "audit_id": audit.id,
-        "job_id": audit.id,
+        "job_id": response_job_id,
         "task_id": task.id if task else f"fallback-{audit.id}",
     })
 
@@ -613,27 +620,63 @@ def api_job_status(job_id):
     try:
         audit_id = int(job_id)
         audit = AuditHistory.query.get(audit_id)
-        if audit:
-            # Map AuditHistory status to frontend-expected status
-            status_map = {
-                "PENDING": "running",
-                "RUNNING": "running",
-                "PASS": "completed",
-                "FAIL": "completed",
-                "ERROR": "failed"
-            }
-            return jsonify({
-                "status": status_map.get(audit.status, "running"),
-                "result": {
-                    "counterexample_found": audit.status == "FAIL",
-                    "stdout": audit.verification_output
-                }
-            })
     except (ValueError, TypeError):
-        # job_id was not an integer audit id
         pass
 
-    # If no AuditHistory row exists for this audit id, return running status
+    # If not found by integer id, try finding by job_id string!
+    if not audit:
+        audit = AuditHistory.query.filter_by(job_id=job_id).first()
+
+    # If found AuditHistory, return status
+    if audit:
+        # Map AuditHistory status to frontend-expected status
+        status_map = {
+            "PENDING": "running",
+            "RUNNING": "running",
+            "PASS": "completed",
+            "FAIL": "completed",
+            "ERROR": "failed"
+        }
+        return jsonify({
+            "status": status_map.get(audit.status, "running"),
+            "result": {
+                "counterexample_found": audit.status == "FAIL",
+                "stdout": audit.verification_output
+            }
+        })
+
+    # If job_id starts with "q-", check queue_manager's jobs!
+    if job_id.startswith("q-"):
+        try:
+            from web_portal.queue_manager import QUEUE_DB
+            import sqlite3
+            conn = sqlite3.connect(str(QUEUE_DB))
+            row = conn.execute("SELECT status, result FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
+            conn.close()
+            if row:
+                status_str, _ = row
+                if status_str == "pending":
+                    return jsonify({"status": "running", "result": {}})
+                elif status_str == "running":
+                    return jsonify({"status": "running", "result": {}})
+                elif status_str == "completed":
+                    # If completed, check again for AuditHistory!
+                    audit = AuditHistory.query.filter_by(job_id=job_id).first()
+                    if audit:
+                        status_map = {"PENDING": "running", "RUNNING": "running", "PASS": "completed", "FAIL": "completed", "ERROR": "failed"}
+                        return jsonify({
+                            "status": status_map.get(audit.status, "completed"),
+                            "result": {
+                                "counterexample_found": audit.status == "FAIL",
+                                "stdout": audit.verification_output
+                            }
+                        })
+                    else:
+                        return jsonify({"status": "completed", "result": {}})
+        except Exception as e:
+            current_app.logger.warning(f"Failed to check queue job {job_id}: {e}")
+
+    # If nothing found, return running status
     return jsonify({"status": "running", "result": {}})
 
 
@@ -851,6 +894,31 @@ def _build_counterexample_payload(row, audit_id_label):
             if any(s["is_error"] for s in steps):
                 trace_dict["error_message"] = "Property violation or error detected."
 
+    # ── 8. Determine actual status based on rules and log content first! ────
+    # Check if any rules are violated or log has classic SPIN failure
+    log_has_failures = False
+    if log_content:
+        if ("assertion violated" in log_content.lower() or
+            "acceptance cycle" in log_content.lower() or
+            bool(re.search(r"errors:\s*[1-9]\d*", log_content))):
+            log_has_failures = True
+            
+    rules_have_failures = False
+    if rules:
+        rules_have_failures = any(
+            (rule.get("status") or "").upper() in ("VIOLATED", "FAILED") or
+            rule.get("success") is False or
+            rule.get("errors", 0) > 0
+            for rule in rules
+        )
+        
+    actual_status = row.status or "FAIL"
+    if log_has_failures or rules_have_failures:
+        actual_status = "FAIL"
+    else:
+        if row.status and row.status.upper() == "PASS":
+            actual_status = "PASS"
+    
     # ── 7. State graph ────────────────────────────────────────────────────
     state_graph = None
     # a) Job-specific graph file (written by verification_worker)
@@ -862,6 +930,12 @@ def _build_counterexample_payload(row, audit_id_label):
             if base.exists():
                 try:
                     state_graph = json.loads(base.read_text(encoding="utf-8"))
+                    # If verification passed, reset all nodes to normal/initial!
+                    if actual_status == "PASS":
+                        if state_graph and state_graph.get("nodes"):
+                            for node in state_graph["nodes"]:
+                                if node.get("type") != "initial":
+                                    node["type"] = "normal"
                     break
                 except Exception:
                     pass
@@ -869,6 +943,22 @@ def _build_counterexample_payload(row, audit_id_label):
     # b) Global fallback graph
     if not state_graph and not trace_dict.get("steps"):
         state_graph = _load_state_graph()
+        # If verification passed, reset all nodes to normal/initial!
+        if actual_status == "PASS" and state_graph:
+            if state_graph and state_graph.get("nodes"):
+                for node in state_graph["nodes"]:
+                    if node.get("type") != "initial":
+                        node["type"] = "normal"
+                    if node.get("type") == "error":
+                        node["type"] = "normal"
+                    if node.get("type") == "deadlock":
+                        node["type"] = "normal"
+            # Also remove any edges to error nodes!
+            if state_graph and state_graph.get("edges"):
+                state_graph["edges"] = [
+                    e for e in state_graph["edges"]
+                    if not (e.get("to") == "Error" or e.get("from") == "Error")
+                ]
 
     # c) Synthesise from trace steps when nothing else is available
     if not state_graph or not state_graph.get("nodes"):
@@ -881,10 +971,14 @@ def _build_counterexample_payload(row, audit_id_label):
                 if sid not in seen:
                     label = s.get("action", sid)
                     label = _re.sub(r"/tmp/[^:]+:\d+:\d+:\s*", "", label).strip()
+                    # Only mark node as error if verification actually failed!
+                    node_type = "initial" if i == 0 else "normal"
+                    if actual_final_status != "PASS" and s.get("is_error"):
+                        node_type = "error"
                     nodes.append({
                         "id": sid,
                         "label": label[:30],
-                        "type": "error" if s.get("is_error") else ("initial" if i == 0 else "normal"),
+                        "type": node_type,
                     })
                     seen.add(sid)
                 if i > 0:
@@ -894,57 +988,42 @@ def _build_counterexample_payload(row, audit_id_label):
                     edges.append({"from": prev_sid, "to": sid, "label": label[:20]})
             state_graph = {"nodes": nodes, "edges": edges}
         else:
-            # Minimal FSM for lending pool (always visible)
-            state_graph = {
-                "nodes": [
-                    {"id": "Idle",          "label": "Idle",          "type": "initial"},
-                    {"id": "Collateralized","label": "Collateralized", "type": "normal"},
-                    {"id": "DebtActive",    "label": "Debt Active",   "type": "normal"},
-                    {"id": "Repaid",        "label": "Repaid",        "type": "normal"},
-                    {"id": "Error",         "label": "Violation",     "type": "error"},
-                ],
-                "edges": [
-                    {"from": "Idle",           "to": "Collateralized", "label": "deposit()"},
-                    {"from": "Collateralized", "to": "DebtActive",     "label": "borrow()"},
-                    {"from": "DebtActive",     "to": "Repaid",         "label": "repay()"},
-                    {"from": "Repaid",         "to": "Idle",           "label": "withdraw()"},
-                    {"from": "DebtActive",     "to": "Error",          "label": "debt > collateral"},
-                ],
-            }
+            # Minimal FSM: remove error node if verification passed!
+            if actual_final_status == "PASS":
+                state_graph = {
+                    "nodes": [
+                        {"id": "Idle",          "label": "Idle",          "type": "initial"},
+                        {"id": "Collateralized","label": "Collateralized", "type": "normal"},
+                        {"id": "DebtActive",    "label": "Debt Active",   "type": "normal"},
+                        {"id": "Repaid",        "label": "Repaid",        "type": "normal"},
+                    ],
+                    "edges": [
+                        {"from": "Idle",           "to": "Collateralized", "label": "deposit()"},
+                        {"from": "Collateralized", "to": "DebtActive",     "label": "borrow()"},
+                        {"from": "DebtActive",     "to": "Repaid",         "label": "repay()"},
+                        {"from": "Repaid",         "to": "Idle",           "label": "withdraw()"},
+                    ],
+                }
+            else:
+                # Minimal FSM with error node for failed verifications
+                state_graph = {
+                    "nodes": [
+                        {"id": "Idle",          "label": "Idle",          "type": "initial"},
+                        {"id": "Collateralized","label": "Collateralized", "type": "normal"},
+                        {"id": "DebtActive",    "label": "Debt Active",   "type": "normal"},
+                        {"id": "Repaid",        "label": "Repaid",        "type": "normal"},
+                        {"id": "Error",         "label": "Violation",     "type": "error"},
+                    ],
+                    "edges": [
+                        {"from": "Idle",           "to": "Collateralized", "label": "deposit()"},
+                        {"from": "Collateralized", "to": "DebtActive",     "label": "borrow()"},
+                        {"from": "DebtActive",     "to": "Repaid",         "label": "repay()"},
+                        {"from": "Repaid",         "to": "Idle",           "label": "withdraw()"},
+                        {"from": "DebtActive",     "to": "Error",          "label": "debt > collateral"},
+                    ],
+                }
 
-    # ── 8. Determine actual status based on rules and log content ──────────
-    # Check if any rules are violated or log has classic SPIN failure messages
-    actual_status = row.status or "FAIL"
-    
-    # Check log for classic SPIN failure indicators (first!)
-    log_has_failures = False
-    if log_content:
-        if (
-            "assertion violated" in log_content.lower() or 
-            "acceptance cycle" in log_content.lower() or
-            bool(re.search(r"errors:\s*[1-9]\d*", log_content)) or
-            ("errors: 0" not in log_content and ("--- LTL" in log_content or "ltl" in log_content.lower()))
-        ):
-            log_has_failures = True
-    
-    # Check rules
-    rules_have_failures = False
-    if rules:
-        rules_have_failures = any(
-            (rule.get("status") or "").upper() in ("VIOLATED", "FAILED") or
-            rule.get("success") is False or
-            rule.get("errors", 0) > 0
-            for rule in rules
-        )
-    
-    # Final status calculation: any failure indicator makes it FAIL
-    if log_has_failures or rules_have_failures:
-        actual_status = "FAIL"
-    else:
-        if row.status:
-            actual_status = row.status
-        else:
-            actual_status = "PASS"
+
 
     # ── 9. Recommendations (using actual_status now) ──────────────────────
     recs = []

@@ -134,12 +134,40 @@ if RUN_WEBVIEW:
     tk_mock.filedialog = ModuleType('filedialog')
     tk_mock.messagebox = ModuleType('messagebox')
     
+    # Store reference to the webview window for later dialogs
+    webview_window_ref = [None]  # using list to allow modification
+    
     # Dialog functions
     def webview_askopenfilename(*args, **kwargs):
+        if webview_window_ref[0]:
+            try:
+                res = webview_window_ref[0].create_file_dialog(
+                    webview.OPEN_DIALOG,
+                    title=kwargs.get('title', 'Open File'),
+                    directory=kwargs.get('initialdir', ''),
+                    file_types=kwargs.get('filetypes', (('All Files', '*.*'),))
+                )
+                return res[0] if res else ""
+            except Exception:
+                pass
+        return ""
+    
+    def webview_asksaveasfilename(*args, **kwargs):
+        if webview_window_ref[0]:
+            try:
+                res = webview_window_ref[0].create_file_dialog(
+                    webview.SAVE_DIALOG,
+                    title=kwargs.get('title', 'Save File'),
+                    directory=kwargs.get('initialdir', ''),
+                    save_filename=kwargs.get('initialfile', 'statev.txt')
+                )
+                return res[0] if res else ""
+            except Exception:
+                pass
         return ""
     
     tk_mock.filedialog.askopenfilename = webview_askopenfilename
-    tk_mock.filedialog.asksaveasfilename = lambda *args, **kwargs: ""
+    tk_mock.filedialog.asksaveasfilename = webview_asksaveasfilename
     tk_mock.messagebox.showwarning = lambda *args, **kwargs: None
     tk_mock.messagebox.showinfo = lambda *args, **kwargs: None
     tk_mock.messagebox.showerror = lambda *args, **kwargs: None
@@ -7046,6 +7074,9 @@ if __name__ == "__main__":
                 min_size=(1024, 768),
                 background_color='#090d16'
             )
+            # Assign the window to our reference for file dialogs
+            if 'webview_window_ref' in globals():
+                webview_window_ref[0] = window
             webview.start()
             print("\n👋 DeFi Guardian closed safely.")
         except Exception as e:
