@@ -953,7 +953,22 @@ def _build_counterexample_payload(row, audit_id_label):
         except Exception as e:
             print(f"DEBUG: AI Spec Recommendation failed: {e}")
 
-    # ── 9. Assemble response ──────────────────────────────────────────────
+    # ── 9. Determine actual status based on rules ─────────────────────────
+    # Check if any rules are violated to determine the correct status
+    actual_status = row.status or "FAIL"
+    if rules:
+        has_violations = any(
+            (rule.get("status") or "").upper() in ("VIOLATED", "FAILED") or
+            rule.get("success") is False or
+            rule.get("errors", 0) > 0
+            for rule in rules
+        )
+        if has_violations:
+            actual_status = "FAIL"
+        else:
+            actual_status = "PASS"
+
+    # ── 10. Assemble response ─────────────────────────────────────────────
     source_code = row.source_code or ""
     if not source_code and row.filename:
         try:
@@ -968,7 +983,7 @@ def _build_counterexample_payload(row, audit_id_label):
     return {
         "audit_id": audit_id_label,
         "tool": tool,
-        "status": row.status or "FAIL",
+        "status": actual_status,
         "filename": row.filename or "unknown",
         "ltl_properties": rules,
         "trace_data": trace_dict,

@@ -3634,6 +3634,11 @@ Ready for verification!
                         'errors': int(err_match.group(1)) if err_match else 0,
                     })
 
+                # Update success based on actual LTL results (if any)
+                if ltl_results:
+                    # Only consider success if ALL LTL properties passed
+                    success = all(ltl['success'] for ltl in ltl_results)
+
                 # Save SPIN state (after LTL extraction so ltl_results is populated)
                 self.save_verification_state('spin', {
                     'success': success,
