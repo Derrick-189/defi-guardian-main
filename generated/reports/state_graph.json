@@ -1,23 +1,25 @@
 {
   "nodes": [
     "Contract",
-    "State_0",
-    "State_1",
-    "State_2"
+    "Contract.State_1",
+    "Contract.INIT",
+    "LTL_safety_no_overflow",
+    "LTL_safety_reentrancy",
+    "LTL_liveness_progress",
+    "LTL_invariant_collateral",
+    "LTL_response_price_drop",
+    "LTL_stability",
+    "LTL_fairness",
+    "LTL_reachability_liquidation"
   ],
   "edges": [
     {
-      "from": "State_0",
-      "to": "State_1",
-      "label": "transition"
-    },
-    {
-      "from": "State_1",
-      "to": "State_2",
-      "label": "transition"
+      "from": "Contract.INIT",
+      "to": "Contract.State_1",
+      "label": "assignment"
     }
   ],
   "counterexample_path": [],
-  "model_name": "scratch.sol",
-  "timestamp": "2026-06-10T14:35:34.220098"
+  "model_name": "Account.sol",
+  "timestamp": "2026-06-10T19:07:43.730534"
 }

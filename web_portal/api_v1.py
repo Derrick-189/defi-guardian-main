@@ -912,18 +912,37 @@ def _build_counterexample_payload(row, audit_id_label):
                 ],
             }
 
-    # ── 8. Determine actual status based on rules first ───────────────────
-    # Check if any rules are violated to determine the correct status
+    # ── 8. Determine actual status based on rules and log content ──────────
+    # Check if any rules are violated or log has classic SPIN failure messages
     actual_status = row.status or "FAIL"
+    
+    # Check log for classic SPIN failure indicators (first!)
+    log_has_failures = False
+    if log_content:
+        if (
+            "assertion violated" in log_content.lower() or 
+            "acceptance cycle" in log_content.lower() or
+            bool(re.search(r"errors:\s*[1-9]\d*", log_content)) or
+            ("errors: 0" not in log_content and ("--- LTL" in log_content or "ltl" in log_content.lower()))
+        ):
+            log_has_failures = True
+    
+    # Check rules
+    rules_have_failures = False
     if rules:
-        has_violations = any(
+        rules_have_failures = any(
             (rule.get("status") or "").upper() in ("VIOLATED", "FAILED") or
             rule.get("success") is False or
             rule.get("errors", 0) > 0
             for rule in rules
         )
-        if has_violations:
-            actual_status = "FAIL"
+    
+    # Final status calculation: any failure indicator makes it FAIL
+    if log_has_failures or rules_have_failures:
+        actual_status = "FAIL"
+    else:
+        if row.status:
+            actual_status = row.status
         else:
             actual_status = "PASS"
 

@@ -1,5 +1,21 @@
 [
   {
+    "id": "be0840c8",
+    "timestamp": "2026-06-10 19:07:38",
+    "tool": "SPIN",
+    "file": "Account.sol",
+    "status": "FAILED",
+    "log_path": "/home/slade/defi-guardian-main/logs/spin/spin_verification_20260610_190737.log",
+    "trace_path": "",
+    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }",
+    "details": {
+      "states": 7,
+      "transitions": 8,
+      "depth": 15,
+      "error_msg": ""
+    }
+  },
+  {
     "id": "a58bd251",
     "timestamp": "2026-06-10 14:34:58",
     "tool": "SPIN",
@@ -1581,22 +1597,6 @@
       "transitions": 0,
       "depth": 0,
       "error_msg": "File \"/tmp/tmpub1m60bo.v\", line 57, characters 0-111:\nWarning: To avoid stack overflow, large numbers in nat are interpreted as\napplications of Init.Nat.of_num_uint. [abstract-large-number,numbers,def"
-    }
-  },
-  {
-    "id": "f28efa24",
-    "timestamp": "2026-05-10 16:27:17",
-    "tool": "SPIN",
-    "file": "SimpleLending.sol",
-    "status": "FAILED",
-    "log_path": "/home/slade/defi_guardian/logs/spin/spin_verification_20260510_162717.log",
-    "trace_path": "",
-    "specs": "ltl safety_no_overflow { [] (amount >= 0 && amount <= 1000000) }\n\nltl safety_reentrancy { [] !(lock && amount > 100) }\n\nltl liveness_progress { <> (state == 2) }\n\nltl invariant_collateral { [] (user_collateral >= user_debt) }\n\nltl response_price_drop { [] (price_eth < 50 -> <> (health_factor < 150)) }\n\nltl stability { [] (lock == false -> <> (amount > 0 && health_factor > 200)) }\n\nltl fairness { [] <> (lock == false) }\n\nltl reachability_liquidation { [] (health_factor < 100 -> <> (liquidation_executed == 1)) }",
-    "details": {
-      "states": 3,
-      "transitions": 3,
-      "depth": 5,
-      "error_msg": ""
     }
   }
 ]
