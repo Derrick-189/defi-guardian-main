@@ -1393,9 +1393,10 @@
         }
 
         async function saveActiveFile() {
-            if (!state.activeFile) {
-                alert('Please load a file first.');
-                return;
+            let path = state.activeFile;
+            if (!path) {
+                path = prompt("Enter file name to save (e.g. scratch.sol):", "scratch.sol");
+                if (!path) return;
             }
             try {
                 const resp = await fetch('/api/v1/files/save', {
@@ -1403,12 +1404,20 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         content: tabCodes.source,
-                        specs: tabCodes.specs
+                        specs: tabCodes.specs,
+                        path: path
                     })
                 });
                 const data = await resp.json();
                 if (data.status === 'success') {
-                    appendTerminalLine('💾 Changes written successfully to active file.', 'term-success');
+                    if (!state.activeFile) {
+                        state.activeFile = data.path;
+                        state.activeFileType = data.path.split('.').pop().toLowerCase();
+                        el.navFileBadge.innerHTML = `<i class="fas fa-file-code me-1 text-info"></i> ${data.path.split(/[\\/]/).pop()}`;
+                        el.navFileBadge.classList.remove('text-muted');
+                        loadWorkspaceFiles();
+                    }
+                    appendTerminalLine('💾 Changes written successfully.', 'term-success');
                 } else {
                     alert('Save failed: ' + data.message);
                 }
@@ -1443,8 +1452,35 @@
         // ── Verification Engine Trigger ────────────────────────────────────
         async function runVerification(tool) {
             if (!state.activeFile) {
-                alert('Please select a workspace file first.');
-                return;
+                const path = prompt("Please provide a file name to save your pasted code before verifying:", "scratch.sol");
+                if (!path) return;
+                
+                try {
+                    const saveResp = await fetch('/api/v1/files/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: tabCodes.source,
+                            specs: tabCodes.specs,
+                            path: path
+                        })
+                    });
+                    const saveData = await saveResp.json();
+                    if (saveData.status === 'success') {
+                        state.activeFile = saveData.path;
+                        state.activeFileType = saveData.path.split('.').pop().toLowerCase();
+                        el.navFileBadge.innerHTML = `<i class="fas fa-file-code me-1 text-info"></i> ${saveData.path.split(/[\\/]/).pop()}`;
+                        el.navFileBadge.classList.remove('text-muted');
+                        loadWorkspaceFiles();
+                        appendTerminalLine('💾 Auto-saved changes.', 'term-success');
+                    } else {
+                        alert('Auto-save failed: ' + saveData.message);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('File write exception:', err);
+                    return;
+                }
             }
             
             state.isRunning = true;
